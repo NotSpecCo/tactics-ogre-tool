@@ -2,6 +2,8 @@
 
 A tool to help you mod Tactics Ogre Reborn.
 
+**Note:** This app is a proof of concept and very little testing has been done as of now. Use at your own risk!
+
 ## Helpful Commands
 
 ```shell
