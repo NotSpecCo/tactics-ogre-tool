@@ -22961,7 +22961,18 @@ pub fn definition() -> ModuleDefinition {
         base_offset: 0x2E,
         entry_count: 10,
         entry_size: 196,
-        entry_names: vec![],
+        entry_names: vec![
+            "Record 0".to_string(),
+            "Record 1".to_string(),
+            "Record 2".to_string(),
+            "Record 3".to_string(),
+            "Record 4".to_string(),
+            "Record 5".to_string(),
+            "Record 6".to_string(),
+            "Record 7".to_string(),
+            "Record 8".to_string(),
+            "Record 9".to_string(),
+        ],
         fields: vec![
             FieldDefinition {
                 name: "Unknown".to_string(),
@@ -24074,7 +24085,7 @@ mod tests {
     #[test]
     fn entry_names_count() {
         let def = definition();
-        assert!(def.entry_names.is_empty());
+        assert_eq!(def.entry_names.len(), 10);
     }
 
     #[test]

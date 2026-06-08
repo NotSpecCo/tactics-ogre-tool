@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, existsSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 
 const NMM_DIR = join(import.meta.dirname, '../reference_files/nightmare_modules');
@@ -216,6 +216,10 @@ function parseEntryNamesFile(filename) {
     return lines.filter((l) => l.trim() !== '').map((l) => l.trim());
 }
 
+function defaultEntryNames(entryCount) {
+    return Array.from({ length: entryCount }, (_, index) => `Record ${index}`);
+}
+
 function escapeRustString(s) {
     return s.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
 }
@@ -259,6 +263,10 @@ function generateModule(mod) {
         if (entryNames.length > nmm.entryCount) {
             entryNames = entryNames.slice(0, nmm.entryCount);
         }
+    } else {
+        // Nightmare modules with NULL entry-name files fall back to numeric selectors.
+        // We materialize those labels so the UI can still render a selector.
+        entryNames = defaultEntryNames(nmm.entryCount);
     }
 
     // Collect unique option files used by this module's fields
@@ -297,15 +305,11 @@ function generateModule(mod) {
     rust += `        entry_count: ${nmm.entryCount},\n`;
     rust += `        entry_size: ${nmm.entrySize},\n`;
 
-    if (entryNames.length > 0) {
-        rust += `        entry_names: vec![\n`;
-        for (const name of entryNames) {
-            rust += `            "${escapeRustString(name)}".to_string(),\n`;
-        }
-        rust += `        ],\n`;
-    } else {
-        rust += `        entry_names: vec![],\n`;
+    rust += `        entry_names: vec![\n`;
+    for (const name of entryNames) {
+        rust += `            "${escapeRustString(name)}".to_string(),\n`;
     }
+    rust += `        ],\n`;
 
     rust += `        fields: vec![\n`;
 
@@ -347,10 +351,7 @@ function generateModule(mod) {
     rust += `        assert_eq!(def.entry_size, ${nmm.entrySize});\n    }\n\n`;
     rust += `    #[test]\n    fn field_count() {\n        assert_eq!(definition().fields.len(), ${nmm.fields.length});\n    }\n\n`;
     rust += `    #[test]\n    fn entry_names_count() {\n        let def = definition();\n`;
-    rust +=
-        entryNames.length > 0
-            ? `        assert_eq!(def.entry_names.len(), ${entryNames.length});\n`
-            : `        assert!(def.entry_names.is_empty());\n`;
+    rust += `        assert_eq!(def.entry_names.len(), ${entryNames.length});\n`;
     rust += `    }\n\n`;
 
     if (nmm.fields.length > 0) {
