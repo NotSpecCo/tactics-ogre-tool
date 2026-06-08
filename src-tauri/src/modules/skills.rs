@@ -5,7 +5,6 @@ pub fn definition() -> ModuleDefinition {
         id: "skills".to_string(),
         name: "Action Skill Editor".to_string(),
         description: "Edit action skill properties".to_string(),
-        dat_file: DatFile::BattleData,
         base_offset: 0x3E713C,
         entry_count: 158,
         entry_size: 180,
@@ -231,7 +230,6 @@ mod tests {
     fn metadata() {
         let def = definition();
         assert_eq!(def.id, "skills");
-        assert_eq!(def.dat_file, DatFile::BattleData);
         assert_eq!(def.base_offset, 0x3E713C);
         assert_eq!(def.entry_count, 158);
         assert_eq!(def.entry_size, 180);

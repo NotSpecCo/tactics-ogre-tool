@@ -554,7 +554,6 @@ pub fn save_dat_to_disk(game_dir: &mut GameDirectory) -> Result<SaveResult, Stri
 mod tests {
     use super::*;
     use crate::modules;
-    use crate::modules::types::DatFile;
     use crate::pipeline::unpack_dat;
 
     fn test_module() -> ModuleDefinition {
@@ -562,7 +561,6 @@ mod tests {
             id: "test".to_string(),
             name: "Test Module".to_string(),
             description: "For testing".to_string(),
-            dat_file: DatFile::BattleData,
             base_offset: 0,
             entry_count: 3,
             entry_size: 10,
@@ -1434,9 +1432,9 @@ mod tests {
 
         let encrypted = fs::read(&dat_path).unwrap();
         let pack = unpack_dat(&encrypted).unwrap();
-        let battle_modules = modules::modules_for_dat("battle/battle_data_release.dat");
+        let all_mods = modules::all_modules();
 
-        for module in &battle_modules {
+        for module in &all_mods {
             for i in 0..module.entry_count {
                 let record = read_record(&pack.bytes, module, i);
                 assert!(

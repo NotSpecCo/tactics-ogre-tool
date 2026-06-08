@@ -10,117 +10,78 @@ const MODULES = [
         id: 'entry_unit',
         name: 'Entry Unit Editor',
         desc: 'Edit starting unit configurations for battles',
-        dat: 'BattleData',
-        outDir: 'battle_data',
-        outFile: 'entry_unit.rs'
     },
     {
         nmm: 'TOReborn Equipment Editor.nmm',
         id: 'equipment',
         name: 'Equipment Editor',
         desc: 'Edit weapon and armor properties',
-        dat: 'BattleData',
-        outDir: 'battle_data',
-        outFile: 'equipment.rs'
     },
     {
         nmm: 'TOReborn Item Editor.nmm',
         id: 'items',
         name: 'Item Editor',
         desc: 'Edit consumable item properties',
-        dat: 'BattleData',
-        outDir: 'battle_data',
-        outFile: 'items.rs'
     },
     {
         nmm: 'TOReborn Class Editor.nmm',
         id: 'classes',
         name: 'Class Editor',
         desc: 'Edit class stats, sprites, and properties',
-        dat: 'BattleData',
-        outDir: 'battle_data',
-        outFile: 'classes.rs'
     },
     {
         nmm: 'TOReborn Spell Editor.nmm',
         id: 'spells',
         name: 'Spell Editor',
         desc: 'Edit spell properties and effects',
-        dat: 'BattleData',
-        outDir: 'battle_data',
-        outFile: 'spells.rs'
     },
     {
         nmm: 'TOReborn Finisher Editor.nmm',
         id: 'finishers',
         name: 'Finisher Editor',
         desc: 'Edit finisher move properties',
-        dat: 'BattleData',
-        outDir: 'battle_data',
-        outFile: 'finishers.rs'
     },
     {
         nmm: 'TOReborn Action Skill Editor.nmm',
         id: 'skills',
         name: 'Action Skill Editor',
         desc: 'Edit action skill properties',
-        dat: 'BattleData',
-        outDir: 'battle_data',
-        outFile: 'skills.rs'
     },
     {
         nmm: 'TOReborn Ease II Editor.nmm',
         id: 'ease2',
         name: 'Ease II Editor',
         desc: 'Edit Ease II spell properties',
-        dat: 'BattleData',
-        outDir: 'battle_data',
-        outFile: 'ease2.rs'
     },
     {
         nmm: 'TOReborn Character Editor.nmm',
         id: 'characters',
         name: 'Character Editor',
         desc: 'Edit character stats and properties',
-        dat: 'BattleData',
-        outDir: 'battle_data',
-        outFile: 'characters.rs'
     },
     {
         nmm: 'TOReborn Skill Access Editor.nmm',
         id: 'skill_access',
         name: 'Skill Access Editor',
         desc: 'Edit which classes can learn each skill',
-        dat: 'BattleData',
-        outDir: 'battle_data',
-        outFile: 'skill_access.rs'
     },
     {
         nmm: 'TOReborn Spell Access Editor.nmm',
         id: 'spell_access',
         name: 'Spell Access Editor',
         desc: 'Edit which classes can use each spell',
-        dat: 'BattleData',
-        outDir: 'battle_data',
-        outFile: 'spell_access.rs'
     },
     {
         nmm: 'TOReborn Ease II Access Editor.nmm',
         id: 'ease2_access',
         name: 'Ease II Access Editor',
         desc: 'Edit Ease II spell class access',
-        dat: 'BattleData',
-        outDir: 'battle_data',
-        outFile: 'ease2_access.rs'
     },
     {
         nmm: 'TOReborn Shop Editor.nmm',
         id: 'shop',
         name: 'Shop Editor',
         desc: 'Edit shop inventory and availability',
-        dat: 'MenuData',
-        outDir: 'menu_data',
-        outFile: 'shop.rs'
     }
 ];
 
@@ -300,7 +261,6 @@ function generateModule(mod) {
     rust += `        id: "${mod.id}".to_string(),\n`;
     rust += `        name: "${escapeRustString(mod.name)}".to_string(),\n`;
     rust += `        description: "${escapeRustString(mod.desc)}".to_string(),\n`;
-    rust += `        dat_file: DatFile::${mod.dat},\n`;
     rust += `        base_offset: 0x${nmm.baseOffset.toString(16).toUpperCase()},\n`;
     rust += `        entry_count: ${nmm.entryCount},\n`;
     rust += `        entry_size: ${nmm.entrySize},\n`;
@@ -345,7 +305,6 @@ function generateModule(mod) {
     rust += `\n#[cfg(test)]\nmod tests {\n    use super::*;\n\n`;
     rust += `    #[test]\n    fn metadata() {\n        let def = definition();\n`;
     rust += `        assert_eq!(def.id, "${mod.id}");\n`;
-    rust += `        assert_eq!(def.dat_file, DatFile::${mod.dat});\n`;
     rust += `        assert_eq!(def.base_offset, 0x${nmm.baseOffset.toString(16).toUpperCase()});\n`;
     rust += `        assert_eq!(def.entry_count, ${nmm.entryCount});\n`;
     rust += `        assert_eq!(def.entry_size, ${nmm.entrySize});\n    }\n\n`;
@@ -373,7 +332,7 @@ function generateModule(mod) {
     rust += `                field.name, field.offset, field.size, def.entry_size\n            );\n        }\n    }\n`;
     rust += `}\n`;
 
-    const outPath = join(OUT_DIR, mod.outDir, mod.outFile);
+    const outPath = join(OUT_DIR, `${mod.id}.rs`);
     writeFileSync(outPath, rust);
     console.log(`  -> ${outPath} (${nmm.fields.length} fields, ${usedOptionFiles.size} shared option lists)`);
 }

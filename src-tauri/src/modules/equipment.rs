@@ -22605,7 +22605,6 @@ pub fn definition() -> ModuleDefinition {
         id: "equipment".to_string(),
         name: "Equipment Editor".to_string(),
         description: "Edit weapon and armor properties".to_string(),
-        dat_file: DatFile::BattleData,
         base_offset: 0x393F20,
         entry_count: 686,
         entry_size: 152,
@@ -24087,7 +24086,6 @@ mod tests {
     fn metadata() {
         let def = definition();
         assert_eq!(def.id, "equipment");
-        assert_eq!(def.dat_file, DatFile::BattleData);
         assert_eq!(def.base_offset, 0x393F20);
         assert_eq!(def.entry_count, 686);
         assert_eq!(def.entry_size, 152);

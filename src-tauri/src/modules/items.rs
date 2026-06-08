@@ -10502,7 +10502,6 @@ pub fn definition() -> ModuleDefinition {
         id: "items".to_string(),
         name: "Item Editor".to_string(),
         description: "Edit consumable item properties".to_string(),
-        dat_file: DatFile::BattleData,
         base_offset: 0x3B0460,
         entry_count: 630,
         entry_size: 56,
@@ -11375,7 +11374,6 @@ mod tests {
     fn metadata() {
         let def = definition();
         assert_eq!(def.id, "items");
-        assert_eq!(def.dat_file, DatFile::BattleData);
         assert_eq!(def.base_offset, 0x3B0460);
         assert_eq!(def.entry_count, 630);
         assert_eq!(def.entry_size, 56);

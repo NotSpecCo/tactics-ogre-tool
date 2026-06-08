@@ -1,47 +1,36 @@
-pub mod battle_data;
-pub mod menu_data;
+pub mod characters;
+pub mod classes;
+pub mod ease2;
+pub mod ease2_access;
+pub mod entry_unit;
+pub mod equipment;
+pub mod finishers;
+pub mod items;
+pub mod shop;
+pub mod skill_access;
+pub mod skills;
+pub mod spell_access;
+pub mod spells;
 pub mod types;
 
-use types::{DatFile, ModuleDefinition};
+use types::ModuleDefinition;
 
 pub fn all_modules() -> Vec<ModuleDefinition> {
     vec![
-        battle_data::entry_unit::definition(),
-        battle_data::equipment::definition(),
-        battle_data::items::definition(),
-        battle_data::classes::definition(),
-        battle_data::spells::definition(),
-        battle_data::finishers::definition(),
-        battle_data::skills::definition(),
-        battle_data::ease2::definition(),
-        battle_data::characters::definition(),
-        battle_data::skill_access::definition(),
-        battle_data::spell_access::definition(),
-        battle_data::ease2_access::definition(),
-        menu_data::shop::definition(),
+        entry_unit::definition(),
+        equipment::definition(),
+        items::definition(),
+        classes::definition(),
+        spells::definition(),
+        finishers::definition(),
+        skills::definition(),
+        ease2::definition(),
+        characters::definition(),
+        skill_access::definition(),
+        spell_access::definition(),
+        ease2_access::definition(),
+        shop::definition(),
     ]
-}
-
-pub fn dat_file_for_path(dat_path: &str) -> Option<DatFile> {
-    let file_name = std::path::Path::new(dat_path)
-        .file_name()
-        .and_then(|f| f.to_str());
-
-    match file_name {
-        Some("battle_data_release.dat") => Some(DatFile::BattleData),
-        Some("menu_data.dat") => Some(DatFile::MenuData),
-        _ => None,
-    }
-}
-
-pub fn modules_for_dat(dat_path: &str) -> Vec<ModuleDefinition> {
-    match dat_file_for_path(dat_path) {
-        Some(df) => all_modules()
-            .into_iter()
-            .filter(|m| m.dat_file == df)
-            .collect(),
-        None => vec![],
-    }
 }
 
 pub fn find_module(module_id: &str) -> Option<ModuleDefinition> {
@@ -55,47 +44,6 @@ mod tests {
     #[test]
     fn all_modules_returns_13() {
         assert_eq!(all_modules().len(), 13);
-    }
-
-    #[test]
-    fn battle_data_has_12_modules() {
-        let mods = modules_for_dat("battle/battle_data_release.dat");
-        assert_eq!(mods.len(), 12);
-        assert_eq!(
-            dat_file_for_path("battle/battle_data_release.dat"),
-            Some(DatFile::BattleData)
-        );
-    }
-
-    #[test]
-    fn battle_data_matches_at_root() {
-        let mods = modules_for_dat("battle_data_release.dat");
-        assert_eq!(mods.len(), 12);
-    }
-
-    #[test]
-    fn battle_data_matches_nested() {
-        let mods = modules_for_dat("some/deep/path/battle_data_release.dat");
-        assert_eq!(mods.len(), 12);
-    }
-
-    #[test]
-    fn menu_data_has_1_module() {
-        let mods = modules_for_dat("menu/menu_data.dat");
-        assert_eq!(mods.len(), 1);
-        assert_eq!(mods[0].id, "shop");
-    }
-
-    #[test]
-    fn does_not_match_suffix() {
-        let mods = modules_for_dat("fake_battle_data_release.dat");
-        assert!(mods.is_empty());
-    }
-
-    #[test]
-    fn unknown_dat_returns_empty() {
-        let mods = modules_for_dat("some/unknown.dat");
-        assert!(mods.is_empty());
     }
 
     #[test]

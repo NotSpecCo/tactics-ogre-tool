@@ -22957,7 +22957,6 @@ pub fn definition() -> ModuleDefinition {
         id: "entry_unit".to_string(),
         name: "Entry Unit Editor".to_string(),
         description: "Edit starting unit configurations for battles".to_string(),
-        dat_file: DatFile::BattleData,
         base_offset: 0x2E,
         entry_count: 10,
         entry_size: 196,
@@ -24071,7 +24070,6 @@ mod tests {
     fn metadata() {
         let def = definition();
         assert_eq!(def.id, "entry_unit");
-        assert_eq!(def.dat_file, DatFile::BattleData);
         assert_eq!(def.base_offset, 0x2E);
         assert_eq!(def.entry_count, 10);
         assert_eq!(def.entry_size, 196);

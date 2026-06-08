@@ -11137,7 +11137,6 @@ pub fn definition() -> ModuleDefinition {
         id: "classes".to_string(),
         name: "Class Editor".to_string(),
         description: "Edit class stats, sprites, and properties".to_string(),
-        dat_file: DatFile::BattleData,
         base_offset: 0x3BA4A0,
         entry_count: 255,
         entry_size: 208,
@@ -12216,7 +12215,6 @@ mod tests {
     fn metadata() {
         let def = definition();
         assert_eq!(def.id, "classes");
-        assert_eq!(def.dat_file, DatFile::BattleData);
         assert_eq!(def.base_offset, 0x3BA4A0);
         assert_eq!(def.entry_count, 255);
         assert_eq!(def.entry_size, 208);

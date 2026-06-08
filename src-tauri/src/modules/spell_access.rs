@@ -5,7 +5,6 @@ pub fn definition() -> ModuleDefinition {
         id: "spell_access".to_string(),
         name: "Spell Access Editor".to_string(),
         description: "Edit which classes can use each spell".to_string(),
-        dat_file: DatFile::BattleData,
         base_offset: 0x4AEA30,
         entry_count: 264,
         entry_size: 64,
@@ -505,7 +504,6 @@ mod tests {
     fn metadata() {
         let def = definition();
         assert_eq!(def.id, "spell_access");
-        assert_eq!(def.dat_file, DatFile::BattleData);
         assert_eq!(def.base_offset, 0x4AEA30);
         assert_eq!(def.entry_count, 264);
         assert_eq!(def.entry_size, 64);

@@ -1,62 +1,82 @@
 use crate::modules::types::*;
 
-fn opt_spell_type() -> Vec<FieldOption> {
+fn opt_finisher_type() -> Vec<FieldOption> {
     vec![
         FieldOption {
             value: 0,
             label: "None".to_string(),
         },
         FieldOption {
-            value: 1,
-            label: "Air".to_string(),
+            value: 16,
+            label: "Debuff".to_string(),
         },
         FieldOption {
-            value: 2,
-            label: "Earth".to_string(),
+            value: 22,
+            label: "Fists".to_string(),
         },
         FieldOption {
-            value: 3,
-            label: "Lightning".to_string(),
+            value: 23,
+            label: "Daggers".to_string(),
         },
         FieldOption {
-            value: 4,
-            label: "Water".to_string(),
+            value: 24,
+            label: "1H Swords".to_string(),
         },
         FieldOption {
-            value: 5,
-            label: "Fire".to_string(),
+            value: 25,
+            label: "2H Swords".to_string(),
         },
         FieldOption {
-            value: 6,
-            label: "Ice".to_string(),
+            value: 26,
+            label: "Axe".to_string(),
         },
         FieldOption {
-            value: 7,
-            label: "Divine".to_string(),
+            value: 28,
+            label: "Spear".to_string(),
         },
         FieldOption {
-            value: 8,
-            label: "Dark".to_string(),
+            value: 29,
+            label: "Hammer".to_string(),
         },
         FieldOption {
-            value: 9,
-            label: "Dragonic".to_string(),
+            value: 31,
+            label: "1H Katana".to_string(),
         },
         FieldOption {
-            value: 10,
-            label: "Necromancy".to_string(),
+            value: 32,
+            label: "2H Katana".to_string(),
         },
         FieldOption {
-            value: 11,
-            label: "Ninjutsu".to_string(),
+            value: 33,
+            label: "Cudgel".to_string(),
         },
         FieldOption {
-            value: 12,
-            label: "War Dances".to_string(),
+            value: 35,
+            label: "Whip".to_string(),
         },
         FieldOption {
-            value: 13,
-            label: "Songs".to_string(),
+            value: 36,
+            label: "Spellbook".to_string(),
+        },
+        FieldOption {
+            value: 37,
+            label: "Instrument".to_string(),
+        },
+        FieldOption {
+            value: 40,
+            label: "Blowgun".to_string(),
+        },
+        FieldOption {
+            value: 41,
+            label: "Bow".to_string(),
+        },
+        FieldOption {
+            value: 42,
+            label: "Crossbow".to_string(),
+        },
+        FieldOption {
+            value: 43,
+            label: "Gun".to_string(),
         },
     ]
 }
@@ -3558,288 +3578,1217 @@ fn opt_element() -> Vec<FieldOption> {
     ]
 }
 
+fn opt_class_list() -> Vec<FieldOption> {
+    vec![
+        FieldOption {
+            value: 0,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 1,
+            label: "Warrior".to_string(),
+        },
+        FieldOption {
+            value: 2,
+            label: "Archer".to_string(),
+        },
+        FieldOption {
+            value: 3,
+            label: "Wizard".to_string(),
+        },
+        FieldOption {
+            value: 4,
+            label: "Cleric".to_string(),
+        },
+        FieldOption {
+            value: 5,
+            label: "Rune Fencer".to_string(),
+        },
+        FieldOption {
+            value: 6,
+            label: "Knight".to_string(),
+        },
+        FieldOption {
+            value: 7,
+            label: "Terror Knight".to_string(),
+        },
+        FieldOption {
+            value: 8,
+            label: "Berserker".to_string(),
+        },
+        FieldOption {
+            value: 9,
+            label: "Swordmaster".to_string(),
+        },
+        FieldOption {
+            value: 10,
+            label: "Dragoon".to_string(),
+        },
+        FieldOption {
+            value: 11,
+            label: "Ninja".to_string(),
+        },
+        FieldOption {
+            value: 12,
+            label: "Rogue".to_string(),
+        },
+        FieldOption {
+            value: 13,
+            label: "Fusilier".to_string(),
+        },
+        FieldOption {
+            value: 14,
+            label: "BeastTamer".to_string(),
+        },
+        FieldOption {
+            value: 15,
+            label: "Warlock".to_string(),
+        },
+        FieldOption {
+            value: 16,
+            label: "Necromancer".to_string(),
+        },
+        FieldOption {
+            value: 17,
+            label: "Lich".to_string(),
+        },
+        FieldOption {
+            value: 18,
+            label: "Divine Knight".to_string(),
+        },
+        FieldOption {
+            value: 19,
+            label: "Hoplite".to_string(),
+        },
+        FieldOption {
+            value: 20,
+            label: "Juggernaut".to_string(),
+        },
+        FieldOption {
+            value: 21,
+            label: "Patriarch".to_string(),
+        },
+        FieldOption {
+            value: 22,
+            label: "Familiar".to_string(),
+        },
+        FieldOption {
+            value: 23,
+            label: "Faerie".to_string(),
+        },
+        FieldOption {
+            value: 24,
+            label: "Gremlin 1".to_string(),
+        },
+        FieldOption {
+            value: 25,
+            label: "Gremlin 2".to_string(),
+        },
+        FieldOption {
+            value: 26,
+            label: "Pumpkin".to_string(),
+        },
+        FieldOption {
+            value: 27,
+            label: "Cloud Dragon".to_string(),
+        },
+        FieldOption {
+            value: 28,
+            label: "Earth Dragon".to_string(),
+        },
+        FieldOption {
+            value: 29,
+            label: "Thunder Dragon".to_string(),
+        },
+        FieldOption {
+            value: 30,
+            label: "Flood Dragon".to_string(),
+        },
+        FieldOption {
+            value: 31,
+            label: "Flame Dragon".to_string(),
+        },
+        FieldOption {
+            value: 32,
+            label: "Frost Dragon".to_string(),
+        },
+        FieldOption {
+            value: 33,
+            label: "Arc Dragon".to_string(),
+        },
+        FieldOption {
+            value: 34,
+            label: "Dark Dragon".to_string(),
+        },
+        FieldOption {
+            value: 35,
+            label: "Hydra".to_string(),
+        },
+        FieldOption {
+            value: 36,
+            label: "Clay Golem".to_string(),
+        },
+        FieldOption {
+            value: 37,
+            label: "Stone Golem".to_string(),
+        },
+        FieldOption {
+            value: 38,
+            label: "Iron Golem".to_string(),
+        },
+        FieldOption {
+            value: 39,
+            label: "Baldur Golem".to_string(),
+        },
+        FieldOption {
+            value: 40,
+            label: "Gryphon".to_string(),
+        },
+        FieldOption {
+            value: 41,
+            label: "Cockatrice".to_string(),
+        },
+        FieldOption {
+            value: 42,
+            label: "Octopus".to_string(),
+        },
+        FieldOption {
+            value: 43,
+            label: "Cyclops".to_string(),
+        },
+        FieldOption {
+            value: 44,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 45,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 46,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 47,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 48,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 49,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 50,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 51,
+            label: "Lord".to_string(),
+        },
+        FieldOption {
+            value: 52,
+            label: "Ranger".to_string(),
+        },
+        FieldOption {
+            value: 53,
+            label: "Priest".to_string(),
+        },
+        FieldOption {
+            value: 54,
+            label: "Dark Priest".to_string(),
+        },
+        FieldOption {
+            value: 55,
+            label: "Princess".to_string(),
+        },
+        FieldOption {
+            value: 56,
+            label: "Paladin".to_string(),
+        },
+        FieldOption {
+            value: 57,
+            label: "Astromancer".to_string(),
+        },
+        FieldOption {
+            value: 58,
+            label: "Vartan".to_string(),
+        },
+        FieldOption {
+            value: 59,
+            label: "White Knight".to_string(),
+        },
+        FieldOption {
+            value: 60,
+            label: "Shaman".to_string(),
+        },
+        FieldOption {
+            value: 61,
+            label: "Wicce".to_string(),
+        },
+        FieldOption {
+            value: 62,
+            label: "Songstress".to_string(),
+        },
+        FieldOption {
+            value: 63,
+            label: "Buccaneer".to_string(),
+        },
+        FieldOption {
+            value: 64,
+            label: "Knight Commander/Ozma".to_string(),
+        },
+        FieldOption {
+            value: 65,
+            label: "Knight Commander/Balxephon".to_string(),
+        },
+        FieldOption {
+            value: 66,
+            label: "Knight Commander/Volak".to_string(),
+        },
+        FieldOption {
+            value: 67,
+            label: "Knight Commander/Barbas".to_string(),
+        },
+        FieldOption {
+            value: 68,
+            label: "Knight Commander/Martym".to_string(),
+        },
+        FieldOption {
+            value: 69,
+            label: "Knight Commander/Oz".to_string(),
+        },
+        FieldOption {
+            value: 70,
+            label: "Knight Commander/Ozma".to_string(),
+        },
+        FieldOption {
+            value: 71,
+            label: "Knight Commander/Andoras".to_string(),
+        },
+        FieldOption {
+            value: 72,
+            label: "Death Templar".to_string(),
+        },
+        FieldOption {
+            value: 73,
+            label: "Dark Bishop".to_string(),
+        },
+        FieldOption {
+            value: 74,
+            label: "Assassin".to_string(),
+        },
+        FieldOption {
+            value: 75,
+            label: "Death Knight".to_string(),
+        },
+        FieldOption {
+            value: 76,
+            label: "Dark Lord 1".to_string(),
+        },
+        FieldOption {
+            value: 77,
+            label: "Dark Lord 2".to_string(),
+        },
+        FieldOption {
+            value: 78,
+            label: "Revenant".to_string(),
+        },
+        FieldOption {
+            value: 79,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 80,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 81,
+            label: "Templar/Warrior".to_string(),
+        },
+        FieldOption {
+            value: 82,
+            label: "Templar/Archer".to_string(),
+        },
+        FieldOption {
+            value: 83,
+            label: "Templar/Wizard".to_string(),
+        },
+        FieldOption {
+            value: 84,
+            label: "Templar/Cleric".to_string(),
+        },
+        FieldOption {
+            value: 85,
+            label: "Templar/Rune Fencer".to_string(),
+        },
+        FieldOption {
+            value: 86,
+            label: "Templar/Knight".to_string(),
+        },
+        FieldOption {
+            value: 87,
+            label: "Templar/Terror Knight".to_string(),
+        },
+        FieldOption {
+            value: 88,
+            label: "Templar/Berserker".to_string(),
+        },
+        FieldOption {
+            value: 89,
+            label: "Templar/Swordmaster".to_string(),
+        },
+        FieldOption {
+            value: 90,
+            label: "Templar/Dragoon".to_string(),
+        },
+        FieldOption {
+            value: 91,
+            label: "Templar/Ninja".to_string(),
+        },
+        FieldOption {
+            value: 92,
+            label: "Templar/Rogue".to_string(),
+        },
+        FieldOption {
+            value: 93,
+            label: "Templar/Fusilier".to_string(),
+        },
+        FieldOption {
+            value: 94,
+            label: "Templar/Beast Tamer".to_string(),
+        },
+        FieldOption {
+            value: 95,
+            label: "Templar/Warlock".to_string(),
+        },
+        FieldOption {
+            value: 96,
+            label: "Templar/Necromancer".to_string(),
+        },
+        FieldOption {
+            value: 97,
+            label: "Sorcerer".to_string(),
+        },
+        FieldOption {
+            value: 98,
+            label: "Fleeing Villager".to_string(),
+        },
+        FieldOption {
+            value: 99,
+            label: "Fleeing Villager".to_string(),
+        },
+        FieldOption {
+            value: 100,
+            label: "Fleeing Villager".to_string(),
+        },
+        FieldOption {
+            value: 101,
+            label: "Vasque Survivor".to_string(),
+        },
+        FieldOption {
+            value: 102,
+            label: "Hanged Man".to_string(),
+        },
+        FieldOption {
+            value: 103,
+            label: "Spectre".to_string(),
+        },
+        FieldOption {
+            value: 104,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 105,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 106,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 107,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 108,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 109,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 110,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 111,
+            label: "Gladiator".to_string(),
+        },
+        FieldOption {
+            value: 112,
+            label: "Blood Hunter".to_string(),
+        },
+        FieldOption {
+            value: 113,
+            label: "Death Eater".to_string(),
+        },
+        FieldOption {
+            value: 114,
+            label: "Cenobite".to_string(),
+        },
+        FieldOption {
+            value: 115,
+            label: "Cannibal".to_string(),
+        },
+        FieldOption {
+            value: 116,
+            label: "Shadow Knight".to_string(),
+        },
+        FieldOption {
+            value: 117,
+            label: "Dreadnought".to_string(),
+        },
+        FieldOption {
+            value: 118,
+            label: "Executioner".to_string(),
+        },
+        FieldOption {
+            value: 119,
+            label: "Kill Seeker".to_string(),
+        },
+        FieldOption {
+            value: 120,
+            label: "Crimson Uhlan".to_string(),
+        },
+        FieldOption {
+            value: 121,
+            label: "Dark Stalker".to_string(),
+        },
+        FieldOption {
+            value: 122,
+            label: "Grim Reaper".to_string(),
+        },
+        FieldOption {
+            value: 123,
+            label: "Sniper".to_string(),
+        },
+        FieldOption {
+            value: 124,
+            label: "Iron Fist".to_string(),
+        },
+        FieldOption {
+            value: 125,
+            label: "Loremaster".to_string(),
+        },
+        FieldOption {
+            value: 126,
+            label: "Witch King".to_string(),
+        },
+        FieldOption {
+            value: 127,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 128,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 129,
+            label: "Raven".to_string(),
+        },
+        FieldOption {
+            value: 130,
+            label: "Lich King".to_string(),
+        },
+        FieldOption {
+            value: 131,
+            label: "Ethereal Vision".to_string(),
+        },
+        FieldOption {
+            value: 132,
+            label: "Night Crow".to_string(),
+        },
+        FieldOption {
+            value: 133,
+            label: "Blood Gavial".to_string(),
+        },
+        FieldOption {
+            value: 134,
+            label: "Gorgon".to_string(),
+        },
+        FieldOption {
+            value: 135,
+            label: "Uruk".to_string(),
+        },
+        FieldOption {
+            value: 136,
+            label: "Wight".to_string(),
+        },
+        FieldOption {
+            value: 137,
+            label: "Wraith".to_string(),
+        },
+        FieldOption {
+            value: 138,
+            label: "Duinshee".to_string(),
+        },
+        FieldOption {
+            value: 139,
+            label: "Incubus".to_string(),
+        },
+        FieldOption {
+            value: 140,
+            label: "Boggart".to_string(),
+        },
+        FieldOption {
+            value: 141,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 142,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 143,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 144,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 145,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 146,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 147,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 148,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 149,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 150,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 151,
+            label: "Crystal Dragon".to_string(),
+        },
+        FieldOption {
+            value: 152,
+            label: "Onyx Dragon".to_string(),
+        },
+        FieldOption {
+            value: 153,
+            label: "Scylla".to_string(),
+        },
+        FieldOption {
+            value: 154,
+            label: "Naga".to_string(),
+        },
+        FieldOption {
+            value: 155,
+            label: "Damasc Golem".to_string(),
+        },
+        FieldOption {
+            value: 156,
+            label: "Flesh Golem".to_string(),
+        },
+        FieldOption {
+            value: 157,
+            label: "Hippogryph".to_string(),
+        },
+        FieldOption {
+            value: 158,
+            label: "Phoenix".to_string(),
+        },
+        FieldOption {
+            value: 159,
+            label: "Rukh".to_string(),
+        },
+        FieldOption {
+            value: 160,
+            label: "Basilisk".to_string(),
+        },
+        FieldOption {
+            value: 161,
+            label: "Kraken".to_string(),
+        },
+        FieldOption {
+            value: 162,
+            label: "Dagon".to_string(),
+        },
+        FieldOption {
+            value: 163,
+            label: "Spriggan".to_string(),
+        },
+        FieldOption {
+            value: 164,
+            label: "Titan".to_string(),
+        },
+        FieldOption {
+            value: 165,
+            label: "Knight Commander/Ozma".to_string(),
+        },
+        FieldOption {
+            value: 166,
+            label: "Knight Commander/Balxephon".to_string(),
+        },
+        FieldOption {
+            value: 167,
+            label: "Knight Commander/Volaq".to_string(),
+        },
+        FieldOption {
+            value: 168,
+            label: "Knight Commander/Barbas".to_string(),
+        },
+        FieldOption {
+            value: 169,
+            label: "Knight Commander/Martym".to_string(),
+        },
+        FieldOption {
+            value: 170,
+            label: "Knight Commander/Oz".to_string(),
+        },
+        FieldOption {
+            value: 171,
+            label: "Knight Commander/Ozma".to_string(),
+        },
+        FieldOption {
+            value: 172,
+            label: "Knight Commander/Andoras".to_string(),
+        },
+        FieldOption {
+            value: 173,
+            label: "Death Templar".to_string(),
+        },
+        FieldOption {
+            value: 174,
+            label: "Aym".to_string(),
+        },
+        FieldOption {
+            value: 175,
+            label: "Aloser".to_string(),
+        },
+        FieldOption {
+            value: 176,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 177,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 178,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 179,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 180,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 181,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 182,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 183,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 184,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 185,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 186,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 187,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 188,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 189,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 190,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 191,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 192,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 193,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 194,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 195,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 196,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 197,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 198,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 199,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 200,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 201,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 202,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 203,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 204,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 205,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 206,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 207,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 208,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 209,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 210,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 211,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 212,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 213,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 214,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 215,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 216,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 217,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 218,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 219,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 220,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 221,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 222,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 223,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 224,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 225,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 226,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 227,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 228,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 229,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 230,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 231,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 232,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 233,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 234,
+            label: "Vija".to_string(),
+        },
+        FieldOption {
+            value: 235,
+            label: "Enja".to_string(),
+        },
+        FieldOption {
+            value: 236,
+            label: "Maitreya".to_string(),
+        },
+        FieldOption {
+            value: 237,
+            label: "Ijana".to_string(),
+        },
+        FieldOption {
+            value: 238,
+            label: "Chandra".to_string(),
+        },
+        FieldOption {
+            value: 239,
+            label: "Vayu".to_string(),
+        },
+        FieldOption {
+            value: 240,
+            label: "Indra".to_string(),
+        },
+        FieldOption {
+            value: 241,
+            label: "Rakshas".to_string(),
+        },
+        FieldOption {
+            value: 242,
+            label: "Ahurama".to_string(),
+        },
+        FieldOption {
+            value: 243,
+            label: "Asurama".to_string(),
+        },
+        FieldOption {
+            value: 244,
+            label: "Aditi".to_string(),
+        },
+        FieldOption {
+            value: 245,
+            label: "Saranga".to_string(),
+        },
+        FieldOption {
+            value: 246,
+            label: "Kandyce".to_string(),
+        },
+        FieldOption {
+            value: 247,
+            label: "Blackmoor".to_string(),
+        },
+        FieldOption {
+            value: 248,
+            label: "Sirene".to_string(),
+        },
+        FieldOption {
+            value: 249,
+            label: "Vainateya".to_string(),
+        },
+        FieldOption {
+            value: 250,
+            label: "Nathalork".to_string(),
+        },
+        FieldOption {
+            value: 251,
+            label: "Xolotl".to_string(),
+        },
+        FieldOption {
+            value: 252,
+            label: "Tlaloc".to_string(),
+        },
+        FieldOption {
+            value: 253,
+            label: "Ifrit".to_string(),
+        },
+        FieldOption {
+            value: 254,
+            label: "Lygenstzel".to_string(),
+        },
+    ]
+}
+
+fn opt_spell_type() -> Vec<FieldOption> {
+    vec![
+        FieldOption {
+            value: 0,
+            label: "None".to_string(),
+        },
+        FieldOption {
+            value: 1,
+            label: "Air".to_string(),
+        },
+        FieldOption {
+            value: 2,
+            label: "Earth".to_string(),
+        },
+        FieldOption {
+            value: 3,
+            label: "Lightning".to_string(),
+        },
+        FieldOption {
+            value: 4,
+            label: "Water".to_string(),
+        },
+        FieldOption {
+            value: 5,
+            label: "Fire".to_string(),
+        },
+        FieldOption {
+            value: 6,
+            label: "Ice".to_string(),
+        },
+        FieldOption {
+            value: 7,
+            label: "Divine".to_string(),
+        },
+        FieldOption {
+            value: 8,
+            label: "Dark".to_string(),
+        },
+        FieldOption {
+            value: 9,
+            label: "Dragonic".to_string(),
+        },
+        FieldOption {
+            value: 10,
+            label: "Necromancy".to_string(),
+        },
+        FieldOption {
+            value: 11,
+            label: "Ninjutsu".to_string(),
+        },
+        FieldOption {
+            value: 12,
+            label: "War Dances".to_string(),
+        },
+        FieldOption {
+            value: 13,
+            label: "Songs".to_string(),
+        },
+    ]
+}
+
 pub fn definition() -> ModuleDefinition {
     ModuleDefinition {
-        id: "spells".to_string(),
-        name: "Spell Editor".to_string(),
-        description: "Edit spell properties and effects".to_string(),
-        dat_file: DatFile::BattleData,
-        base_offset: 0x3CFBE0,
-        entry_count: 264,
+        id: "finishers".to_string(),
+        name: "Finisher Editor".to_string(),
+        description: "Edit finisher move properties".to_string(),
+        base_offset: 0x3E0ECC,
+        entry_count: 108,
         entry_size: 180,
         entry_names: vec![
+            "Flaming Fists".to_string(),
+            "Rapid Strike".to_string(),
+            "Howling Rage".to_string(),
+            "Retribution".to_string(),
+            "Envigorate".to_string(),
+            "Heart Crusher".to_string(),
+            "Shadowpin".to_string(),
+            "Double Fang".to_string(),
+            "Overwhelm".to_string(),
+            "Tempest Blade (Weapon)".to_string(),
+            "Rending Gale".to_string(),
+            "Vie Wound".to_string(),
+            "Cherry Ronde".to_string(),
+            "Papllion Reel".to_string(),
+            "Venomous Strike (Weapon)".to_string(),
+            "Sonic Blade".to_string(),
+            "Lightning Strike".to_string(),
+            "Cyclone Saber".to_string(),
+            "Grand Cross".to_string(),
+            "Crushing Blow (Weapon)".to_string(),
+            "Mistral Edge".to_string(),
+            "Ice Prison".to_string(),
+            "Mantis Strike".to_string(),
+            "Infinity".to_string(),
+            "Dark Prison (Weapon)".to_string(),
             "None".to_string(),
-            "Deadshot".to_string(),
-            "Deadshot II".to_string(),
-            "Deadshot III".to_string(),
-            "Deadshot IV".to_string(),
-            "Tornado".to_string(),
-            "Tornado II".to_string(),
-            "Tornado III".to_string(),
-            "Tornado IV".to_string(),
-            "Sylphide".to_string(),
-            "Sylphide II".to_string(),
-            "Aeroflux".to_string(),
-            "Aeroflux II".to_string(),
-            "Instill Air".to_string(),
-            "Aerogaurd".to_string(),
-            "Whirlwind".to_string(),
-            "Gaurding Gale".to_string(),
-            "Balmy Breeze".to_string(),
-            "Black Williwaw".to_string(),
-            "Vulcan Lance".to_string(),
-            "Vulcan Lance II".to_string(),
-            "Vulcan Lance III".to_string(),
-            "Vulcan Lance IV".to_string(),
-            "Cragfall".to_string(),
-            "Cragfall II".to_string(),
-            "Cragfall III".to_string(),
-            "Cragfall IV".to_string(),
-            "Gnome".to_string(),
-            "Gnome II".to_string(),
-            "Earthquake".to_string(),
-            "Earthquake II".to_string(),
-            "Instill Earth".to_string(),
-            "Petrogaurd".to_string(),
-            "Protect".to_string(),
-            "Blade Ward".to_string(),
-            "Duststorm".to_string(),
-            "Petrifog".to_string(),
-            "Lightning Bow".to_string(),
-            "Lightning Bow II".to_string(),
-            "Lightning Bow III".to_string(),
-            "Lightning Bow IV".to_string(),
-            "Thunderflare".to_string(),
-            "Thunderflare II".to_string(),
-            "Thunderflare III".to_string(),
-            "Thunderflare IV".to_string(),
-            "Thunderbird".to_string(),
-            "Thunderbird II".to_string(),
-            "Thunderburst".to_string(),
-            "Thunderburst II".to_string(),
-            "Instill Lightning".to_string(),
-            "Electricgaurd".to_string(),
-            "Galvanize".to_string(),
-            "Stormspark".to_string(),
-            "Stunbomb".to_string(),
-            "Stunslay".to_string(),
-            "Aquablast".to_string(),
-            "Aquablast II".to_string(),
-            "Aquablast III".to_string(),
-            "Aquablast IV".to_string(),
-            "Acid Rain".to_string(),
-            "Acid Rain II".to_string(),
-            "Acid Rain III".to_string(),
-            "Acid Rain IV".to_string(),
-            "Undine".to_string(),
-            "Undine II".to_string(),
-            "Dread Vapor".to_string(),
-            "Dread Vapor II".to_string(),
-            "Instill Water".to_string(),
-            "Aqaugaurd".to_string(),
-            "Quench".to_string(),
-            "Stagnate".to_string(),
-            "Poison Mist".to_string(),
-            "Sludgebind".to_string(),
-            "Sparksphere".to_string(),
-            "Sparksphere II".to_string(),
-            "Sparksphere III".to_string(),
-            "Sparksphere IV".to_string(),
-            "Firestorm".to_string(),
-            "Firestorm II".to_string(),
-            "Firestorm III".to_string(),
-            "Firestorm IV".to_string(),
-            "Salamander".to_string(),
-            "Salamander II".to_string(),
-            "Supernova".to_string(),
-            "Supernova II".to_string(),
-            "Instill Fire".to_string(),
-            "Pryogaurd".to_string(),
-            "Flame Fusion".to_string(),
-            "Pyrocrlastic Flow".to_string(),
-            "Misery".to_string(),
-            "Brimstone".to_string(),
-            "Iceblast".to_string(),
-            "Iceblast II".to_string(),
-            "Iceblast III".to_string(),
-            "Iceblast IV".to_string(),
-            "Avalanche".to_string(),
-            "Avalanche II".to_string(),
-            "Avalanche III".to_string(),
-            "Avalanche IV".to_string(),
-            "Wendigo".to_string(),
-            "Wendigo II".to_string(),
-            "Ice Requiem".to_string(),
-            "Ice Requiem II".to_string(),
-            "Instill Ice".to_string(),
-            "Frost Gaurd".to_string(),
-            "Icy Focus".to_string(),
-            "Indomitable Will".to_string(),
-            "Numbing Cold".to_string(),
-            "Freezing Gust".to_string(),
-            "Spiritsurge".to_string(),
-            "Spiritsurge II".to_string(),
-            "Spiritsurge III".to_string(),
-            "Spiritsurge IV".to_string(),
-            "Judgement".to_string(),
-            "Judgement II".to_string(),
-            "Judgement III".to_string(),
-            "Judgement IV".to_string(),
-            "Wisplight".to_string(),
-            "Wisplight II".to_string(),
-            "Heavenly Judge".to_string(),
-            "Heavenly Judge II".to_string(),
-            "Exorcism".to_string(),
-            "Exorcism II".to_string(),
-            "Instill Light".to_string(),
-            "Light guard".to_string(),
-            "Silent Light".to_string(),
-            "Boon of Swiftness".to_string(),
-            "Dispel".to_string(),
-            "Awaken".to_string(),
-            "Awaken II".to_string(),
-            "Innervate".to_string(),
-            "Singing Light".to_string(),
-            "Awaken Stone".to_string(),
-            "Liberate".to_string(),
-            "Cleanse".to_string(),
-            "Cleanse II".to_string(),
-            "Unburden".to_string(),
-            "Decurse".to_string(),
-            "Hearten".to_string(),
-            "Ease".to_string(),
-            "Heal".to_string(),
-            "Heal II".to_string(),
-            "Heal III".to_string(),
-            "Heal IV".to_string(),
-            "Major Heal".to_string(),
-            "Major Heal II".to_string(),
-            "Major Heal III".to_string(),
-            "Resurrect".to_string(),
-            "Resurrect II".to_string(),
-            "Word of Pain".to_string(),
-            "Word of Pain II".to_string(),
-            "Word of Pain III".to_string(),
-            "Word of Pain IV".to_string(),
-            "Meteor Strike".to_string(),
-            "Meteor Strike II".to_string(),
-            "Meteor Strike III".to_string(),
-            "Meteor Strike IV".to_string(),
-            "Hellbound".to_string(),
-            "Hellbound II".to_string(),
-            "Abyss".to_string(),
-            "Abyss II".to_string(),
-            "Drain Heart".to_string(),
-            "Drain Mind".to_string(),
-            "Drain Power".to_string(),
-            "Instill Shadow".to_string(),
-            "Shadow Gaurd".to_string(),
-            "Spellcharge".to_string(),
-            "Paradigm Shift".to_string(),
-            "Torpor".to_string(),
-            "Petriburst".to_string(),
-            "Paralytic Wave".to_string(),
-            "Poison Cloud".to_string(),
             "None".to_string(),
-            "Sleep".to_string(),
-            "Charm".to_string(),
-            "Dominate".to_string(),
-            "Shackle".to_string(),
-            "Fixate".to_string(),
-            "Gravity Flux".to_string(),
-            "Deadscream".to_string(),
-            "Dead Mans Ivy".to_string(),
-            "Tempest".to_string(),
-            "Tempest II".to_string(),
-            "Gaia Strike".to_string(),
-            "Gaia Strike II".to_string(),
-            "Vortex".to_string(),
-            "Vortex II".to_string(),
-            "Deluge".to_string(),
-            "Deluge II".to_string(),
-            "Annihilation".to_string(),
-            "Annihilation II".to_string(),
-            "Iceover".to_string(),
-            "Iceover II".to_string(),
-            "Starfall".to_string(),
-            "Starfall II".to_string(),
-            "Diablo's Spite".to_string(),
-            "Diablo's Spite II".to_string(),
-            "Palace Guide Book".to_string(),
-            "Detect".to_string(),
-            "Springboard".to_string(),
-            "Teleport".to_string(),
-            "Palace Guide Book II".to_string(),
-            "Gift of Restoration".to_string(),
-            "Gift of Renewal".to_string(),
-            "Nullify Strike".to_string(),
-            "Negate Spell".to_string(),
-            "Dodge Blades".to_string(),
-            "Ballistics".to_string(),
-            "Enlighten".to_string(),
-            "Phantom Shell".to_string(),
-            "Holy Shield".to_string(),
-            "Sacrifice".to_string(),
             "None".to_string(),
-            "Living Corpse".to_string(),
-            "Banish".to_string(),
-            "Curse".to_string(),
-            "Curse II".to_string(),
-            "Curse III".to_string(),
-            "Tainted Love".to_string(),
-            "Prodigize".to_string(),
-            "Breed Suspicion".to_string(),
-            "Phantom Pain".to_string(),
-            "Life Force".to_string(),
-            "Putrify".to_string(),
-            "Putrify II".to_string(),
-            "Brain Rot".to_string(),
-            "Summon Darkness".to_string(),
-            "Black Plume".to_string(),
-            "Styx Shift".to_string(),
-            "Wind Dervish".to_string(),
-            "Wind Dervish II".to_string(),
-            "Sand Spider".to_string(),
-            "Sand Spider II".to_string(),
-            "Chimaera".to_string(),
-            "Chimaera II".to_string(),
-            "Water Tiger".to_string(),
-            "Water Tiger II".to_string(),
-            "Fire Snake".to_string(),
-            "Fire Snake II".to_string(),
-            "Rime Raven".to_string(),
-            "Rime Raven II".to_string(),
-            "Shadowbind".to_string(),
-            "Palace Guide Book III".to_string(),
-            "Leaping Monkey".to_string(),
-            "Waterstep".to_string(),
-            "Decoy".to_string(),
-            "Bridle".to_string(),
-            "Benumb".to_string(),
-            "Envenom".to_string(),
-            "Lion Dance".to_string(),
-            "Harvest Dance".to_string(),
-            "Bellows Dance".to_string(),
-            "Shriving Dance".to_string(),
-            "Comely Dance".to_string(),
-            "Bedeviling Dance".to_string(),
-            "Invirogating Dance".to_string(),
-            "Demonpetal Dance".to_string(),
-            "Ardent Conga".to_string(),
-            "Weakening Joropo".to_string(),
-            "Taunting Mambo".to_string(),
-            "Stiring Folclore".to_string(),
-            "Somber Chacarera".to_string(),
-            "Escalating Sanat".to_string(),
-            "Poised Arabesque".to_string(),
+            "None".to_string(),
+            "None".to_string(),
+            "Ruination".to_string(),
+            "Schthe Wind".to_string(),
+            "Giga Tempest".to_string(),
+            "Spiral Scourge".to_string(),
+            "Fiery Death (Weapon)".to_string(),
+            "Tyrant's Mace".to_string(),
+            "Gaia Sunder".to_string(),
+            "Crimson Reach".to_string(),
+            "Dancing Sprite".to_string(),
+            "Angel of Death (Weapon)".to_string(),
+            "Weaken".to_string(),
+            "Breach".to_string(),
+            "Spoilspell".to_string(),
+            "Spoilheal".to_string(),
+            "Enfeeble".to_string(),
+            "Dark Blade".to_string(),
+            "Thunderwave".to_string(),
+            "Swallow Slash".to_string(),
+            "Advent Sign".to_string(),
+            "Apocalypse (Weapon)".to_string(),
+            "Stonebloom".to_string(),
+            "Skyrend".to_string(),
+            "Ghostwail".to_string(),
+            "Sunblossom".to_string(),
+            "None".to_string(),
+            "Wrathful Strike".to_string(),
+            "Raining Blows".to_string(),
+            "Pressure Whirl".to_string(),
+            "Trinity Pulse".to_string(),
+            "None".to_string(),
+            "Falsestrike".to_string(),
+            "Stagger".to_string(),
+            "Falseflight".to_string(),
+            "Misstep".to_string(),
+            "Spellslip".to_string(),
+            "Flood Lash".to_string(),
+            "Wrenching Coil".to_string(),
+            "Swift Thrash".to_string(),
+            "Armageddon".to_string(),
+            "Demon Rose (Weapon)".to_string(),
+            "Raging Pummel".to_string(),
+            "Disembrain".to_string(),
+            "Eviscerate".to_string(),
+            "Devastate".to_string(),
+            "None".to_string(),
+            "Aggressive Rendition".to_string(),
+            "Harmonic Blast".to_string(),
+            "Torrential Rhapsody".to_string(),
+            "Forced Fermata".to_string(),
+            "None".to_string(),
+            "Frigid Blast".to_string(),
+            "Scorpion Shot".to_string(),
+            "Heaven's Scorn".to_string(),
+            "Venom Sting".to_string(),
+            "None".to_string(),
+            "Dark Weight".to_string(),
+            "Slumber Shot".to_string(),
+            "Flaming Blast".to_string(),
+            "Empyreal Shot".to_string(),
+            "None".to_string(),
+            "Brimstone Hail".to_string(),
+            "Dullbind".to_string(),
+            "Deathwail".to_string(),
+            "Sanctus Flare".to_string(),
+            "None".to_string(),
+            "Mirage Strike".to_string(),
+            "Rapid Blast".to_string(),
+            "Scatter Shot".to_string(),
+            "Atonement".to_string(),
+            "None".to_string(),
+            "Fiery Death".to_string(),
+            "Angel of Death".to_string(),
+            "Venomous Strike".to_string(),
+            "Crushing Blow".to_string(),
+            "Tempest Blade".to_string(),
+            "Demon Rose".to_string(),
+            "Dark Prison".to_string(),
+            "Apocalypse".to_string(),
         ],
         fields: vec![
             FieldDefinition {
-                name: "Type".to_string(),
+                name: "Finisher Type".to_string(),
                 offset: 2,
                 size: 1,
                 field_type: FieldType::Dropdown,
-                options: Some(opt_spell_type()),
+                options: Some(opt_finisher_type()),
             },
             FieldDefinition {
                 name: "RT Penalty".to_string(),
@@ -4451,6 +5400,20 @@ pub fn definition() -> ModuleDefinition {
                 options: None,
             },
             FieldDefinition {
+                name: "Class Lock".to_string(),
+                offset: 124,
+                size: 1,
+                field_type: FieldType::Dropdown,
+                options: Some(opt_class_list()),
+            },
+            FieldDefinition {
+                name: "Unknown 125".to_string(),
+                offset: 125,
+                size: 1,
+                field_type: FieldType::Hex,
+                options: None,
+            },
+            FieldDefinition {
                 name: "Unknown 126".to_string(),
                 offset: 126,
                 size: 1,
@@ -4479,7 +5442,14 @@ pub fn definition() -> ModuleDefinition {
                 options: None,
             },
             FieldDefinition {
-                name: "Effect Type?Category?Casting?".to_string(),
+                name: "Learn Level".to_string(),
+                offset: 130,
+                size: 1,
+                field_type: FieldType::Uint,
+                options: None,
+            },
+            FieldDefinition {
+                name: "Animation".to_string(),
                 offset: 131,
                 size: 1,
                 field_type: FieldType::Hex,
@@ -4521,11 +5491,11 @@ pub fn definition() -> ModuleDefinition {
                 options: None,
             },
             FieldDefinition {
-                name: "Always Sequential".to_string(),
+                name: "Always 10B".to_string(),
                 offset: 144,
                 size: 2,
-                field_type: FieldType::Dropdown,
-                options: Some(opt_spell_list()),
+                field_type: FieldType::Hex,
+                options: None,
             },
             FieldDefinition {
                 name: "Always 0A".to_string(),
@@ -4664,35 +5634,34 @@ mod tests {
     #[test]
     fn metadata() {
         let def = definition();
-        assert_eq!(def.id, "spells");
-        assert_eq!(def.dat_file, DatFile::BattleData);
-        assert_eq!(def.base_offset, 0x3CFBE0);
-        assert_eq!(def.entry_count, 264);
+        assert_eq!(def.id, "finishers");
+        assert_eq!(def.base_offset, 0x3E0ECC);
+        assert_eq!(def.entry_count, 108);
         assert_eq!(def.entry_size, 180);
     }
 
     #[test]
     fn field_count() {
-        assert_eq!(definition().fields.len(), 117);
+        assert_eq!(definition().fields.len(), 120);
     }
 
     #[test]
     fn entry_names_count() {
         let def = definition();
-        assert_eq!(def.entry_names.len(), 264);
+        assert_eq!(def.entry_names.len(), 108);
     }
 
     #[test]
     fn first_field() {
         let f = &definition().fields[0];
-        assert_eq!(f.name, "Type");
+        assert_eq!(f.name, "Finisher Type");
         assert_eq!(f.offset, 2);
         assert_eq!(f.size, 1);
     }
 
     #[test]
     fn last_field() {
-        let f = &definition().fields[116];
+        let f = &definition().fields[119];
         assert_eq!(f.name, "Always FF");
         assert_eq!(f.offset, 177);
         assert_eq!(f.size, 1);

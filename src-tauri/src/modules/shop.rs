@@ -9848,7 +9848,6 @@ pub fn definition() -> ModuleDefinition {
         id: "shop".to_string(),
         name: "Shop Editor".to_string(),
         description: "Edit shop inventory and availability".to_string(),
-        dat_file: DatFile::MenuData,
         base_offset: 0x69376,
         entry_count: 514,
         entry_size: 38,
@@ -10556,7 +10555,6 @@ mod tests {
     fn metadata() {
         let def = definition();
         assert_eq!(def.id, "shop");
-        assert_eq!(def.dat_file, DatFile::MenuData);
         assert_eq!(def.base_offset, 0x69376);
         assert_eq!(def.entry_count, 514);
         assert_eq!(def.entry_size, 38);

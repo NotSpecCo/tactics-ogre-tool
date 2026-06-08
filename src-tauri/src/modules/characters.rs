@@ -10364,7 +10364,6 @@ pub fn definition() -> ModuleDefinition {
         id: "characters".to_string(),
         name: "Character Editor".to_string(),
         description: "Edit character stats and properties".to_string(),
-        dat_file: DatFile::BattleData,
         base_offset: 0x420A20,
         entry_count: 511,
         entry_size: 84,
@@ -11118,7 +11117,6 @@ mod tests {
     fn metadata() {
         let def = definition();
         assert_eq!(def.id, "characters");
-        assert_eq!(def.dat_file, DatFile::BattleData);
         assert_eq!(def.base_offset, 0x420A20);
         assert_eq!(def.entry_count, 511);
         assert_eq!(def.entry_size, 84);

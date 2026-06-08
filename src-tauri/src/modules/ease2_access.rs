@@ -5,7 +5,6 @@ pub fn definition() -> ModuleDefinition {
         id: "ease2_access".to_string(),
         name: "Ease II Access Editor".to_string(),
         description: "Edit Ease II spell class access".to_string(),
-        dat_file: DatFile::BattleData,
         base_offset: 0x4B2C70,
         entry_count: 1,
         entry_size: 64,
@@ -240,7 +239,6 @@ mod tests {
     fn metadata() {
         let def = definition();
         assert_eq!(def.id, "ease2_access");
-        assert_eq!(def.dat_file, DatFile::BattleData);
         assert_eq!(def.base_offset, 0x4B2C70);
         assert_eq!(def.entry_count, 1);
         assert_eq!(def.entry_size, 64);

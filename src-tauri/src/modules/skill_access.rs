@@ -6428,7 +6428,6 @@ pub fn definition() -> ModuleDefinition {
         id: "skill_access".to_string(),
         name: "Skill Access Editor".to_string(),
         description: "Edit which classes can learn each skill".to_string(),
-        dat_file: DatFile::BattleData,
         base_offset: 0x42B982,
         entry_count: 800,
         entry_size: 102,
@@ -7870,7 +7869,6 @@ mod tests {
     fn metadata() {
         let def = definition();
         assert_eq!(def.id, "skill_access");
-        assert_eq!(def.dat_file, DatFile::BattleData);
         assert_eq!(def.base_offset, 0x42B982);
         assert_eq!(def.entry_count, 800);
         assert_eq!(def.entry_size, 102);
