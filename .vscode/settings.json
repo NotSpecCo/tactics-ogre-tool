@@ -1,0 +1,7 @@
+{
+    "svelte.enable-ts-plugin": true,
+    "files.associations": {
+        "*.css": "tailwindcss"
+    },
+    "js/ts.preferences.autoImportFileExcludePatterns": ["@lucide/svelte"]
+}
