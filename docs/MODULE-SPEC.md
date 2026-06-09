@@ -41,9 +41,9 @@ files:
     - battle/entry/entry_unit_*.dat
 ```
 
-`files` entries may be literal paths or glob patterns using `*` and `?`. Directory targets are not part of version `1`; a directory path is invalid. A glob matches files only, not directories.
+`files` entries may be literal paths or glob patterns using `*` and `?`. Directory targets are not part of version `1`; a directory path is invalid. A glob matches files only, not directories. Target matching is case-insensitive, so `battle/entry/entry_unit_*.dat` matches both `entry_unit_0001.dat` and `ENTRY_UNIT_0001.dat`.
 
-The user selects a `.dat` file. The app decrypts and unpacks that file in the background, keeps the resulting payload in memory, and applies module offsets to that in-memory payload. `base_offset`, field `offset`, and `entry.count_from` offsets are never relative to the encrypted `.dat` container or the intermediate zip wrapper.
+The user selects a `.dat` file. The app decrypts and unpacks that file in the background, keeps the resulting payload in memory, and applies module offsets to that in-memory payload. Each supported `.dat` must resolve to exactly one editable payload. If the selected `.dat` resolves to zero payloads, multiple editable payloads, or an unpacking shape the app cannot map to one payload, the app must throw an error and leave UI presentation of that error to the caller. `base_offset`, field `offset`, and `entry.count_from` offsets are never relative to the encrypted `.dat` container or the intermediate zip wrapper.
 
 Sidecar paths such as `entry.labels_file` and `options_file` are relative to the module file's directory and must stay within the module tree after normalization.
 
@@ -162,11 +162,11 @@ entry:
 
 | Type       | Stored value             | Required keys                                           | Notes                                                         |
 | ---------- | ------------------------ | ------------------------------------------------------- | ------------------------------------------------------------- |
-| `uint`     | Unsigned integer         | `id`, `label`, `offset`, `size`, `type`                 | `size` must be `1`, `2`, or `4`.                              |
+| `uint`     | Unsigned integer         | `id`, `label`, `offset`, `size`, `type`                 | `size` must be `1`, `2`, `3`, or `4`.                         |
 | `int`      | Signed integer           | `id`, `label`, `offset`, `size`, `type`                 | `size` must be `1`, `2`, or `4`. Always displayed as decimal. |
 | `bytes`    | Raw bytes                | `id`, `label`, `offset`, `size`, `type`                 | `size` may be any positive integer.                           |
 | `text`     | Fixed-length ASCII bytes | `id`, `label`, `offset`, `size`, `type`                 | `size` may be any positive integer.                           |
-| `dropdown` | Unsigned integer         | `id`, `label`, `offset`, `size`, `type`, `options_file` | `size` must be `1`, `2`, or `4`.                              |
+| `dropdown` | Unsigned integer         | `id`, `label`, `offset`, `size`, `type`, `options_file` | `size` must be `1`, `2`, `3`, or `4`.                         |
 | `section`  | none                     | `id`, `label`, `type`                                   | Visual heading only. No offset, size, or stored value.        |
 
 Common optional field keys:
@@ -180,9 +180,15 @@ Common optional field keys:
 
 `display` affects only presentation and parsing of user input. It does not change the stored bytes.
 
+Multi-byte integer fields use `endian` to determine byte order. For 3-byte `uint` and `dropdown` fields, little-endian stores the least significant byte first and big-endian stores the most significant byte first.
+
 ## Numeric Rules
 
-Numeric YAML values may be decimal (`256`) or hexadecimal (`0x0100`).
+Every YAML scalar whose schema expects an integer is normalized before validation. A loader must accept either a native YAML integer scalar or a string scalar containing an unsigned decimal integer (`256`) or unsigned hexadecimal integer (`0x0100`). Hexadecimal string matching is case-insensitive for `a` through `f`.
+
+Quoted and unquoted forms are both valid when the YAML parser produces one of those accepted scalar types. For example, `0x00393F20` and `"0x00393F20"` are equivalent after normalization. Loaders must not depend on a YAML parser preserving unquoted hexadecimal values as native integers.
+
+Floating-point values, booleans, nulls, arrays, objects, signed strings, binary/octal strings, digit separators, and other numeric syntaxes are invalid for integer fields. After normalization, the normal validation rules still apply, such as non-negative, positive, and stored-range checks.
 
 Stored integer ranges are determined by `type` and `size`:
 
@@ -190,6 +196,7 @@ Stored integer ranges are determined by `type` and `size`:
 | ------------------- | ---- | ----------------------------- |
 | `uint` / `dropdown` | `1`  | `0` to `255`                  |
 | `uint` / `dropdown` | `2`  | `0` to `65535`                |
+| `uint` / `dropdown` | `3`  | `0` to `16777215`             |
 | `uint` / `dropdown` | `4`  | `0` to `4294967295`           |
 | `int`               | `1`  | `-128` to `127`               |
 | `int`               | `2`  | `-32768` to `32767`           |
@@ -306,14 +313,15 @@ Field validation:
 3. Non-section `offset` is a non-negative integer.
 4. Non-section `size` is a positive integer.
 5. Each non-section field satisfies `offset + size <= entry.size`.
-6. `uint`, `int`, and `dropdown` sizes are `1`, `2`, or `4`.
-7. `bytes` and `text` sizes may be any positive integer.
-8. `int` does not use `display`.
-9. `bytes` may only use `display: hex`.
-10. `dropdown` has an `options_file`.
-11. Non-dropdown fields do not have `options_file`.
-12. Sidecar paths exist and are valid relative paths.
-13. Partial overlaps require `overlap: true`.
+6. `uint` and `dropdown` sizes are `1`, `2`, `3`, or `4`.
+7. `int` sizes are `1`, `2`, or `4`.
+8. `bytes` and `text` sizes may be any positive integer.
+9. `int` does not use `display`.
+10. `bytes` may only use `display: hex`.
+11. `dropdown` has an `options_file`.
+12. Non-dropdown fields do not have `options_file`.
+13. Sidecar paths exist and are valid relative paths.
+14. Partial overlaps require `overlap: true`.
 
 Sidecar validation:
 
@@ -326,22 +334,31 @@ Sidecar validation:
 7. Option values fit every dropdown size that references the option file.
 8. Entry values are less than every fixed entry count that references the entry file.
 
+Runtime payload validation:
+
+1. `base_offset + entry.count * entry.size` must be within the decrypted/unpacked in-memory payload length.
+2. For dynamic counts, the full `count_from` integer range must be within the count source payload length before the count is read.
+3. After resolving a dynamic count, `base_offset + resolved_count * entry.size` must be within the matched target payload length.
+4. Every stored field range for every resolved entry, `base_offset + entry_index * entry.size + field.offset` through `size`, must be within the matched target payload length.
+
+If any runtime payload validation check fails, the reader or writer must throw an error and leave UI presentation of that error to the caller.
+
 ## Converting Nightmare Modules
 
 The existing `.nmm` modules in `reference_files/nightmare_modules_new/` are the source of truth for field layouts. Each `.nmm` file, along with the three shared reference directories (`_record`, `_list`, `_name`), converts to this YAML format.
 
 ### Nightmare Directory Mapping
 
-| Nightmare            | Ours            | Purpose                                        |
-| -------------------- | --------------- | ---------------------------------------------- |
-| `_record/*.txt`      | `entries/*.yml` | Row labels for entry selectors                 |
-| `_list/*.txt`        | `options/*.yml` | Field dropdowns                                |
-| `_name/*.txt`        | `options/*.yml` | Field dropdowns that reference game string IDs |
-| `battle/*.nmm`       | `modules/*.yml` | Module definitions                             |
-| `battle/entry/*.nmm` | `modules/*.yml` | Battle entry module definitions                |
-| `menu/*.nmm`         | `modules/*.yml` | Module definitions                             |
+| Nightmare            | Ours                 | Purpose                                        |
+| -------------------- | -------------------- | ---------------------------------------------- |
+| `_record/*.txt`      | `entries/*.yml`      | Row labels for entry selectors                 |
+| `_list/*.txt`        | `options/*.yml`      | Field dropdowns                                |
+| `_name/*.txt`        | `options/name_*.yml` | Field dropdowns that reference game string IDs |
+| `battle/*.nmm`       | `modules/*.yml`      | Module definitions                             |
+| `battle/entry/*.nmm` | `modules/*.yml`      | Battle entry module definitions                |
+| `menu/*.nmm`         | `modules/*.yml`      | Module definitions                             |
 
-`_list` and `_name` both become `options/` files. `_record` is the only source that becomes `entries/`.
+`_list` and `_name` both become `options/` files. `_name` outputs use a `name_` filename prefix to avoid collisions with `_list` files that share the same basename, such as `_list/Class.txt` and `_name/Class.txt`. `_record` is the only source that becomes `entries/`.
 
 ### .nmm Parsing Rules
 
@@ -438,7 +455,13 @@ Each Nightmare field is 5 logical lines: label, offset, size in bytes, type code
 | `HEXA` | Raw hex byte dump                  | `bytes`    | `hex`        |
 | `TEXT` | Fixed-length text bytes            | `text`     | n/a          |
 
+`NEHU` fields with size `3` convert to `uint` fields with `size: 3` and `display: hex`.
+
+Nightmare sidecar paths are resolved relative to the source `.nmm` file before they are mapped to YAML paths. For example, both `../_list/Class.txt` from `battle/Class.nmm` and `../../_list/Class.txt` from `battle/entry/BattleUnit.nmm` resolve to the same `options/class.yml` output file.
+
 Fields whose options file is `_list/separator.txt` convert to `section` entries. Keep the Nightmare label as the section label and discard the original offset, size, type code, and options file.
+
+After converting separator rows to `section` entries, the converter must compare all remaining fields in the same module. Identical byte ranges are duplicates and do not use `overlap: true`. Partially overlapping byte ranges must emit `overlap: true` on every non-section field participating in the partial overlap. Sections never emit `overlap: true`.
 
 Generated field IDs are lowercase `snake_case` labels. If that produces duplicates, append `_2`, `_3`, and so on in field order. If the normalized label is empty or does not start with a letter, use `field_<offset>` or `section_<ordinal>`.
 
@@ -514,14 +537,3 @@ These features are intentionally outside version `1`:
 4. Multi-file modules where one logical table is split across several files.
 5. Conditional field visibility.
 6. Computed fields.
-
-## TODOs
-
-These issues should be resolved before treating the version `1` spec as complete:
-
-1. Decide how to represent Nightmare `NEHU` fields with `size: 3`. The authoritative module set has two 3-byte `NEHU` fields, but version `1` currently limits `uint` and `dropdown` fields to sizes `1`, `2`, and `4`.
-2. Define deterministic conversion behavior for partial byte overlaps. `battle/Armament.nmm` and `battle/Class.nmm` contain intentional partial overlaps between a one-byte interpreted field and a wider unused/padding field, and the converter needs a rule for when to emit `overlap: true`.
-3. Decide target glob case sensitivity. The reference game files include both `entry_unit_*.dat` and `ENTRY_UNIT_*.dat`, so `battle/entry/entry_unit_*.dat` may not match all battle entry files on case-sensitive filesystems.
-4. Define runtime payload bounds checks. Validation should say what happens when `base_offset + entry.count * entry.size`, a dynamic `count_from` address, or any field range exceeds the decrypted/unpacked in-memory payload length.
-5. Define YAML numeric scalar handling precisely. Examples use unquoted hex values such as `0x00393F20`, but YAML parser behavior can differ; the loader should either require a YAML parser that preserves these as integers or explicitly accept numeric strings.
-6. Define the app-level unpacking invariant for selected `.dat` files. The spec says offsets apply to the decrypted/unpacked in-memory payload, but should state whether every supported `.dat` must resolve to exactly one editable payload and what error is produced if it does not.
