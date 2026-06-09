@@ -2,7 +2,7 @@
 
 Modules define how to read and edit structured binary tables inside selected game `.dat` files. Each module is a `.json5` file loaded from the filesystem at runtime.
 
-Module and sidecar files parse with a standard JSON5 parser. Strings are always quoted, so labels like `No` or `Tactics Ogre: Reborn` need no special handling. JSON5 comments (`//` and `/* */`) are permitted and ignored by loaders; tools that rewrite files are not required to preserve them. Text that must survive belongs in `notes`.
+Module and sidecar files parse with a standard JSON5 parser. Strings are always quoted, so labels like `No` or `Tactics Ogre: Reborn` need no special handling. JSON5 comments (`//` and `/* */`) are permitted and ignored by loaders; tools that rewrite files are not required to preserve them. Text that must survive belongs in `notes`. All property names and module file names are lowercase `snake_case`.
 
 This document defines version `1` of the module format. Version `1` is scoped to the Tactics Ogre modules in `reference_files/nightmare_modules_new`.
 
@@ -39,12 +39,12 @@ Module `files` are game-root-relative POSIX paths to `.dat` files. They must not
 
 ```json5
 files: [
-  "battle/battle_data_release.dat",
-  "battle/entry/entry_unit_*.dat",
+    'battle/battle_data_release.dat',
+    'battle/entry/entry_unit_*.dat'
 ],
 ```
 
-`files` entries may be literal paths or glob patterns using `*` and `?`. Directory targets are not part of version `1`; a directory path is invalid. A glob matches files only, not directories. Target matching is case-insensitive, so `battle/entry/entry_unit_*.dat` matches both `entry_unit_0001.dat` and `ENTRY_UNIT_0001.dat`.
+`files` entries may be literal paths or glob patterns using `*` and `?`, with standard POSIX glob semantics: `*` and `?` match within a single path segment and never match `/`. Directory targets are not part of version `1`; a directory path is invalid. A glob matches files only, not directories. Target matching is case-insensitive, so `battle/entry/entry_unit_*.dat` matches both `entry_unit_0001.dat` and `ENTRY_UNIT_0001.dat`.
 
 The user selects a `.dat` file. The app decrypts and unpacks that file in the background, keeps the resulting payload in memory, and applies module offsets to that in-memory payload. Each supported `.dat` must resolve to exactly one editable payload. If the selected `.dat` resolves to zero payloads, multiple editable payloads, or an unpacking shape the app cannot map to one payload, the app must throw an error and leave UI presentation of that error to the caller. `base_offset`, field `offset`, and `entry.count_from` offsets are never relative to the encrypted `.dat` container or the intermediate zip wrapper.
 
@@ -54,72 +54,72 @@ Sidecar paths such as `entry.labels_file` and `options_file` are relative to the
 
 ```json5
 {
-  schema_version: 1,
-  id: "battle_armament",
-  label: "Armament",
-  notes: "Weapon and armor stats.",
+    schema_version: 1,
+    id: 'battle_armament',
+    label: 'Armament',
+    notes: 'Weapon and armor stats.',
 
-  source: {
-    format: "nightmare",
-    path: "battle/Armament.nmm",
-    title: "Tactics Ogre: Reborn ==> battle_data_release / pack ==> Armament (Equipment)",
-  },
+    source: {
+        format: 'nightmare',
+        path: 'battle/Armament.nmm',
+        title: 'Tactics Ogre: Reborn ==> battle_data_release / pack ==> Armament (Equipment)'
+    },
 
-  files: ["battle/battle_data_release.dat"],
+    files: ['battle/battle_data_release.dat'],
 
-  base_offset: 0x00393f20,
-  endian: "little",
+    base_offset: 0x00393f20,
+    endian: 'little',
 
-  entry: {
-    count: 761,
-    size: 152,
-    labels_file: "entries/armament.json5",
-  },
+    entry: {
+        count: 761,
+        size: 152,
+        labels_file: 'entries/armament.json5'
+    },
 
-  fields: [
-    {
-      id: "item_type",
-      label: "Item Type",
-      offset: 0x00,
-      size: 1,
-      type: "dropdown",
-      display: "hex",
-      options_file: "options/item_type.json5",
-    },
-    {
-      id: "attack_power",
-      label: "Attack Power",
-      offset: 0x04,
-      size: 2,
-      type: "uint",
-    },
-    {
-      id: "weight",
-      label: "Weight",
-      offset: 0x08,
-      size: 2,
-      type: "int",
-    },
-    {
-      id: "unknown_0a",
-      label: "Unknown Bytes",
-      offset: 0x0a,
-      size: 4,
-      type: "bytes",
-    },
-    {
-      id: "name",
-      label: "Name",
-      offset: 0x10,
-      size: 16,
-      type: "text",
-    },
-    {
-      id: "general_flags",
-      type: "section",
-      label: "General Flags",
-    },
-  ],
+    fields: [
+        {
+            id: 'item_type',
+            label: 'Item Type',
+            offset: 0x00,
+            size: 1,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/item_type.json5'
+        },
+        {
+            id: 'attack_power',
+            label: 'Attack Power',
+            offset: 0x04,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'weight',
+            label: 'Weight',
+            offset: 0x08,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'unknown_0a',
+            label: 'Unknown Bytes',
+            offset: 0x0a,
+            size: 4,
+            type: 'bytes'
+        },
+        {
+            id: 'name',
+            label: 'Name',
+            offset: 0x10,
+            size: 16,
+            type: 'text'
+        },
+        {
+            id: 'general_flags',
+            type: 'section',
+            label: 'General Flags'
+        }
+    ]
 }
 ```
 
@@ -148,9 +148,9 @@ Most tables have a fixed entry count:
 
 ```json5
 entry: {
-  count: 256,
-  size: 208,
-  labels_file: "entries/class.json5",
+    count: 256,
+    size: 208,
+    labels_file: 'entries/class.json5'
 },
 ```
 
@@ -158,20 +158,24 @@ Tables whose count is stored in the target file use `count_from`:
 
 ```json5
 entry: {
-  count_from: {
-    base_offset: 0x20,
-    offset: 0x04,
-    size: 4,
-    type: "uint",
-  },
-  size: 0xc4,
-  labels_file: null,
+    count_from: {
+        base_offset: 0x20,
+        offset: 0x04,
+        size: 4,
+        type: 'uint'
+    },
+    size: 0xc4,
+    labels_file: null
 },
 ```
 
 `count` and `count_from` are mutually exclusive.
 
-`count_from.file` is optional. If omitted, the current matched target file is used. If present, it must be a literal game-root-relative file path, not a glob, and must resolve to exactly one file in the same game root. `count_from.base_offset` defaults to `0`. The final count address is `count_from.base_offset + count_from.offset`.
+`labels_file` is optional. Omitting it and setting it to `null` are equivalent: the table has no entry labels.
+
+`count_from` requires `offset`, `size`, and `type`; `base_offset` and `endian` are optional.
+
+The count is always read from the current matched target file. `count_from.base_offset` defaults to `0`. The final count address is `count_from.base_offset + count_from.offset`.
 
 `count_from.type` must be `uint` in version `1`. `count_from.size` must be `1`, `2`, or `4`, and uses the module's `endian` unless `count_from.endian` is provided.
 
@@ -181,19 +185,18 @@ entry: {
 | ---------- | ------------------------ | ------------------------------------------------------- | ------------------------------------------------------------- |
 | `uint`     | Unsigned integer         | `id`, `label`, `offset`, `size`, `type`                 | `size` must be `1`, `2`, `3`, or `4`.                         |
 | `int`      | Signed integer           | `id`, `label`, `offset`, `size`, `type`                 | `size` must be `1`, `2`, or `4`. Always displayed as decimal. |
-| `bytes`    | Raw bytes                | `id`, `label`, `offset`, `size`, `type`                 | `size` may be any positive integer.                           |
+| `bytes`    | Raw bytes                | `id`, `label`, `offset`, `size`, `type`                 | `size` may be any positive integer. Always displayed as hex.  |
 | `text`     | Fixed-length ASCII bytes | `id`, `label`, `offset`, `size`, `type`                 | `size` may be any positive integer.                           |
 | `dropdown` | Unsigned integer         | `id`, `label`, `offset`, `size`, `type`, `options_file` | `size` must be `1`, `2`, `3`, or `4`.                         |
 | `section`  | none                     | `id`, `label`, `type`                                   | Visual heading only. No offset, size, or stored value.        |
 
 Common optional field keys:
 
-| Key        | Applies to                  | Description                                                                             |
-| ---------- | --------------------------- | --------------------------------------------------------------------------------------- |
-| `display`  | `uint`, `dropdown`, `bytes` | `decimal` or `hex`. Defaults to `decimal` for `uint` and `dropdown`, `hex` for `bytes`. |
-| `endian`   | `uint`, `int`, `dropdown`   | Overrides module `endian`.                                                              |
-| `readonly` | stored fields               | If true, the field may be displayed but must not be written. Defaults to false.         |
-| `notes`    | all fields                  | Help text shown to the user in the UI.                                                  |
+| Key       | Applies to                | Description                                |
+| --------- | ------------------------- | ------------------------------------------ |
+| `display` | `uint`, `dropdown`        | `decimal` or `hex`. Defaults to `decimal`. |
+| `endian`  | `uint`, `int`, `dropdown` | Overrides module `endian`.                 |
+| `notes`   | all fields                | Help text shown to the user in the UI.     |
 
 `display` affects only presentation and parsing of user input. It does not change the stored bytes.
 
@@ -223,22 +226,25 @@ Writers must reject values outside the field's range.
 
 Version `1` supports fixed-length ASCII text fields only.
 
-Readers decode bytes up to the first `0x00` byte, or the full field size if no terminator is present. Writers encode ASCII, reject strings longer than `size`, and pad the remaining bytes with `0x00`.
+Readers decode bytes up to the first `0x00` byte, or the full field size if no terminator is present. Bytes outside printable ASCII (`0x20` to `0x7e`) decode to the `U+FFFD` replacement character. This decoding is lossy and display-only: the app must never write a text field by re-encoding its displayed string, only from explicit user input.
+
+Writers accept printable ASCII (`0x20` to `0x7e`) only. They reject any other character, reject strings longer than `size`, and pad the remaining bytes with `0x00`.
 
 Character mapping tables are not part of version `1`.
+
+> **Implementation note:** when building the JSON5 module reader, cover the lossy `U+FFFD` read path and the no-round-trip rule in tests. The reference set contains a single `TEXT` field, so these paths are easy to miss.
 
 ## Duplicate and Overlapping Storage
 
 Duplicate offsets are allowed. Nightmare modules intentionally expose the same stored value through multiple interpretations, such as a raw numeric field plus one or more dropdowns.
 
-Each field is an independent view over its declared storage. Editing any writable field writes that field's bytes. Other fields that read the same bytes must be refreshed from storage after the write. There is no field priority; the last successful write wins.
+Each field is an independent view over its declared storage. Editing any field writes that field's bytes. Other fields that read the same bytes must be refreshed from storage after the write. There is no field priority; the last successful write wins.
 
-Validation must distinguish these cases:
+Overlap rules:
 
 1. Identical storage ranges are allowed.
-2. Partially overlapping byte ranges are allowed only with an explicit `overlap: true` field key.
-3. A writable field overlapping a `readonly` field is allowed.
-4. A `section` never participates in overlap checks.
+2. Partially overlapping byte ranges are allowed but produce a validation warning, since they are usually offset mistakes.
+3. A `section` never participates in overlap checks.
 
 ## Bit-Level Fields
 
@@ -252,10 +258,10 @@ Used by `dropdown` fields. Each option has an integer value, label, and optional
 
 ```json5
 [
-  { value: 0x00, label: "None" },
-  { value: 0x01, label: "Sword", notes: "Standard one-handed blade" },
-  { value: 0x02, label: "Axe" },
-  { value: 0x03, label: "Spear" },
+    { value: 0x00, label: 'None' },
+    { value: 0x01, label: 'Sword', notes: 'Standard one-handed blade' },
+    { value: 0x02, label: 'Axe' },
+    { value: 0x03, label: 'Spear' }
 ]
 ```
 
@@ -269,6 +275,7 @@ Option semantics:
 4. Empty labels are allowed but should produce a validation warning. UIs should fall back to the numeric value when a label is empty.
 5. Missing values do not compact or renumber anything.
 6. Values must fit in the dropdown field size that references them.
+7. A stored value with no matching option is valid, not an error. The UI displays the raw numeric value using the field's `display` format, and the stored bytes keep that value until the user explicitly selects an option or enters a new value. Loading and saving an entry must never coerce an unmatched value to any option.
 
 ## Entry Files
 
@@ -276,9 +283,9 @@ Used by `entry.labels_file`. Entry files use the same item shape as options file
 
 ```json5
 [
-  { value: 0x00, label: "Broad Sword" },
-  { value: 0x01, label: "Short Sword" },
-  { value: 0x02, label: "Battle Axe", notes: "Two-handed axe with high damage" },
+    { value: 0x00, label: 'Broad Sword' },
+    { value: 0x01, label: 'Short Sword' },
+    { value: 0x02, label: 'Battle Axe', notes: 'Two-handed axe with high damage' }
 ]
 ```
 
@@ -290,7 +297,7 @@ Entry semantics:
 2. Missing entries do not compact or renumber later entries.
 3. If an entry index has no label, the UI displays the numeric index.
 4. Entries marked `<not used>`, `<deleted>`, or `<<Nothing>>` should normally be kept during automated conversion because they preserve source intent. They may be omitted manually only if the numeric index semantics remain unchanged.
-5. Entry values must be less than the resolved entry count.
+5. Entry values at or above the resolved entry count are allowed but never displayed; the UI ignores them. This supports sharing one entry file between modules with different counts, such as `entries/class.json5` used by both `battle_class` (count 256) and `menu_classmark` (count 80).
 
 ## Validation Rules
 
@@ -308,25 +315,25 @@ Module validation:
 8. `entry.size` is a positive integer.
 9. Exactly one of `entry.count` or `entry.count_from` is present.
 10. Fixed `entry.count` is a positive integer.
-11. `fields` is non-empty.
-12. Field IDs are unique within a module.
+11. `entry.count_from`, when present, has a non-negative `offset`; a non-negative `base_offset` when present; a `size` of `1`, `2`, or `4`; a `type` of `uint`; and an `endian` of `little` or `big` when present.
+12. `fields` is non-empty.
+13. Field IDs are unique within a module.
 
 Field validation:
 
 1. Non-section fields have `offset` and `size`.
-2. Section fields do not have `offset`, `size`, `options_file`, `display`, `readonly`, or `endian`.
+2. Section fields do not have `offset`, `size`, `options_file`, `display`, or `endian`.
 3. Non-section `offset` is a non-negative integer.
 4. Non-section `size` is a positive integer.
 5. Each non-section field satisfies `offset + size <= entry.size`.
 6. `uint` and `dropdown` sizes are `1`, `2`, `3`, or `4`.
 7. `int` sizes are `1`, `2`, or `4`.
 8. `bytes` and `text` sizes may be any positive integer.
-9. `int` does not use `display`.
-10. `bytes` may only use `display: "hex"`.
-11. `dropdown` has an `options_file`.
-12. Non-dropdown fields do not have `options_file`.
-13. Sidecar paths exist and are valid relative paths.
-14. Partial overlaps require `overlap: true`.
+9. Only `uint` and `dropdown` fields use `display`.
+10. `dropdown` has an `options_file`.
+11. Non-dropdown fields do not have `options_file`.
+12. Sidecar paths exist and are valid relative paths.
+13. Partially overlapping byte ranges are warnings, not errors.
 
 Sidecar validation:
 
@@ -337,12 +344,12 @@ Sidecar validation:
 5. Duplicate values are warnings, not errors.
 6. Empty labels are warnings, not errors.
 7. Option values fit every dropdown size that references the option file.
-8. Entry values are less than every fixed entry count that references the entry file.
+8. Entry values at or above a referencing module's fixed entry count are warnings, not errors.
 
 Runtime payload validation:
 
 1. `base_offset + entry.count * entry.size` must be within the decrypted/unpacked in-memory payload length.
-2. For dynamic counts, the full `count_from` integer range must be within the count source payload length before the count is read.
+2. For dynamic counts, the full `count_from` integer range must be within the matched target payload length before the count is read.
 3. After resolving a dynamic count, `base_offset + resolved_count * entry.size` must be within the matched target payload length.
 4. Every stored field range for every resolved entry, `base_offset + entry_index * entry.size + field.offset` through `size`, must be within the matched target payload length.
 
@@ -365,7 +372,22 @@ The existing `.nmm` modules in `reference_files/nightmare_modules_new/` are the 
 
 `_list` and `_name` both become `options/` files. `_name` outputs use a `name_` filename prefix to avoid collisions with `_list` files that share the same basename, such as `_list/Class.txt` and `_name/Class.txt`. `_record` is the only source that becomes `entries/`.
 
+Converted file names are the normalized source basename (see Name Normalization), plus the `name_` prefix for `_name` sources. `_list/ItemType.txt` becomes `options/item_type.json5`; `_record/BattleUnitHeader.txt` becomes `entries/battle_unit_header.json5`; `_name/UnitName.txt` becomes `options/name_unit_name.json5`.
+
+### Name Normalization
+
+Converted identifiers and file names use lowercase `snake_case`, produced by one normalization:
+
+1. Insert an underscore at each camel case word boundary: between a lowercase letter and an uppercase letter, and between an uppercase letter and an uppercase letter followed by a lowercase letter.
+2. Lowercase all ASCII letters.
+3. Replace each run of characters outside `a-z` and `0-9` with a single underscore.
+4. Trim leading and trailing underscores.
+
+`ItemType` becomes `item_type`. `BattleUnitHeader` becomes `battle_unit_header`. `Skill: <not used> 0006` becomes `skill_not_used_0006`. `? Flag ?` becomes `flag`. `??` becomes the empty string.
+
 ### .nmm Parsing Rules
+
+All Nightmare source files (`.nmm`, `_list`, `_name`, `_record`) are split into lines on any newline convention: `\n`, `\r\n`, or `\r`, including a mix within one file. The reference set uses CRLF throughout, but converters must not depend on that, since module developers may edit these files on Windows, macOS, or Linux. After splitting, trailing whitespace is trimmed from each line so no label or path carries a stray `\r`.
 
 Nightmare allows blank lines and `#`-prefixed comments almost anywhere. The converter reads `.nmm` files as logical lines by discarding blank lines and comment lines before parsing headers or fields.
 
@@ -404,7 +426,7 @@ NULL                           # character table file, ignored in v1
 
 Header conversion rules:
 
-1. `id` is the lowercase snake_case source path without extension, joined by underscores. `battle/Class.nmm` becomes `battle_class`; `battle/entry/BattleUnit.nmm` becomes `battle_entry_battle_unit`.
+1. `id` is the source path without extension, with each path segment normalized (see Name Normalization) and segments joined by underscores. `battle/Class.nmm` becomes `battle_class`; `battle/entry/BattleUnit.nmm` becomes `battle_entry_battle_unit`.
 2. `label` is the final segment after the last `==>`, trimmed.
 3. `source.format` is `nightmare`.
 4. `source.path` is the source path relative to `reference_files/nightmare_modules_new`.
@@ -426,29 +448,29 @@ Target file conversion rules:
 `battle/entry/BattleUnitHeader.nmm` converts as a normal fixed-count module:
 
 ```json5
-files: ["battle/entry/entry_unit_*.dat"],
+files: ['battle/entry/entry_unit_*.dat'],
 base_offset: 0x20,
 entry: {
-  count: 1,
-  size: 0x10,
-  labels_file: "entries/battle_unit_header.json5",
+    count: 1,
+    size: 0x10,
+    labels_file: 'entries/battle_unit_header.json5'
 },
 ```
 
 `battle/entry/BattleUnit.nmm` uses the header's record count field:
 
 ```json5
-files: ["battle/entry/entry_unit_*.dat"],
+files: ['battle/entry/entry_unit_*.dat'],
 base_offset: 0x30,
 entry: {
-  count_from: {
-    base_offset: 0x20,
-    offset: 0x04,
-    size: 4,
-    type: "uint",
-  },
-  size: 0xc4,
-  labels_file: null,
+    count_from: {
+        base_offset: 0x20,
+        offset: 0x04,
+        size: 4,
+        type: 'uint'
+    },
+    size: 0xc4,
+    labels_file: null
 },
 ```
 
@@ -463,18 +485,20 @@ Each Nightmare field is 5 logical lines: label, offset, size in bytes, type code
 | `NEHU` | Normal edit, hex, unsigned         | `uint`      | `hex`          |
 | `NDDU` | Normal dropdown, decimal, unsigned | `dropdown`  | `decimal`      |
 | `NDHU` | Normal dropdown, hex, unsigned     | `dropdown`  | `hex`          |
-| `HEXA` | Raw hex byte dump                  | `bytes`     | `hex`          |
+| `HEXA` | Raw hex byte dump                  | `bytes`     | n/a            |
 | `TEXT` | Fixed-length text bytes            | `text`      | n/a            |
 
-`NEHU` fields with size `3` convert to `uint` fields with `size: 3` and `display: "hex"`.
+`NEHU` fields with size `3` convert to `uint` fields with `size: 3` and `display: 'hex'`.
 
 Nightmare sidecar paths are resolved relative to the source `.nmm` file before they are mapped to module paths. For example, both `../_list/Class.txt` from `battle/Class.nmm` and `../../_list/Class.txt` from `battle/entry/BattleUnit.nmm` resolve to the same `options/class.json5` output file.
 
 Fields whose options file is `_list/separator.txt` convert to `section` entries. Keep the Nightmare label as the section label and discard the original offset, size, type code, and options file.
 
-After converting separator rows to `section` entries, the converter must compare all remaining fields in the same module. Identical byte ranges are duplicates and do not use `overlap: true`. Partially overlapping byte ranges must emit `overlap: true` on every non-section field participating in the partial overlap. Sections never emit `overlap: true`.
+Partially overlapping byte ranges in the source convert as-is and surface as validation warnings. The reference set contains two: in `battle/Armament.nmm` and `battle/Class.nmm`, a 1-byte set-reference dropdown overlaps a 2-byte padding field at offset `0x00`.
 
-Generated field IDs are lowercase `snake_case` labels. If that produces duplicates, append `_2`, `_3`, and so on in field order. If the normalized label is empty or does not start with a letter, use `field_<offset>` or `section_<ordinal>`.
+Generated field IDs are normalized labels (see Name Normalization). If the normalized label is empty or does not start with a letter, the fallback ID is `field_0x<offset>` for stored fields, written in lowercase hex padded to at least two digits, or `section_<ordinal>` for sections, where the ordinal is the section's 1-based position among the module's sections. `? 23 Flag ?` at offset `0x23` becomes `field_0x23`.
+
+Deduplication runs after all IDs are generated, including fallbacks: in field order, the second and later occurrences of an ID get `_2`, `_3`, and so on appended. This also covers fallback collisions, since duplicate offsets are allowed.
 
 ### \_list Files to options/\*.json5
 
@@ -491,13 +515,15 @@ Converts to:
 
 ```json5
 [
-  { value: 0x00, label: "No" },
-  { value: 0x01, label: "Yes, Aquatic" },
-  { value: 0x02, label: "Yes, Lavatic" },
+    { value: 0x00, label: 'No' },
+    { value: 0x01, label: 'Yes, Aquatic' },
+    { value: 0x02, label: 'Yes, Lavatic' }
 ]
 ```
 
 The declared count should match the number of parsed pairs. A mismatch is a conversion warning.
+
+A line containing only a value and no label converts to `label: 'unknown'`. This keeps converted files free of empty-label warnings.
 
 ### \_record Files to entries/\*.json5
 
@@ -513,9 +539,9 @@ Converts to:
 
 ```json5
 [
-  { value: 0x00, label: "<<Nothing>>" },
-  { value: 0x01, label: "Warrior" },
-  { value: 0x02, label: "Archer" },
+    { value: 0x00, label: '<<Nothing>>' },
+    { value: 0x01, label: 'Warrior' },
+    { value: 0x02, label: 'Archer' }
 ]
 ```
 
@@ -542,3 +568,5 @@ These features are intentionally outside version `1`:
 4. Multi-file modules where one logical table is split across several files.
 5. Conditional field visibility.
 6. Computed fields.
+7. Cross-file `count_from` sources, where a table's count lives in a different file than the table.
+8. Read-only fields.
