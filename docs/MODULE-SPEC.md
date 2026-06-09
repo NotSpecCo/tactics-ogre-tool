@@ -53,7 +53,6 @@ Sidecar paths such as `entry.labels_file` and `options_file` are relative to the
 schema_version: 1
 id: battle_armament
 label: Armament
-description: Armament table editor
 notes: Weapon and armor stats.
 
 source:
@@ -117,8 +116,7 @@ fields:
 | `schema_version` | yes      | Must be `1`.                                                                    |
 | `id`             | yes      | Stable module identifier. Use lowercase ASCII letters, digits, and underscores. |
 | `label`          | yes      | Human-readable module name.                                                     |
-| `description`    | yes      | Short human-readable description.                                               |
-| `notes`          | no       | Longer help text or source commentary.                                          |
+| `notes`          | no       | Help text shown to the user in the UI.                                          |
 | `source`         | no       | Provenance metadata. Ignored by binary readers and writers.                     |
 | `files`          | yes      | Game-root-relative file paths or glob patterns this module applies to.          |
 | `base_offset`    | yes      | Byte offset of the first table entry in each matched target file.               |
@@ -127,6 +125,8 @@ fields:
 | `fields`         | yes      | Ordered field and section definitions.                                          |
 
 `id` values are persistence keys. They must not be generated from `label` at load time.
+
+`notes` is optional help text shown to the user in the UI. Anything that has a `label` may also have `notes`: modules, fields (including sections), options, and entries.
 
 ## Entry Definition
 
@@ -176,7 +176,7 @@ Common optional field keys:
 | `display`  | `uint`, `dropdown`, `bytes` | `decimal` or `hex`. Defaults to `decimal` for `uint` and `dropdown`, `hex` for `bytes`. |
 | `endian`   | `uint`, `int`, `dropdown`   | Overrides module `endian`.                                                              |
 | `readonly` | stored fields               | If true, the field may be displayed but must not be written. Defaults to false.         |
-| `notes`    | all fields                  | Help text or source commentary.                                                         |
+| `notes`    | all fields                  | Help text shown to the user in the UI.                                                  |
 
 `display` affects only presentation and parsing of user input. It does not change the stored bytes.
 
@@ -233,7 +233,7 @@ The authoritative `reference_files/nightmare_modules_new` set does not use Night
 
 ## Options Files
 
-Used by `dropdown` fields. Each option has an integer value, label, and optional description or notes.
+Used by `dropdown` fields. Each option has an integer value, label, and optional notes.
 
 ```yaml
 - value: 0x00
@@ -241,7 +241,7 @@ Used by `dropdown` fields. Each option has an integer value, label, and optional
 
 - value: 0x01
   label: Sword
-  description: Standard one-handed blade
+  notes: Standard one-handed blade
 
 - value: 0x02
   label: Axe
@@ -274,7 +274,7 @@ Used by `entry.labels_file`. Entry files use the same item shape as options file
 
 - value: 0x02
   label: Battle Axe
-  description: Two-handed axe with high damage
+  notes: Two-handed axe with high damage
 ```
 
 The value is the entry index. Entry files are ordered lists, but lookup is by `value`.
@@ -364,7 +364,7 @@ The existing `.nmm` modules in `reference_files/nightmare_modules_new/` are the 
 
 Nightmare allows blank lines and `#`-prefixed comments almost anywhere. The converter reads `.nmm` files as logical lines by discarding blank lines and comment lines before parsing headers or fields.
 
-The first few physical lines in these modules are Nightmare-specific file verification and relocation metadata:
+The first three comment lines in each module, followed by one blank line, are Nightmare-specific file verification metadata:
 
 ```text
 #181ADE14          # 32-bit checksum of the target file
@@ -373,9 +373,15 @@ The first few physical lines in these modules are Nightmare-specific file verifi
                    # BASEPOINTER flag, blank in these modules
 ```
 
-This metadata is not represented directly in YAML. It may be preserved under `source` if useful.
+This metadata is not represented directly in YAML. Its file-verification role is replaced by the module's explicit `files` list. The converter skips the first three comment lines and never converts them to `notes`. It may preserve them under `source` if useful.
 
-Prose comments before the `.nmm` header convert to module `notes`. Comments inside the field list are not converted automatically because they often represent disabled fields or scratch notes.
+All other comments convert by position:
+
+1. Prose comments after the metadata block and before the `.nmm` header convert to module `notes`.
+2. Comment lines inside a field's five logical lines convert to that field's `notes`. In this module set, these always appear immediately after the field label.
+3. Comment lines between field blocks are not converted automatically because they usually represent disabled fields (fully commented-out five-line blocks) or scratch notes.
+
+When multiple comment lines convert to the same `notes` value, strip each line's leading `#`, trim surrounding whitespace, and join the lines with newlines in file order.
 
 ### .nmm Header Conversion
 
@@ -395,13 +401,12 @@ Header conversion rules:
 
 1. `id` is the lowercase snake_case source path without extension, joined by underscores. `battle/Class.nmm` becomes `battle_class`; `battle/entry/BattleUnit.nmm` becomes `battle_entry_battle_unit`.
 2. `label` is the final segment after the last `==>`, trimmed.
-3. `description` is `${label} table editor`.
-4. `source.format` is `nightmare`.
-5. `source.path` is the source path relative to `reference_files/nightmare_modules_new`.
-6. `source.title` is the full Nightmare title.
-7. Numeric header values may be decimal or hex.
-8. `entry.labels_file` is the converted `_record` file path, or `null` for `NULL`.
-9. The Nightmare character table path is ignored in version `1`.
+3. `source.format` is `nightmare`.
+4. `source.path` is the source path relative to `reference_files/nightmare_modules_new`.
+5. `source.title` is the full Nightmare title.
+6. Numeric header values may be decimal or hex.
+7. `entry.labels_file` is the converted `_record` file path, or `null` for `NULL`.
+8. The Nightmare character table path is ignored in version `1`.
 
 Target file conversion rules:
 
