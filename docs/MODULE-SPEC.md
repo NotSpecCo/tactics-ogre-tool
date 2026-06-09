@@ -1,6 +1,8 @@
-# Module Spec (YAML)
+# Module Spec (JSON5)
 
-Modules define how to read and edit structured binary tables inside selected game `.dat` files. Each module is a `.yml` file loaded from the filesystem at runtime.
+Modules define how to read and edit structured binary tables inside selected game `.dat` files. Each module is a `.json5` file loaded from the filesystem at runtime.
+
+Module and sidecar files parse with a standard JSON5 parser. Strings are always quoted, so labels like `No` or `Tactics Ogre: Reborn` need no special handling. JSON5 comments (`//` and `/* */`) are permitted and ignored by loaders; tools that rewrite files are not required to preserve them. Text that must survive belongs in `notes`.
 
 This document defines version `1` of the module format. Version `1` is scoped to the Tactics Ogre modules in `reference_files/nightmare_modules_new`.
 
@@ -18,16 +20,16 @@ Use these when researching conversion behavior. The new Tactics Ogre module set 
 
 ```text
 modules/
-|-- battle_armament.yml
-|-- battle_hit_rate.yml
-|-- menu_shop.yml
-|-- options/                # dropdown option files
-|   |-- no_yes.yml
-|   |-- item_type.yml
+|-- battle_armament.json5
+|-- battle_hit_rate.json5
+|-- menu_shop.json5
+|-- options/                // dropdown option files
+|   |-- no_yes.json5
+|   |-- item_type.json5
 |   `-- ...
-`-- entries/                # entry label files
-    |-- class.yml
-    |-- skill.yml
+`-- entries/                // entry label files
+    |-- class.json5
+    |-- skill.json5
     `-- ...
 ```
 
@@ -35,10 +37,11 @@ modules/
 
 Module `files` are game-root-relative POSIX paths to `.dat` files. They must not begin with `/`.
 
-```yaml
-files:
-    - battle/battle_data_release.dat
-    - battle/entry/entry_unit_*.dat
+```json5
+files: [
+  "battle/battle_data_release.dat",
+  "battle/entry/entry_unit_*.dat",
+],
 ```
 
 `files` entries may be literal paths or glob patterns using `*` and `?`. Directory targets are not part of version `1`; a directory path is invalid. A glob matches files only, not directories. Target matching is case-insensitive, so `battle/entry/entry_unit_*.dat` matches both `entry_unit_0001.dat` and `ENTRY_UNIT_0001.dat`.
@@ -49,64 +52,75 @@ Sidecar paths such as `entry.labels_file` and `options_file` are relative to the
 
 ## Module File Format
 
-```yaml
-schema_version: 1
-id: battle_armament
-label: Armament
-notes: Weapon and armor stats.
+```json5
+{
+  schema_version: 1,
+  id: "battle_armament",
+  label: "Armament",
+  notes: "Weapon and armor stats.",
 
-source:
-    format: nightmare
-    path: battle/Armament.nmm
-    title: Tactics Ogre: Reborn ==> battle_data_release / pack ==> Armament (Equipment)
+  source: {
+    format: "nightmare",
+    path: "battle/Armament.nmm",
+    title: "Tactics Ogre: Reborn ==> battle_data_release / pack ==> Armament (Equipment)",
+  },
 
-files:
-    - battle/battle_data_release.dat
+  files: ["battle/battle_data_release.dat"],
 
-base_offset: 0x00393F20
-endian: little
+  base_offset: 0x00393f20,
+  endian: "little",
 
-entry:
-    count: 686
-    size: 152
-    labels_file: entries/armament.yml
+  entry: {
+    count: 761,
+    size: 152,
+    labels_file: "entries/armament.json5",
+  },
 
-fields:
-    - id: item_type
-      label: Item Type
-      offset: 0x00
-      size: 1
-      type: dropdown
-      display: hex
-      options_file: options/item_type.yml
-
-    - id: attack_power
-      label: Attack Power
-      offset: 0x04
-      size: 2
-      type: uint
-
-    - id: weight
-      label: Weight
-      offset: 0x08
-      size: 2
-      type: int
-
-    - id: unknown_0a
-      label: Unknown Bytes
-      offset: 0x0A
-      size: 4
-      type: bytes
-
-    - id: name
-      label: Name
-      offset: 0x10
-      size: 16
-      type: text
-
-    - id: general_flags
-      type: section
-      label: General Flags
+  fields: [
+    {
+      id: "item_type",
+      label: "Item Type",
+      offset: 0x00,
+      size: 1,
+      type: "dropdown",
+      display: "hex",
+      options_file: "options/item_type.json5",
+    },
+    {
+      id: "attack_power",
+      label: "Attack Power",
+      offset: 0x04,
+      size: 2,
+      type: "uint",
+    },
+    {
+      id: "weight",
+      label: "Weight",
+      offset: 0x08,
+      size: 2,
+      type: "int",
+    },
+    {
+      id: "unknown_0a",
+      label: "Unknown Bytes",
+      offset: 0x0a,
+      size: 4,
+      type: "bytes",
+    },
+    {
+      id: "name",
+      label: "Name",
+      offset: 0x10,
+      size: 16,
+      type: "text",
+    },
+    {
+      id: "general_flags",
+      type: "section",
+      label: "General Flags",
+    },
+  ],
+}
 ```
 
 ## Module Keys
@@ -132,24 +146,27 @@ fields:
 
 Most tables have a fixed entry count:
 
-```yaml
-entry:
-    count: 256
-    size: 208
-    labels_file: entries/class.yml
+```json5
+entry: {
+  count: 256,
+  size: 208,
+  labels_file: "entries/class.json5",
+},
 ```
 
 Tables whose count is stored in the target file use `count_from`:
 
-```yaml
-entry:
-    count_from:
-        base_offset: 0x20
-        offset: 0x04
-        size: 4
-        type: uint
-    size: 0xC4
-    labels_file: null
+```json5
+entry: {
+  count_from: {
+    base_offset: 0x20,
+    offset: 0x04,
+    size: 4,
+    type: "uint",
+  },
+  size: 0xc4,
+  labels_file: null,
+},
 ```
 
 `count` and `count_from` are mutually exclusive.
@@ -184,11 +201,9 @@ Multi-byte integer fields use `endian` to determine byte order. For 3-byte `uint
 
 ## Numeric Rules
 
-Every YAML scalar whose schema expects an integer is normalized before validation. A loader must accept either a native YAML integer scalar or a string scalar containing an unsigned decimal integer (`256`) or unsigned hexadecimal integer (`0x0100`). Hexadecimal string matching is case-insensitive for `a` through `f`.
+Integers are native JSON5 numeric literals, written as unsigned decimal (`256`) or unsigned hexadecimal (`0x0100`) values. Hexadecimal digits are case-insensitive.
 
-Quoted and unquoted forms are both valid when the YAML parser produces one of those accepted scalar types. For example, `0x00393F20` and `"0x00393F20"` are equivalent after normalization. Loaders must not depend on a YAML parser preserving unquoted hexadecimal values as native integers.
-
-Floating-point values, booleans, nulls, arrays, objects, signed strings, binary/octal strings, digit separators, and other numeric syntaxes are invalid for integer fields. After normalization, the normal validation rules still apply, such as non-negative, positive, and stored-range checks.
+Any other form is invalid where the schema expects an integer: leading `+` or `-` signs, fractional parts, exponents, `Infinity`, `NaN`, booleans, nulls, arrays, objects, and strings containing numbers such as `"256"` or `"0x0100"`. After parsing, the normal validation rules still apply, such as non-negative, positive, and stored-range checks.
 
 Stored integer ranges are determined by `type` and `size`:
 
@@ -233,24 +248,18 @@ The authoritative `reference_files/nightmare_modules_new` set does not use Night
 
 ## Options Files
 
-Used by `dropdown` fields. Each option has an integer value, label, and optional notes.
+Used by `dropdown` fields. Each option has an integer value, label, and optional notes. The file is a top-level JSON5 array.
 
-```yaml
-- value: 0x00
-  label: None
-
-- value: 0x01
-  label: Sword
-  notes: Standard one-handed blade
-
-- value: 0x02
-  label: Axe
-
-- value: 0x03
-  label: Spear
+```json5
+[
+  { value: 0x00, label: "None" },
+  { value: 0x01, label: "Sword", notes: "Standard one-handed blade" },
+  { value: 0x02, label: "Axe" },
+  { value: 0x03, label: "Spear" },
+]
 ```
 
-Option files are ordered lists, not maps. The loader must preserve file order.
+Option files are ordered arrays, not maps. The loader must preserve file order.
 
 Option semantics:
 
@@ -265,19 +274,15 @@ Option semantics:
 
 Used by `entry.labels_file`. Entry files use the same item shape as options files:
 
-```yaml
-- value: 0x00
-  label: Broad Sword
-
-- value: 0x01
-  label: Short Sword
-
-- value: 0x02
-  label: Battle Axe
-  notes: Two-handed axe with high damage
+```json5
+[
+  { value: 0x00, label: "Broad Sword" },
+  { value: 0x01, label: "Short Sword" },
+  { value: 0x02, label: "Battle Axe", notes: "Two-handed axe with high damage" },
+]
 ```
 
-The value is the entry index. Entry files are ordered lists, but lookup is by `value`.
+The value is the entry index. Entry files are ordered arrays, but lookup is by `value`.
 
 Entry semantics:
 
@@ -317,7 +322,7 @@ Field validation:
 7. `int` sizes are `1`, `2`, or `4`.
 8. `bytes` and `text` sizes may be any positive integer.
 9. `int` does not use `display`.
-10. `bytes` may only use `display: hex`.
+10. `bytes` may only use `display: "hex"`.
 11. `dropdown` has an `options_file`.
 12. Non-dropdown fields do not have `options_file`.
 13. Sidecar paths exist and are valid relative paths.
@@ -325,7 +330,7 @@ Field validation:
 
 Sidecar validation:
 
-1. Sidecar files parse as YAML arrays.
+1. Sidecar files parse as top-level JSON5 arrays.
 2. Every item has `value` and `label`.
 3. Values are non-negative integers.
 4. Labels are strings.
@@ -345,18 +350,18 @@ If any runtime payload validation check fails, the reader or writer must throw a
 
 ## Converting Nightmare Modules
 
-The existing `.nmm` modules in `reference_files/nightmare_modules_new/` are the source of truth for field layouts. Each `.nmm` file, along with the three shared reference directories (`_record`, `_list`, `_name`), converts to this YAML format.
+The existing `.nmm` modules in `reference_files/nightmare_modules_new/` are the source of truth for field layouts. Each `.nmm` file, along with the three shared reference directories (`_record`, `_list`, `_name`), converts to this JSON5 format.
 
 ### Nightmare Directory Mapping
 
-| Nightmare            | Ours                 | Purpose                                        |
-| -------------------- | -------------------- | ---------------------------------------------- |
-| `_record/*.txt`      | `entries/*.yml`      | Row labels for entry selectors                 |
-| `_list/*.txt`        | `options/*.yml`      | Field dropdowns                                |
-| `_name/*.txt`        | `options/name_*.yml` | Field dropdowns that reference game string IDs |
-| `battle/*.nmm`       | `modules/*.yml`      | Module definitions                             |
-| `battle/entry/*.nmm` | `modules/*.yml`      | Battle entry module definitions                |
-| `menu/*.nmm`         | `modules/*.yml`      | Module definitions                             |
+| Nightmare            | Ours                   | Purpose                                        |
+| -------------------- | ---------------------- | ---------------------------------------------- |
+| `_record/*.txt`      | `entries/*.json5`      | Row labels for entry selectors                 |
+| `_list/*.txt`        | `options/*.json5`      | Field dropdowns                                |
+| `_name/*.txt`        | `options/name_*.json5` | Field dropdowns that reference game string IDs |
+| `battle/*.nmm`       | `modules/*.json5`      | Module definitions                             |
+| `battle/entry/*.nmm` | `modules/*.json5`      | Battle entry module definitions                |
+| `menu/*.nmm`         | `modules/*.json5`      | Module definitions                             |
 
 `_list` and `_name` both become `options/` files. `_name` outputs use a `name_` filename prefix to avoid collisions with `_list` files that share the same basename, such as `_list/Class.txt` and `_name/Class.txt`. `_record` is the only source that becomes `entries/`.
 
@@ -373,7 +378,7 @@ The first three comment lines in each module, followed by one blank line, are Ni
                    # BASEPOINTER flag, blank in these modules
 ```
 
-This metadata is not represented directly in YAML. Its file-verification role is replaced by the module's explicit `files` list. The converter skips the first three comment lines and never converts them to `notes`. It may preserve them under `source` if useful.
+This metadata is not represented directly in the module file. Its file-verification role is replaced by the module's explicit `files` list. The converter skips the first three comment lines and never converts them to `notes`. It may preserve them under `source` if useful.
 
 All other comments convert by position:
 
@@ -410,7 +415,7 @@ Header conversion rules:
 
 Target file conversion rules:
 
-| Nightmare title segment                   | YAML `files`                     |
+| Nightmare title segment                   | Module `files`                   |
 | ----------------------------------------- | -------------------------------- |
 | `battle_data_release / pack`              | `battle/battle_data_release.dat` |
 | `menu_data / pack`                        | `menu/menu_data.dat`             |
@@ -420,49 +425,50 @@ Target file conversion rules:
 
 `battle/entry/BattleUnitHeader.nmm` converts as a normal fixed-count module:
 
-```yaml
-files:
-    - battle/entry/entry_unit_*.dat
-base_offset: 0x20
-entry:
-    count: 1
-    size: 0x10
-    labels_file: entries/battle_unit_header.yml
+```json5
+files: ["battle/entry/entry_unit_*.dat"],
+base_offset: 0x20,
+entry: {
+  count: 1,
+  size: 0x10,
+  labels_file: "entries/battle_unit_header.json5",
+},
 ```
 
 `battle/entry/BattleUnit.nmm` uses the header's record count field:
 
-```yaml
-files:
-    - battle/entry/entry_unit_*.dat
-base_offset: 0x30
-entry:
-    count_from:
-        base_offset: 0x20
-        offset: 0x04
-        size: 4
-        type: uint
-    size: 0xC4
-    labels_file: null
+```json5
+files: ["battle/entry/entry_unit_*.dat"],
+base_offset: 0x30,
+entry: {
+  count_from: {
+    base_offset: 0x20,
+    offset: 0x04,
+    size: 4,
+    type: "uint",
+  },
+  size: 0xc4,
+  labels_file: null,
+},
 ```
 
 ### .nmm Field Type Codes
 
 Each Nightmare field is 5 logical lines: label, offset, size in bytes, type code, and options file or `NULL`.
 
-| Code   | Meaning                            | YAML type  | YAML display |
-| ------ | ---------------------------------- | ---------- | ------------ |
-| `NEDU` | Normal edit, decimal, unsigned     | `uint`     | `decimal`    |
-| `NEDS` | Normal edit, decimal, signed       | `int`      | n/a          |
-| `NEHU` | Normal edit, hex, unsigned         | `uint`     | `hex`        |
-| `NDDU` | Normal dropdown, decimal, unsigned | `dropdown` | `decimal`    |
-| `NDHU` | Normal dropdown, hex, unsigned     | `dropdown` | `hex`        |
-| `HEXA` | Raw hex byte dump                  | `bytes`    | `hex`        |
-| `TEXT` | Fixed-length text bytes            | `text`     | n/a          |
+| Code   | Meaning                            | Module type | Module display |
+| ------ | ---------------------------------- | ----------- | -------------- |
+| `NEDU` | Normal edit, decimal, unsigned     | `uint`      | `decimal`      |
+| `NEDS` | Normal edit, decimal, signed       | `int`       | n/a            |
+| `NEHU` | Normal edit, hex, unsigned         | `uint`      | `hex`          |
+| `NDDU` | Normal dropdown, decimal, unsigned | `dropdown`  | `decimal`      |
+| `NDHU` | Normal dropdown, hex, unsigned     | `dropdown`  | `hex`          |
+| `HEXA` | Raw hex byte dump                  | `bytes`     | `hex`          |
+| `TEXT` | Fixed-length text bytes            | `text`      | n/a            |
 
-`NEHU` fields with size `3` convert to `uint` fields with `size: 3` and `display: hex`.
+`NEHU` fields with size `3` convert to `uint` fields with `size: 3` and `display: "hex"`.
 
-Nightmare sidecar paths are resolved relative to the source `.nmm` file before they are mapped to YAML paths. For example, both `../_list/Class.txt` from `battle/Class.nmm` and `../../_list/Class.txt` from `battle/entry/BattleUnit.nmm` resolve to the same `options/class.yml` output file.
+Nightmare sidecar paths are resolved relative to the source `.nmm` file before they are mapped to module paths. For example, both `../_list/Class.txt` from `battle/Class.nmm` and `../../_list/Class.txt` from `battle/entry/BattleUnit.nmm` resolve to the same `options/class.json5` output file.
 
 Fields whose options file is `_list/separator.txt` convert to `section` entries. Keep the Nightmare label as the section label and discard the original offset, size, type code, and options file.
 
@@ -470,7 +476,7 @@ After converting separator rows to `section` entries, the converter must compare
 
 Generated field IDs are lowercase `snake_case` labels. If that produces duplicates, append `_2`, `_3`, and so on in field order. If the normalized label is empty or does not start with a letter, use `field_<offset>` or `section_<ordinal>`.
 
-### \_list Files to options/\*.yml
+### \_list Files to options/\*.json5
 
 `_list` files have a count on line 1, then `value label` pairs:
 
@@ -483,20 +489,17 @@ Generated field IDs are lowercase `snake_case` labels. If that produces duplicat
 
 Converts to:
 
-```yaml
-- value: 0x00
-  label: No
-
-- value: 0x01
-  label: Yes, Aquatic
-
-- value: 0x02
-  label: Yes, Lavatic
+```json5
+[
+  { value: 0x00, label: "No" },
+  { value: 0x01, label: "Yes, Aquatic" },
+  { value: 0x02, label: "Yes, Lavatic" },
+]
 ```
 
 The declared count should match the number of parsed pairs. A mismatch is a conversion warning.
 
-### \_record Files to entries/\*.yml
+### \_record Files to entries/\*.json5
 
 `_record` files are positional: one label per line, no explicit index.
 
@@ -508,20 +511,17 @@ Archer
 
 Converts to:
 
-```yaml
-- value: 0x00
-  label: '<<Nothing>>'
-
-- value: 0x01
-  label: Warrior
-
-- value: 0x02
-  label: Archer
+```json5
+[
+  { value: 0x00, label: "<<Nothing>>" },
+  { value: 0x01, label: "Warrior" },
+  { value: 0x02, label: "Archer" },
+]
 ```
 
 Automated conversion should keep all positional entries, including placeholders, so indexes remain inspectable.
 
-### \_name Files to options/\*.yml
+### \_name Files to options/\*.json5
 
 `_name` files have a count on line 1, then `value label` pairs. They convert exactly like `_list` files and are used as dropdown option files.
 
