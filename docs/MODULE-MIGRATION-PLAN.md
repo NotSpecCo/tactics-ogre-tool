@@ -2,6 +2,8 @@
 
 Migrate the app from hardcoded Rust module definitions to the JSON5 module format defined in `docs/MODULE-SPEC.md`. This document is the working plan: an agent should complete **one step at a time, in order**, verifying and committing after each step.
 
+**Status:** Steps 1–7 are complete and committed on `fixes-part-1`. The backend serves JSON5 modules end to end; the frontend still speaks the old IPC shape and is broken at runtime until Step 8. Continue with Step 8.
+
 **How to use this document (for the executing agent):**
 
 1. Read `docs/MODULE-SPEC.md` in full before starting any step. It is the authority on all format and behavior questions. This plan never overrides the spec; if they conflict, the spec wins — and flag the conflict to the user immediately.
