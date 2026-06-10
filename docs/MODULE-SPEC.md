@@ -206,7 +206,7 @@ Multi-byte integer fields use `endian` to determine byte order. For 3-byte `uint
 
 Integers are native JSON5 numeric literals, written as unsigned decimal (`256`) or unsigned hexadecimal (`0x0100`) values. Hexadecimal digits are case-insensitive.
 
-Any other form is invalid where the schema expects an integer: leading `+` or `-` signs, fractional parts, exponents, `Infinity`, `NaN`, booleans, nulls, arrays, objects, and strings containing numbers such as `"256"` or `"0x0100"`. After parsing, the normal validation rules still apply, such as non-negative, positive, and stored-range checks.
+Any other form is invalid where the schema expects an integer: leading `-` signs, fractional parts, exponents, `Infinity`, `NaN`, booleans, nulls, arrays, objects, and strings containing numbers such as `"256"` or `"0x0100"`. A leading `+` sign is permitted because standard JSON5 parsers accept it; `+256` parses to `256`. After parsing, the normal validation rules still apply, such as non-negative, positive, and stored-range checks.
 
 Stored integer ranges are determined by `type` and `size`:
 
@@ -405,10 +405,12 @@ This metadata is not represented directly in the module file. Its file-verificat
 All other comments convert by position:
 
 1. Prose comments after the metadata block and before the `.nmm` header convert to module `notes`.
-2. Comment lines inside a field's five logical lines convert to that field's `notes`. In this module set, these always appear immediately after the field label.
-3. Comment lines between field blocks are not converted automatically because they usually represent disabled fields (fully commented-out five-line blocks) or scratch notes.
+2. Comment lines inside a field's five logical lines convert to that field's `notes`. In this module set, these appear immediately after the field label.
+3. A run of consecutive comment lines directly above a field's label line, with no blank line between the run and the label, also converts to that field's `notes`, unless the run is a disabled field block. The reference set documents many fields this way, such as the `Status: ...` fields in `battle/HitRate.nmm` and the element resist fields in `battle/Armament.nmm`.
+4. A disabled field block is a run of comment lines whose length is a multiple of five, where each group of five parses as a commented-out field: its second and third lines are integers and its fourth line is a field type code. Disabled field blocks are never converted to `notes`.
+5. All other comment lines between field blocks are not converted, because they represent disabled fields or scratch notes. Converters should emit a warning identifying each dropped comment run so a human can review what was discarded.
 
-When multiple comment lines convert to the same `notes` value, strip each line's leading `#`, trim surrounding whitespace, and join the lines with newlines in file order.
+When multiple comment lines convert to the same `notes` value (for example a run above a field's label plus a comment after it), strip each line's leading `#`, trim surrounding whitespace, and join the lines with newlines in file order.
 
 ### .nmm Header Conversion
 
