@@ -1,6 +1,7 @@
 pub mod binary;
 pub mod crypto;
 pub mod filetable;
+pub mod module_runtime;
 pub mod module_set;
 pub mod module_spec;
 pub mod modules;
