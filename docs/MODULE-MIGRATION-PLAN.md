@@ -2,7 +2,7 @@
 
 Migrate the app from hardcoded Rust module definitions to the JSON5 module format defined in `docs/MODULE-SPEC.md`. This document is the working plan: an agent should complete **one step at a time, in order**, verifying and committing after each step.
 
-**Status:** Steps 1–10 are complete (1–9 committed on `fixes-part-1`; Step 10 staged pending review). The diagnostics modal, startup notice, and reload action are in place. Continue with Step 11.
+**Status:** Steps 1–10 are complete and committed on `fixes-part-1`. Step 11's sweep, README update, and full verification gate are done (staged pending review); the manual end-to-end checklist with a real game directory remains. Then work the Follow-up tasks list.
 
 **How to use this document (for the executing agent):**
 
