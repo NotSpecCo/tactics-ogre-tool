@@ -2,7 +2,7 @@
 
 Migrate the app from hardcoded Rust module definitions to the JSON5 module format defined in `docs/MODULE-SPEC.md`. This document is the working plan: an agent should complete **one step at a time, in order**, verifying and committing after each step.
 
-**Status:** Steps 1–8 are complete and committed on `fixes-part-1`. The backend serves JSON5 modules end to end and the frontend speaks the new IPC shape; field rendering for the new format (sections, display formats, text/bytes handling) lands in Step 9. Continue with Step 9.
+**Status:** Steps 1–10 are complete (1–9 committed on `fixes-part-1`; Step 10 staged pending review). The diagnostics modal, startup notice, and reload action are in place. Continue with Step 11.
 
 **How to use this document (for the executing agent):**
 
@@ -284,3 +284,5 @@ Known issues deliberately deferred so the steps can proceed. **Executing agents:
    _Solution:_ rename `MatchedModule.module` to `loaded` and/or add accessor methods (e.g. `MatchedModule::id()`).
 5. **Duplicate `Endian` enums.** `module_spec::Endian` and `binary::Endian` are identical two-variant enums maintained in parallel (`binary::Endian` is still used by `filetable`).
    _Solution:_ consolidate to a single definition — keep `module_spec::Endian` (it has the serde derives) and re-export it from `binary`, or vice versa.
+6. **`npm run check` warns `Cannot find type definition file for 'node'`.** The generated `.svelte-kit/tsconfig.json` lists `node` in `compilerOptions.types`, but `@types/node` is not installed, so every svelte-check run reports one warning.
+   _Solution:_ add `@types/node` as a devDependency.
