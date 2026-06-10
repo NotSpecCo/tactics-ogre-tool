@@ -265,3 +265,20 @@ Made during planning; revisit only with the user.
 ## Future work (explicitly out of scope)
 
 Tracked by the spec's Future Extensions section: bit-level fields, character mapping tables, directory targets, multi-file tables, conditional visibility, computed fields, cross-file `count_from`, read-only fields. Do not design for these speculatively.
+
+---
+
+## Follow-up tasks (cleanup after all steps complete)
+
+Known issues deliberately deferred so the steps can proceed. **Executing agents: when you find an out-of-scope issue during a step, add it here** (concise issue + solution) instead of fixing it inline. After Step 11, work through this list.
+
+1. **Stale `resolved_count` after editing a dynamic count.** `MatchedModule.resolved_count` is snapshotted at `open_dat`, but `count_from` modules read a live count the user can edit (the BattleUnitHeader `record_count` field occupies the exact bytes BattleUnit's `count_from` reads). The runtime stays correct (it re-resolves per read/write), but the UI's `entry_count` goes stale until the dat is reopened.
+   _Solution:_ recompute counts from the live payload in `get_modules`/`set_field` (or drop the snapshot and resolve in `module_summary`), so the UI always sees the current count.
+2. **Silent size fallbacks in `module_runtime` helpers.** `signed_range`/`sign_extend` treat any int size other than 1/2 as i32 via `_ =>` arms, and `max_unsigned` shifts unchecked — a hand-built `ModuleFile` with an invalid size (all fields are `pub`, no validated constructor) degrades silently. Only `parse_module` enforces size sets today.
+   _Solution:_ add `debug_assert!`/explicit error arms for invalid sizes in those helpers so bypassed validation fails loudly.
+3. **Per-call deep clones of the module set.** `lib.rs::current_module_set` clones the whole `ModuleSet` (24 modules + compiled GlobSets + sidecar Arcs) on every `open_game_directory`/`open_dat`, and `match_modules` clones each matching `LoadedModule` again. The set is never mutated after load (only wholesale-replaced by `reload_modules`).
+   _Solution:_ store `Arc<LoadedModule>` in `ModuleSet` (or `Arc<ModuleSet>` in state) so these become pointer copies.
+4. **Triple-nested access chains.** `matched.module.module.id` (`MatchedModule.module` → `LoadedModule.module` → `ModuleFile`) appears 6+ times across `session.rs`/`lib.rs`.
+   _Solution:_ rename `MatchedModule.module` to `loaded` and/or add accessor methods (e.g. `MatchedModule::id()`).
+5. **Duplicate `Endian` enums.** `module_spec::Endian` and `binary::Endian` are identical two-variant enums maintained in parallel (`binary::Endian` is still used by `filetable`).
+   _Solution:_ consolidate to a single definition — keep `module_spec::Endian` (it has the serde derives) and re-export it from `binary`, or vice versa.
