@@ -595,3 +595,4 @@ These features are intentionally outside version `1`:
 7. Cross-file count sources, where a table's entry count lives in a different file than the table.
 8. Resizing tables: adding or removing entries requires rewriting the block header count and shifting every block after the table. Version `1` reads counts from block headers but never changes a table's length.
 9. Read-only fields.
+10. Union fields: one stored value with multiple selectable interpretations, ideally switched by a discriminator field. Version `1` carries over Nightmare's duplicate-offset pattern instead (see Duplicate and Overlapping Storage), where the same bytes are exposed as a raw numeric field plus one or more dropdowns. Converting those field groups into unions requires per-module human judgment, so it is deferred until after the converted set is stable.
