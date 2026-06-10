@@ -16,6 +16,7 @@
     endian: 'little',
 
     entry: {
+        header: true,
         count: 31,
         size: 24,
         labels_file: null

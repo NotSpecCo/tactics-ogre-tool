@@ -102,7 +102,7 @@ pub struct DatSession {
     pub dirty: bool,
     /// Modules matched to this dat at open time. Record and field commands
     /// resolve module IDs only through this list, never through the global
-    /// set. Entry counts are never cached here: `count_from` counts live in
+    /// set. Entry counts are never cached here: block header counts live in
     /// payload bytes the user can edit, so they are resolved against the
     /// live payload on every use.
     pub modules: Vec<Arc<LoadedModule>>,
@@ -148,8 +148,18 @@ pub struct ModuleSummary {
     pub label: String,
     pub notes: Option<String>,
     pub entry_count: u64,
+    /// Non-fatal warning: a header-driven module's expected `entry.count`
+    /// differs from the block header count. `entry_count` (the header
+    /// count) stays authoritative.
+    pub count_divergence: Option<CountDivergenceInfo>,
     /// Entry labels with values below the resolved count, in file order.
     pub entry_labels: Vec<LabeledValue>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct CountDivergenceInfo {
+    pub expected: u64,
+    pub actual: u64,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -328,10 +338,16 @@ pub fn find_matched<'a>(
 }
 
 /// Builds a summary with the entry count resolved against the live payload
-/// (a `count_from` count may sit in bytes the user has edited since open).
+/// (a block header count may sit in bytes the user has edited since open,
+/// via the battle unit header module).
 pub fn module_summary(loaded: &LoadedModule, payload: &[u8]) -> Result<ModuleSummary, String> {
     let count =
         module_runtime::resolve_count(payload, &loaded.module).map_err(|e| e.to_string())?;
+    let count_divergence =
+        module_runtime::count_divergence(&loaded.module, count).map(|d| CountDivergenceInfo {
+            expected: d.expected,
+            actual: d.actual,
+        });
 
     // Entry labels at or above the resolved count are never displayed.
     let entry_labels = loaded
@@ -351,14 +367,15 @@ pub fn module_summary(loaded: &LoadedModule, payload: &[u8]) -> Result<ModuleSum
         label: loaded.module.label.clone(),
         notes: loaded.module.notes.clone(),
         entry_count: count,
+        count_divergence,
         entry_labels,
     })
 }
 
 /// Summarizes every module against the live payload. Modules whose counts
 /// no longer resolve are reported in the second value instead of being
-/// silently dropped (the user can break a `count_from` count by editing the
-/// bytes it reads).
+/// silently dropped (the user can break a block header by editing the bytes
+/// it occupies).
 pub fn summarize_modules(
     modules: &[Arc<LoadedModule>],
     payload: &[u8],
@@ -801,9 +818,9 @@ mod tests {
         assert_eq!(summary.entry_labels[1].label, "Beta");
     }
 
-    /// A set with one count_from module: a u8 count at offset 0, table at
-    /// offset 1 with 2-byte entries.
-    fn count_from_set() -> ModuleSet {
+    /// A set with one header-driven module: `xlce` block header at offset 0,
+    /// table at offset 0x10 with 2-byte entries, expected count 3.
+    fn header_set() -> ModuleSet {
         load_set(&[
             (
                 "dynamic.json5",
@@ -812,9 +829,10 @@ mod tests {
                     id: 'dynamic',
                     label: 'Dynamic',
                     files: ['battle/dyn.dat'],
-                    base_offset: 1,
+                    base_offset: 0x10,
                     entry: {
-                        count_from: { base_offset: 0, offset: 0, size: 1, type: 'uint' },
+                        header: true,
+                        count: 3,
                         size: 2,
                         labels_file: 'entries/dyn.json5'
                     },
@@ -828,20 +846,33 @@ mod tests {
         ])
     }
 
+    /// A payload holding an `xlce` block header (entry size 2) and room for
+    /// `entries` two-byte entries.
+    fn header_payload(count: u32, entries: usize) -> Vec<u8> {
+        let mut payload = Vec::new();
+        payload.extend_from_slice(b"xlce");
+        payload.extend_from_slice(&count.to_le_bytes());
+        payload.extend_from_slice(&0x10u32.to_le_bytes());
+        payload.extend_from_slice(&2u32.to_le_bytes());
+        payload.extend_from_slice(&vec![0u8; entries * 2]);
+        payload
+    }
+
     #[test]
-    fn module_summary_resolves_count_from_the_live_payload() {
-        let set = count_from_set();
-        // Count byte says 3; room for exactly 3 entries.
-        let mut payload = vec![3u8, 0, 0, 0, 0, 0, 0];
+    fn module_summary_resolves_count_from_the_live_block_header() {
+        let set = header_set();
+        // Header count says 3; room for exactly 3 entries.
+        let mut payload = header_payload(3, 3);
         let modules = matched(&set, "battle/dyn.dat", &payload);
 
         let summary = module_summary(&modules[0], &payload).unwrap();
         assert_eq!(summary.entry_count, 3);
         assert_eq!(summary.entry_labels.len(), 3);
+        assert!(summary.count_divergence.is_none());
 
-        // Editing the stored count must be visible without re-matching, and
-        // labels at or above the new count disappear.
-        payload[0] = 2;
+        // Editing the stored header count must be visible without
+        // re-matching, and labels at or above the new count disappear.
+        payload[4] = 2;
         let summary = module_summary(&modules[0], &payload).unwrap();
         assert_eq!(summary.entry_count, 2);
         assert_eq!(summary.entry_labels.len(), 2);
@@ -849,23 +880,47 @@ mod tests {
     }
 
     #[test]
+    fn module_summary_reports_expected_count_divergence_as_a_warning() {
+        let set = header_set();
+        // Header count 2 diverges from the module's expected count 3. The
+        // header count stays authoritative; the divergence is non-fatal.
+        let payload = header_payload(2, 2);
+        let modules = matched(&set, "battle/dyn.dat", &payload);
+
+        let summary = module_summary(&modules[0], &payload).unwrap();
+        assert_eq!(summary.entry_count, 2);
+        let divergence = summary.count_divergence.expect("divergence expected");
+        assert_eq!(divergence.expected, 3);
+        assert_eq!(divergence.actual, 2);
+    }
+
+    #[test]
     fn summarize_modules_reports_counts_broken_by_edits() {
-        let set = count_from_set();
-        let mut payload = vec![3u8, 0, 0, 0, 0, 0, 0];
+        let set = header_set();
+        let mut payload = header_payload(3, 3);
         let modules = matched(&set, "battle/dyn.dat", &payload);
 
         let (summaries, errors) = summarize_modules(&modules, &payload);
         assert_eq!(summaries.len(), 1);
         assert!(errors.is_empty());
 
-        // A count edit that pushes the table past the payload must surface
-        // as an error for that module, not silently drop or stale-cache it.
-        payload[0] = 200;
+        // A header count edit that pushes the table past the payload must
+        // surface as an error for that module, not silently drop or
+        // stale-cache it.
+        payload[4] = 200;
         let (summaries, errors) = summarize_modules(&modules, &payload);
         assert!(summaries.is_empty());
         assert_eq!(errors.len(), 1);
         assert!(errors[0].contains("dynamic"));
         assert!(errors[0].contains("payload"));
+
+        // Breaking the magic itself is also an error, not a silent drop.
+        payload[4] = 3;
+        payload[0] = b'X';
+        let (summaries, errors) = summarize_modules(&modules, &payload);
+        assert!(summaries.is_empty());
+        assert_eq!(errors.len(), 1);
+        assert!(errors[0].contains("magic"));
     }
 
     // --- read_record ---
@@ -1556,6 +1611,84 @@ mod tests {
                     record.unwrap_err()
                 );
             }
+        }
+    }
+
+    #[test]
+    fn battle_unit_count_resolves_from_a_real_entry_unit_header() {
+        let dat_path = test_data_dir().join("battle/entry/ENTRY_UNIT_1553.dat");
+        if !dat_path.exists() {
+            eprintln!("skipping: test data not found at {}", dat_path.display());
+            return;
+        }
+
+        let encrypted = fs::read(&dat_path).unwrap();
+        let pack = unpack_dat(&encrypted).unwrap();
+
+        let set = real_module_set();
+        let (matched, errors) =
+            match_modules(&set, "battle/entry/ENTRY_UNIT_1553.dat", &pack.bytes);
+        assert!(errors.is_empty(), "module errors: {errors:?}");
+
+        // BattleUnit (header-driven, glob) and BattleUnitHeader (fixed).
+        assert_eq!(matched.len(), 2);
+
+        let unit = matched
+            .iter()
+            .find(|m| m.id() == "battle_entry_battle_unit")
+            .unwrap();
+        let summary = module_summary(unit, &pack.bytes).unwrap();
+        // This file's block header holds 11 units; the .nmm source declared
+        // 23 — exactly the per-file variance header-driven counts exist for.
+        assert_eq!(summary.entry_count, 11);
+        // No expected count on the glob module, so no divergence warning.
+        assert!(summary.count_divergence.is_none());
+
+        for index in 0..summary.entry_count {
+            read_record(&pack.bytes, unit, index).unwrap();
+        }
+
+        // The companion header module exposes the same block header as an
+        // editable record; its count field must read the resolved count.
+        let header = matched
+            .iter()
+            .find(|m| m.id() == "battle_entry_battle_unit_header")
+            .unwrap();
+        let record = read_record(&pack.bytes, header, 0).unwrap();
+        let count_field = record
+            .fields
+            .iter()
+            .find(|f| matches!(f.value, Some(FieldValue::Uint(11))))
+            .expect("a header field should expose the unit count 11");
+        assert!(count_field.label.to_lowercase().contains("count"));
+    }
+
+    #[test]
+    fn menu_modules_resolve_against_the_real_menu_dat() {
+        let dat_path = test_data_dir().join("menu/menu_data.dat");
+        if !dat_path.exists() {
+            eprintln!("skipping: test data not found at {}", dat_path.display());
+            return;
+        }
+
+        let encrypted = fs::read(&dat_path).unwrap();
+        let pack = unpack_dat(&encrypted).unwrap();
+
+        let set = real_module_set();
+        let (matched, errors) = match_modules(&set, "menu/menu_data.dat", &pack.bytes);
+        assert!(errors.is_empty(), "module errors: {errors:?}");
+        assert_eq!(matched.len(), 2);
+
+        let (summaries, summary_errors) = summarize_modules(&matched, &pack.bytes);
+        assert!(summary_errors.is_empty(), "{summary_errors:?}");
+        for summary in &summaries {
+            // Vanilla files must match the converted expected counts exactly.
+            assert!(
+                summary.count_divergence.is_none(),
+                "unexpected divergence in '{}': {:?}",
+                summary.id,
+                summary.count_divergence
+            );
         }
     }
 }

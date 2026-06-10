@@ -4,6 +4,8 @@ Migrate the app from hardcoded Rust module definitions to the JSON5 module forma
 
 **Status:** All 11 steps are complete and committed on `fixes-part-1`, including the manual end-to-end checklist. The Follow-up tasks below are all resolved (pending review). The migration is done.
 
+> **Post-migration spec change (2026-06-10):** after this plan completed, the spec replaced `count_from` with block-header-driven tables (`entry.header: true`, reading entry counts from the 16-byte `xlce` block headers; see the spec's Entry Definition and Header-Driven Table Detection sections). The converter, Rust module layer, committed `modules/` tree, and frontend were migrated to the header format the same day, including a non-fatal expected-count divergence warning surfaced through `ModuleSummary`. References to `count_from` below describe what was built at the time, not the current code.
+
 **How to use this document (for the executing agent):**
 
 1. Read `docs/MODULE-SPEC.md` in full before starting any step. It is the authority on all format and behavior questions. This plan never overrides the spec; if they conflict, the spec wins — and flag the conflict to the user immediately.

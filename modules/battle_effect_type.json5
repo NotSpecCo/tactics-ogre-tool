@@ -16,6 +16,7 @@
     endian: 'little',
 
     entry: {
+        header: true,
         count: 44,
         size: 12,
         labels_file: 'entries/effect_type.json5'

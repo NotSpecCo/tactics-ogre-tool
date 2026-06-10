@@ -16,6 +16,7 @@
     endian: 'little',
 
     entry: {
+        header: true,
         count: 81,
         size: 260,
         labels_file: 'entries/health_damage.json5'

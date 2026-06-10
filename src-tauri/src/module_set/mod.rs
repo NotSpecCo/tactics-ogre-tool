@@ -8,7 +8,7 @@
 //! `ModuleSet`, warnings do not exclude.
 //!
 //! Many spec rules are already guaranteed by `module_spec::parse` (schema
-//! version, count/count_from exclusivity, positive sizes, integer size sets,
+//! version, header/count entry rules, positive sizes, integer size sets,
 //! per-type key legality). Parse failures surface here as errors attributed
 //! to the module file, so the full rule list still holds for any loaded set.
 

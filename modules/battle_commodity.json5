@@ -16,6 +16,7 @@
     endian: 'little',
 
     entry: {
+        header: true,
         count: 732,
         size: 56,
         labels_file: 'entries/commodity.json5'

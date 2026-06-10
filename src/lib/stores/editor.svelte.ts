@@ -79,7 +79,7 @@ class EditorStore {
             }
             set.add(fieldId);
             session.markDirty();
-            // The write may have changed bytes a count_from entry count
+            // The write may have changed bytes a block header entry count
             // reads, so refresh module summaries from the live payload.
             await session.refreshModules();
         } catch (e) {

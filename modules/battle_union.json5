@@ -16,6 +16,7 @@
     endian: 'little',
 
     entry: {
+        header: true,
         count: 21,
         size: 4,
         labels_file: 'entries/union.json5'

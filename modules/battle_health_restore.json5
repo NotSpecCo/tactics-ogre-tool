@@ -16,6 +16,7 @@
     endian: 'little',
 
     entry: {
+        header: true,
         count: 21,
         size: 268,
         labels_file: 'entries/health_restore.json5'

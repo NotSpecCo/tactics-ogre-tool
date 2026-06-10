@@ -16,6 +16,7 @@
     endian: 'little',
 
     entry: {
+        header: true,
         count: 761,
         size: 152,
         labels_file: 'entries/armament.json5'

@@ -24,6 +24,14 @@
                     {mod.notes}
                 </span>
             {/if}
+            {#if mod.count_divergence}
+                <span
+                    class="text-sm text-amber-600"
+                    title="This file's table header reports a different entry count than the module expects. The file's count is used."
+                >
+                    ⚠ {mod.count_divergence.actual} entries (expected {mod.count_divergence.expected})
+                </span>
+            {/if}
         </button>
     {/each}
 </nav>

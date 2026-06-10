@@ -25,8 +25,19 @@ export interface ModuleSummary {
     label: string;
     notes: string | null;
     entry_count: number;
+    /**
+     * Non-fatal warning: a header-driven module's expected entry count
+     * differs from the block header count. `entry_count` (the header count)
+     * stays authoritative.
+     */
+    count_divergence: CountDivergence | null;
     /** Entry labels with values below the resolved count, in file order. */
     entry_labels: LabeledValue[];
+}
+
+export interface CountDivergence {
+    expected: number;
+    actual: number;
 }
 
 export interface LabeledValue {
@@ -114,7 +125,7 @@ export function openDat(sessionId: string, datPath: string, force?: boolean): Pr
 
 /**
  * Re-summarizes the open dat's modules against the live payload, so entry
- * counts reflect edits to the bytes a `count_from` count reads.
+ * counts reflect edits to the bytes a block header count reads.
  */
 export function getModules(sessionId: string): Promise<DatSessionInfo> {
     return invoke('get_modules', { sessionId });

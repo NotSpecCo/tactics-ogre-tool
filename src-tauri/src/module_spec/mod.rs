@@ -8,6 +8,6 @@ mod tests;
 
 pub use parse::{parse_module, parse_sidecar, ParseError};
 pub use types::{
-    BytesField, CountFrom, CountSpec, DisplayFormat, DropdownField, Endian, Entry, Field, IntField,
+    BytesField, CountSpec, DisplayFormat, DropdownField, Endian, Entry, Field, IntField,
     ModuleFile, SectionField, SidecarItem, SourceInfo, TextField, UintField,
 };

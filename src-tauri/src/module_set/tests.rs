@@ -397,25 +397,32 @@ fn entry_labels_at_or_above_fixed_count_warn() {
     assert_eq!(warning.module_id.as_deref(), Some("test_module"));
 }
 
+/// A header-driven module over a glob target, with an optional expected
+/// count fragment (e.g. `"count: 4,"` or `""`).
+fn header_module(count_fragment: &str) -> String {
+    format!(
+        "{{
+            schema_version: 1,
+            id: 'dynamic',
+            label: 'Dynamic',
+            files: ['battle/entry/entry_unit_*.dat'],
+            base_offset: 0x30,
+            entry: {{
+                header: true,
+                {count_fragment}
+                size: 0xc4,
+                labels_file: 'entries/test.json5'
+            }},
+            fields: [ {{ id: 'a', label: 'A', offset: 0, size: 1, type: 'uint' }} ]
+        }}"
+    )
+}
+
 #[test]
-fn dynamic_count_modules_skip_the_entry_count_check() {
+fn header_modules_without_expected_count_skip_the_entry_count_check() {
+    let module = header_module("");
     let (set, report) = load(&[
-        (
-            "dynamic.json5",
-            "{
-                schema_version: 1,
-                id: 'dynamic',
-                label: 'Dynamic',
-                files: ['battle/entry/entry_unit_*.dat'],
-                base_offset: 0x30,
-                entry: {
-                    count_from: { base_offset: 0x20, offset: 0x04, size: 4, type: 'uint' },
-                    size: 0xc4,
-                    labels_file: 'entries/test.json5'
-                },
-                fields: [ { id: 'a', label: 'A', offset: 0, size: 1, type: 'uint' } ]
-            }",
-        ),
+        ("dynamic.json5", &module),
         (
             "entries/test.json5",
             "[ { value: 9999, label: 'High value' } ]",
@@ -423,6 +430,37 @@ fn dynamic_count_modules_skip_the_entry_count_check() {
     ]);
     assert_eq!(set.modules.len(), 1);
     assert!(report.warnings.is_empty(), "{:?}", report.warnings);
+}
+
+#[test]
+fn header_modules_with_expected_count_warn_on_entry_overflow() {
+    let module = header_module("count: 4,");
+    let (set, report) = load(&[
+        ("dynamic.json5", &module),
+        (
+            "entries/test.json5",
+            "[ { value: 9999, label: 'High value' } ]",
+        ),
+    ]);
+    assert_eq!(set.modules.len(), 1);
+    assert!(report
+        .warnings
+        .iter()
+        .any(|i| i.message.contains("never displayed")));
+}
+
+#[test]
+fn header_modules_with_base_offset_below_0x10_are_errors() {
+    let module = header_module("").replace("base_offset: 0x30", "base_offset: 0x0c");
+    let (set, report) = load(&[
+        ("dynamic.json5", &module),
+        ("entries/test.json5", "[ { value: 0, label: 'Ok' } ]"),
+    ]);
+    assert_eq!(set.modules.len(), 0);
+    assert!(report
+        .errors
+        .iter()
+        .any(|i| i.message.contains("at least 0x10")));
 }
 
 // --- non-module files ------------------------------------------------------------------

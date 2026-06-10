@@ -177,7 +177,7 @@ fn open_dat(
 }
 
 /// Re-summarizes the open dat's modules against the live payload, so entry
-/// counts reflect any edits to the bytes a `count_from` count reads.
+/// counts reflect any edits to the bytes a block header count reads.
 #[tauri::command]
 fn get_modules(
     state: tauri::State<'_, AppState>,

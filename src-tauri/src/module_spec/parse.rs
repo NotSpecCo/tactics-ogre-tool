@@ -7,7 +7,7 @@
 use serde::Deserialize;
 
 use super::types::{
-    BytesField, CountFrom, CountSpec, DisplayFormat, DropdownField, Endian, Entry, Field, IntField,
+    BytesField, CountSpec, DisplayFormat, DropdownField, Endian, Entry, Field, IntField,
     ModuleFile, SectionField, SidecarItem, SourceInfo, TextField, UintField,
 };
 
@@ -62,32 +62,12 @@ struct RawModule {
 #[serde(deny_unknown_fields)]
 struct RawEntry {
     #[serde(default)]
-    count: Option<u64>,
+    header: Option<bool>,
     #[serde(default)]
-    count_from: Option<RawCountFrom>,
+    count: Option<u64>,
     size: u64,
     #[serde(default)]
     labels_file: Option<String>,
-}
-
-#[derive(Deserialize)]
-#[serde(deny_unknown_fields)]
-struct RawCountFrom {
-    #[serde(default)]
-    base_offset: Option<u64>,
-    offset: u64,
-    size: u64,
-    #[serde(rename = "type")]
-    value_type: CountFromType,
-    #[serde(default)]
-    endian: Option<Endian>,
-}
-
-/// Version 1 admits only `uint` dynamic counts.
-#[derive(Deserialize)]
-#[serde(rename_all = "lowercase")]
-enum CountFromType {
-    Uint,
 }
 
 #[derive(Deserialize, Clone, Copy)]
@@ -260,24 +240,24 @@ fn convert_module(raw: RawModule) -> Result<ModuleFile, ParseError> {
 }
 
 fn convert_entry(raw: RawEntry) -> Result<Entry, ParseError> {
-    let count = match (raw.count, raw.count_from) {
-        (Some(_), Some(_)) => {
-            return Err(shape(
-                "entry",
-                "count and count_from are mutually exclusive",
-            ));
+    if raw.count == Some(0) {
+        return Err(shape("entry.count", "must be a positive integer"));
+    }
+
+    let count = if raw.header.unwrap_or(false) {
+        CountSpec::Header {
+            expected: raw.count,
         }
-        (None, None) => {
-            return Err(shape(
-                "entry",
-                "exactly one of count or count_from is required",
-            ));
+    } else {
+        match raw.count {
+            Some(n) => CountSpec::Fixed(n),
+            None => {
+                return Err(shape(
+                    "entry.count",
+                    "is required unless entry.header is true",
+                ));
+            }
         }
-        (Some(0), None) => {
-            return Err(shape("entry.count", "must be a positive integer"));
-        }
-        (Some(n), None) => CountSpec::Fixed(n),
-        (None, Some(count_from)) => CountSpec::From(convert_count_from(count_from)?),
     };
 
     if raw.size == 0 {
@@ -288,25 +268,6 @@ fn convert_entry(raw: RawEntry) -> Result<Entry, ParseError> {
         count,
         size: raw.size,
         labels_file: raw.labels_file,
-    })
-}
-
-fn convert_count_from(raw: RawCountFrom) -> Result<CountFrom, ParseError> {
-    // `type` is enforced as `uint` by the CountFromType enum at parse time.
-    let CountFromType::Uint = raw.value_type;
-
-    if !matches!(raw.size, 1 | 2 | 4) {
-        return Err(shape(
-            "entry.count_from.size",
-            format!("must be 1, 2, or 4, found {}", raw.size),
-        ));
-    }
-
-    Ok(CountFrom {
-        base_offset: raw.base_offset.unwrap_or(0),
-        offset: raw.offset,
-        size: raw.size,
-        endian: raw.endian,
     })
 }
 

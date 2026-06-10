@@ -17,6 +17,18 @@ export const TYPE_CODE_MAP = {
 
 const SIDECAR_DIRS = ['_list', '_name', '_record'];
 
+// Deliberate partial views: each shares its block with the corresponding
+// full-table module and exposes only entry 0, so its declared count is
+// intentionally smaller than the block header count. These convert as
+// fixed-count tables (spec: "Header-Driven Table Detection").
+export const PARTIAL_VIEW_MODULES = new Set([
+    'battle/HealthDamageConfiguration.nmm',
+    'battle/HealthRestoreConfiguration.nmm',
+    'battle/HitRateConfiguration.nmm'
+]);
+
+const BLOCK_HEADER_SIZE = 0x10;
+
 // --- line handling ---------------------------------------------------------
 
 // Split on \n, \r\n, or \r (mixed allowed) and trim trailing whitespace from
@@ -123,12 +135,20 @@ export function parseNmmText(text, context) {
         throw new Error(`${context}: expected at least 7 logical header lines, found ${content.length}`);
     }
 
-    // The first three comment lines are Nightmare file-verification metadata,
-    // skipped by position (their content varies; one file has a bare '#').
+    // The first three comment lines are Nightmare file-verification metadata:
+    // checksum, ID-string address, ID string (content varies; some files have
+    // a bare '#' checksum line). The address and ID string drive header-driven
+    // table detection per the spec's "Header-Driven Table Detection".
     const preHeader = comments.filter((c) => c.line < content[0].line);
     if (preHeader.length < 3) {
         warnings.push(`${context}: expected 3 metadata comment lines before the header, found ${preHeader.length}`);
     }
+    const metaTokens = preHeader.slice(0, 3).map((c) => c.trimmed.replace(/^#/, '').trim());
+    let metaAddress = null;
+    if (preHeader.length >= 2 && /^(0x[0-9a-f]+|[0-9]+)$/i.test(metaTokens[1])) {
+        metaAddress = parseIntegerToken(metaTokens[1], `${context}:${preHeader[1].line}`);
+    }
+    const metaId = preHeader.length >= 3 ? metaTokens[2] : null;
     const noteComments = preHeader.slice(3);
     const notes = joinComments(noteComments);
 
@@ -205,7 +225,7 @@ export function parseNmmText(text, context) {
     }
     flushRun();
 
-    return { title, baseOffset, entryCount, entrySize, labelsPath, notes, fields, warnings };
+    return { title, baseOffset, entryCount, entrySize, labelsPath, notes, fields, warnings, metaAddress, metaId };
 }
 
 // --- sidecar references ------------------------------------------------------
@@ -313,21 +333,34 @@ export function convertNmmText(text, relPath) {
         return { id, ...d.field };
     });
 
+    const files = filesFromTitle(parsed.title);
+    const labelsRef = resolveSidecarRef(relPath, parsed.labelsPath ?? 'NULL');
+    const labelsFile = labelsRef === null ? null : mappedEntriesPath(labelsRef);
+
+    // Header-driven table detection: the metadata ID string is 'xlce' and the
+    // metadata address is the block header at base_offset - 0x10, except for
+    // the deliberate partial views.
+    const headerDriven =
+        parsed.metaId === 'xlce' &&
+        parsed.metaAddress === parsed.baseOffset - BLOCK_HEADER_SIZE &&
+        !PARTIAL_VIEW_MODULES.has(relPath);
+
     let entry;
-    if (relPath === 'battle/entry/BattleUnit.nmm') {
-        // Dynamic count from the BattleUnitHeader record count field (spec:
-        // "Dynamic Battle Unit Counts").
+    if (headerDriven) {
+        // Literal targets keep the declared count as the expected count; glob
+        // targets drop it, since per-file counts vary by design.
+        const isGlob = files.some((f) => /[*?]/.test(f));
         entry = {
-            count_from: { base_offset: 0x20, offset: 0x04, size: 4, type: 'uint' },
+            header: true,
+            ...(isGlob ? {} : { count: parsed.entryCount }),
             size: parsed.entrySize,
-            labels_file: null
+            labels_file: labelsFile
         };
     } else {
-        const labelsRef = resolveSidecarRef(relPath, parsed.labelsPath ?? 'NULL');
         entry = {
             count: parsed.entryCount,
             size: parsed.entrySize,
-            labels_file: labelsRef === null ? null : mappedEntriesPath(labelsRef)
+            labels_file: labelsFile
         };
     }
 
@@ -337,7 +370,7 @@ export function convertNmmText(text, relPath) {
         label: labelFromTitle(parsed.title),
         notes: parsed.notes,
         source: { format: 'nightmare', path: relPath, title: parsed.title },
-        files: filesFromTitle(parsed.title),
+        files,
         base_offset: parsed.baseOffset,
         endian: 'little',
         entry,
@@ -426,15 +459,10 @@ export function serializeModule(module) {
     out.push(`    endian: ${q(module.endian)},`);
     out.push('');
     out.push('    entry: {');
-    if (module.entry.count_from) {
-        const cf = module.entry.count_from;
-        out.push('        count_from: {');
-        out.push(`            base_offset: ${formatHex(cf.base_offset, 2)},`);
-        out.push(`            offset: ${formatHex(cf.offset, 2)},`);
-        out.push(`            size: ${cf.size},`);
-        out.push(`            type: ${q(cf.type)}`);
-        out.push('        },');
-    } else {
+    if (module.entry.header) {
+        out.push('        header: true,');
+    }
+    if (module.entry.count !== undefined) {
         out.push(`        count: ${module.entry.count},`);
     }
     out.push(`        size: ${module.entry.size},`);

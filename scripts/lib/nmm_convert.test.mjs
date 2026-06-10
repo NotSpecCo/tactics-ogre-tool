@@ -126,7 +126,7 @@ describe('parseIntegerToken', () => {
 });
 
 describe('parseNmmText', () => {
-    it('parses the header, skipping the three metadata comments by position', () => {
+    it('parses the header, extracting the metadata address and ID string', () => {
         const parsed = parseNmmText(nmm({ metadata: ['#', '#0x00000020', '#xlce'] }), 'test.nmm');
         expect(parsed.title).toContain('battle_data_release');
         expect(parsed.baseOffset).toBe(0x100);
@@ -134,6 +134,14 @@ describe('parseNmmText', () => {
         expect(parsed.entrySize).toBe(32);
         expect(parsed.labelsPath).toBeNull();
         expect(parsed.notes).toBe('');
+        expect(parsed.metaAddress).toBe(0x20);
+        expect(parsed.metaId).toBe('xlce');
+    });
+
+    it('tolerates unparseable metadata address lines', () => {
+        const parsed = parseNmmText(nmm({ metadata: ['#181ADE14', '#not-an-address', '#xlce'] }), 'test.nmm');
+        expect(parsed.metaAddress).toBeNull();
+        expect(parsed.metaId).toBe('xlce');
     });
 
     it('accepts decimal header numerics', () => {
@@ -355,9 +363,18 @@ describe('convertNmmText', () => {
         expect(module.entry).toEqual({ count: 16, size: 32, labels_file: 'entries/class.json5' });
     });
 
-    it('converts battle/entry/BattleUnit.nmm with the spec count_from block', () => {
+    it('converts as header-driven when the metadata points at base_offset - 0x10', () => {
+        const { module } = convertNmmText(
+            nmm({ metadata: ['#181ADE14', '#0x000000F0', '#xlce'], baseOffset: '0x00000100', count: '16' }),
+            'battle/Test.nmm'
+        );
+        expect(module.entry).toEqual({ header: true, count: 16, size: 32, labels_file: null });
+    });
+
+    it('drops the expected count for header-driven glob targets, like BattleUnit', () => {
         const { module } = convertNmmText(
             nmm({
+                metadata: ['#', '#0x00000020', '#xlce'],
                 title: 'Tactics Ogre: Reborn ==> battle / entry / entry_unit_#### / pack ==> Battle Unit',
                 baseOffset: '0x00000030',
                 count: '23',
@@ -365,11 +382,31 @@ describe('convertNmmText', () => {
             }),
             'battle/entry/BattleUnit.nmm'
         );
-        expect(module.entry).toEqual({
-            count_from: { base_offset: 0x20, offset: 0x04, size: 4, type: 'uint' },
-            size: 0xc4,
-            labels_file: null
-        });
+        expect(module.entry).toEqual({ header: true, size: 0xc4, labels_file: null });
+    });
+
+    it('converts as fixed-count when the metadata ID string is not xlce', () => {
+        const { module } = convertNmmText(
+            nmm({ metadata: ['#181ADE14', '#0x000000F0', '#other'], baseOffset: '0x00000100' }),
+            'battle/Test.nmm'
+        );
+        expect(module.entry).toEqual({ count: 16, size: 32, labels_file: null });
+    });
+
+    it('converts as fixed-count when the metadata address is not base_offset - 0x10', () => {
+        const { module } = convertNmmText(
+            nmm({ metadata: ['#181ADE14', '#0x00000020', '#xlce'], baseOffset: '0x00000020' }),
+            'battle/Test.nmm'
+        );
+        expect(module.entry).toEqual({ count: 16, size: 32, labels_file: null });
+    });
+
+    it('converts the partial-view Configuration modules as fixed-count despite matching metadata', () => {
+        const { module } = convertNmmText(
+            nmm({ metadata: ['#181ADE14', '#0x000000F0', '#xlce'], baseOffset: '0x00000100', count: '1' }),
+            'battle/HitRateConfiguration.nmm'
+        );
+        expect(module.entry).toEqual({ count: 1, size: 32, labels_file: null });
     });
 
     it('rejects a dropdown without an options file and a non-dropdown with one', () => {
@@ -495,22 +532,31 @@ describe('serialization', () => {
 `);
     });
 
-    it('serializes count_from entries', () => {
+    it('serializes header-driven entries with the expected count for literal targets', () => {
+        const { module } = convertNmmText(
+            nmm({ metadata: ['#181ADE14', '#0x000000F0', '#xlce'], baseOffset: '0x00000100' }),
+            'battle/Test.nmm'
+        );
+        expect(serializeModule(module)).toContain(`    entry: {
+        header: true,
+        count: 16,
+        size: 32,
+        labels_file: null
+    },`);
+    });
+
+    it('serializes header-driven entries without a count for glob targets', () => {
         const { module } = convertNmmText(
             nmm({
+                metadata: ['#', '#0x00000020', '#xlce'],
                 title: 'X ==> battle / entry / entry_unit_#### / pack ==> Battle Unit',
+                baseOffset: '0x00000030',
                 size: '0x000000C4'
             }),
             'battle/entry/BattleUnit.nmm'
         );
-        const text = serializeModule(module);
-        expect(text).toContain(`    entry: {
-        count_from: {
-            base_offset: 0x20,
-            offset: 0x04,
-            size: 4,
-            type: 'uint'
-        },
+        expect(serializeModule(module)).toContain(`    entry: {
+        header: true,
         size: 196,
         labels_file: null
     },`);
@@ -541,23 +587,49 @@ describe('convertTree against the real reference set', () => {
         const text = tree.outputs.get('battle_armament.json5');
         expect(text).toContain("id: 'battle_armament'");
         expect(text).toContain('base_offset: 0x00393f20');
+        expect(text).toContain('header: true');
         expect(text).toContain('count: 761');
         expect(text).toContain('size: 152');
         expect(text).toContain("labels_file: 'entries/armament.json5'");
         expect(text).toContain("files: ['battle/battle_data_release.dat']");
     });
 
-    it('produces the BattleUnit pair per the spec dynamic count section', () => {
+    it('produces the BattleUnit pair per the spec battle unit tables section', () => {
         const unit = tree.outputs.get('battle_entry_battle_unit.json5');
         expect(unit).toContain("files: ['battle/entry/entry_unit_*.dat']");
-        expect(unit).toContain('count_from');
+        expect(unit).toContain('header: true');
+        expect(unit).not.toContain('count:');
         expect(unit).toContain('base_offset: 0x00000030');
 
         const header = tree.outputs.get('battle_entry_battle_unit_header.json5');
+        expect(header).not.toContain('header: true');
         expect(header).toContain('count: 1');
         expect(header).toContain('size: 16');
         expect(header).toContain('base_offset: 0x00000020');
         expect(header).toContain("type: 'text'");
+    });
+
+    it('converts every module except the four known exceptions as header-driven', () => {
+        const fixedCount = [...tree.outputs.keys()]
+            .filter((rel) => !rel.includes('/') && tree.outputs.get(rel).includes('entry: {'))
+            .filter((rel) => !tree.outputs.get(rel).includes('header: true'))
+            .sort();
+        expect(fixedCount).toEqual([
+            'battle_entry_battle_unit_header.json5',
+            'battle_health_damage_configuration.json5',
+            'battle_health_restore_configuration.json5',
+            'battle_hit_rate_configuration.json5'
+        ]);
+    });
+
+    it('keeps the declared count 1 on the partial-view Configuration modules', () => {
+        for (const rel of [
+            'battle_health_damage_configuration.json5',
+            'battle_health_restore_configuration.json5',
+            'battle_hit_rate_configuration.json5'
+        ]) {
+            expect(tree.outputs.get(rel)).toContain('count: 1');
+        }
     });
 
     it('maps menu modules to menu_data.dat', () => {

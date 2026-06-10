@@ -16,12 +16,7 @@
     endian: 'little',
 
     entry: {
-        count_from: {
-            base_offset: 0x20,
-            offset: 0x04,
-            size: 4,
-            type: 'uint'
-        },
+        header: true,
         size: 196,
         labels_file: null
     },

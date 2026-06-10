@@ -59,6 +59,7 @@ const SPEC_EXAMPLE: &str = r#"
     endian: 'little',
 
     entry: {
+        header: true,
         count: 761,
         size: 152,
         labels_file: 'entries/armament.json5'
@@ -128,7 +129,12 @@ fn spec_example_module_parses() {
     assert_eq!(source.path.as_deref(), Some("battle/Armament.nmm"));
     assert!(source.title.unwrap().contains("Armament (Equipment)"));
 
-    assert_eq!(module.entry.count, CountSpec::Fixed(761));
+    assert_eq!(
+        module.entry.count,
+        CountSpec::Header {
+            expected: Some(761)
+        }
+    );
     assert_eq!(module.entry.size, 152);
     assert_eq!(
         module.entry.labels_file.as_deref(),
@@ -167,30 +173,19 @@ fn spec_example_module_parses() {
 }
 
 #[test]
-fn spec_count_from_example_parses() {
+fn spec_header_driven_glob_example_parses() {
+    // The BattleUnit example from the spec's "Battle Unit Tables" section:
+    // header-driven with no expected count.
     let module = parse_ok(
         "{
-            count_from: {
-                base_offset: 0x20,
-                offset: 0x04,
-                size: 4,
-                type: 'uint'
-            },
+            header: true,
             size: 0xc4,
             labels_file: null
         }",
         FIELD_UINT,
     );
 
-    assert_eq!(
-        module.entry.count,
-        CountSpec::From(CountFrom {
-            base_offset: 0x20,
-            offset: 0x04,
-            size: 4,
-            endian: None,
-        })
-    );
+    assert_eq!(module.entry.count, CountSpec::Header { expected: None });
     assert_eq!(module.entry.size, 0xc4);
     assert_eq!(module.entry.labels_file, None);
 }
@@ -198,27 +193,17 @@ fn spec_count_from_example_parses() {
 // --- defaults and optional keys --------------------------------------------------
 
 #[test]
-fn count_from_base_offset_defaults_to_zero() {
-    let module = parse_ok(
-        "{ count_from: { offset: 0x04, size: 2, type: 'uint' }, size: 8 }",
-        FIELD_UINT,
-    );
-    match module.entry.count {
-        CountSpec::From(cf) => assert_eq!(cf.base_offset, 0),
-        other => panic!("expected count_from, got {other:?}"),
-    }
+fn header_true_with_count_keeps_the_expected_count() {
+    let module = parse_ok("{ header: true, count: 16, size: 32 }", FIELD_UINT);
+    assert_eq!(module.entry.count, CountSpec::Header { expected: Some(16) });
 }
 
 #[test]
-fn count_from_endian_override_parses() {
-    let module = parse_ok(
-        "{ count_from: { offset: 0, size: 4, type: 'uint', endian: 'big' }, size: 8 }",
-        FIELD_UINT,
-    );
-    match module.entry.count {
-        CountSpec::From(cf) => assert_eq!(cf.endian, Some(Endian::Big)),
-        other => panic!("expected count_from, got {other:?}"),
-    }
+fn header_false_is_equivalent_to_absent() {
+    let explicit = parse_ok("{ header: false, count: 16, size: 32 }", FIELD_UINT);
+    let absent = parse_ok("{ count: 16, size: 32 }", FIELD_UINT);
+    assert_eq!(explicit.entry.count, CountSpec::Fixed(16));
+    assert_eq!(explicit.entry, absent.entry);
 }
 
 #[test]
@@ -388,23 +373,18 @@ fn schema_version_other_than_1_is_rejected() {
 }
 
 #[test]
-fn count_and_count_from_are_mutually_exclusive() {
-    let err = parse_err(
-        "{ count: 4, count_from: { offset: 0, size: 4, type: 'uint' }, size: 8 }",
-        FIELD_UINT,
-    );
-    assert!(err.to_string().contains("mutually exclusive"));
-}
-
-#[test]
-fn entry_requires_count_or_count_from() {
+fn entry_requires_count_unless_header() {
     let err = parse_err("{ size: 8 }", FIELD_UINT);
-    assert!(err.to_string().contains("exactly one"));
+    assert!(err.to_string().contains("required unless"));
+
+    let err = parse_err("{ header: false, size: 8 }", FIELD_UINT);
+    assert!(err.to_string().contains("required unless"));
 }
 
 #[test]
 fn zero_count_and_zero_sizes_are_rejected() {
     parse_err("{ count: 0, size: 32 }", FIELD_UINT);
+    parse_err("{ header: true, count: 0, size: 32 }", FIELD_UINT);
     parse_err("{ count: 16, size: 0 }", FIELD_UINT);
 
     let fields = "{ id: 'a', label: 'A', offset: 0, size: 0, type: 'uint' }";
@@ -412,34 +392,17 @@ fn zero_count_and_zero_sizes_are_rejected() {
 }
 
 #[test]
-fn count_from_size_must_be_1_2_or_4() {
-    let err = parse_err(
-        "{ count_from: { offset: 0, size: 3, type: 'uint' }, size: 8 }",
-        FIELD_UINT,
-    );
-    assert!(err.to_string().contains("1, 2, or 4"));
+fn header_must_be_a_boolean() {
+    parse_err("{ header: 1, size: 8 }", FIELD_UINT);
+    parse_err("{ header: 'true', size: 8 }", FIELD_UINT);
 }
 
 #[test]
-fn count_from_type_must_be_uint() {
+fn count_from_is_no_longer_a_valid_key() {
+    // The pre-header spec revision used a count_from block; it must now be
+    // rejected as an unknown key so stale modules fail loudly.
     parse_err(
-        "{ count_from: { offset: 0, size: 4, type: 'int' }, size: 8 }",
-        FIELD_UINT,
-    );
-}
-
-#[test]
-fn count_from_requires_offset_size_and_type() {
-    parse_err(
-        "{ count_from: { size: 4, type: 'uint' }, size: 8 }",
-        FIELD_UINT,
-    );
-    parse_err(
-        "{ count_from: { offset: 0, type: 'uint' }, size: 8 }",
-        FIELD_UINT,
-    );
-    parse_err(
-        "{ count_from: { offset: 0, size: 4 }, size: 8 }",
+        "{ count_from: { offset: 0, size: 4, type: 'uint' }, size: 8 }",
         FIELD_UINT,
     );
 }
@@ -454,7 +417,7 @@ fn unknown_keys_are_rejected_everywhere() {
 
     parse_err("{ count: 16, size: 32, extra: 1 }", FIELD_UINT);
     parse_err(
-        "{ count_from: { offset: 0, size: 4, type: 'uint', extra: 1 }, size: 8 }",
+        "{ header: true, count: 16, size: 32, extra: 1 }",
         FIELD_UINT,
     );
 

@@ -16,6 +16,7 @@
     endian: 'little',
 
     entry: {
+        header: true,
         count: 256,
         size: 208,
         labels_file: 'entries/class.json5'

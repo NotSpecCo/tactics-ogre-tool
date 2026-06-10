@@ -66,72 +66,139 @@ fn fixed_count_table_exceeding_payload_is_rejected() {
     );
 }
 
+/// A payload with an `xlce` block header at offset 0 (so the table base is
+/// 0x10) followed by `entries` entries of `entry_size` filler bytes each.
+/// Header integers are encoded with `big = false` for little-endian.
+fn header_payload(count: u32, entry_size: u32, entries: usize, big: bool) -> Vec<u8> {
+    let mut p = Vec::new();
+    p.extend_from_slice(b"xlce");
+    for value in [count, 0x10, entry_size] {
+        if big {
+            p.extend_from_slice(&value.to_be_bytes());
+        } else {
+            p.extend_from_slice(&value.to_le_bytes());
+        }
+    }
+    p.extend_from_slice(&vec![0x55u8; entries * entry_size as usize]);
+    p
+}
+
+const HEADER_ENTRY: &str = "{ header: true, size: 1 }";
+const FIELD_U8: &str = "{ id: 'a', label: 'A', offset: 0, size: 1, type: 'uint' }";
+
 #[test]
-fn count_from_reads_little_and_big_endian() {
-    // Count lives at base_offset 2 + offset 2, size 2; table at 8 with 1-byte entries.
-    let entry = "{ count_from: { base_offset: 2, offset: 2, size: 2, type: 'uint' }, size: 1 }";
-    let field = "{ id: 'a', label: 'A', offset: 0, size: 1, type: 'uint' }";
+fn header_count_reads_little_and_big_endian() {
+    let m = module("little", 0x10, HEADER_ENTRY, FIELD_U8);
+    assert_eq!(resolve_count(&header_payload(3, 1, 3, false), &m), Ok(3));
 
-    let mut p = vec![0u8; 8];
-    p[4] = 0x03; // LE 0x0003
-    p.extend([0x55; 3]); // exactly 3 one-byte entries at offset 8
-    let m = module("little", 8, entry, field);
-    assert_eq!(resolve_count(&p, &m), Ok(3));
-
-    let mut p = vec![0u8; 8];
-    p[5] = 0x03; // BE 0x0003
-    p.extend([0x55; 3]);
-    let m = module("big", 8, entry, field);
-    assert_eq!(resolve_count(&p, &m), Ok(3));
+    let m = module("big", 0x10, HEADER_ENTRY, FIELD_U8);
+    assert_eq!(resolve_count(&header_payload(3, 1, 3, true), &m), Ok(3));
 }
 
 #[test]
-fn count_from_endian_override_beats_module_endian() {
-    let entry = "{ count_from: { offset: 0, size: 2, type: 'uint', endian: 'big' }, size: 1 }";
-    let field = "{ id: 'a', label: 'A', offset: 0, size: 1, type: 'uint' }";
-    let m = module("little", 2, entry, field);
-
-    let mut p = vec![0x00, 0x02]; // BE 2
-    p.extend([0x55; 2]);
-    assert_eq!(resolve_count(&p, &m), Ok(2));
+fn header_count_zero_resolves_to_an_empty_table() {
+    let m = module("little", 0x10, HEADER_ENTRY, FIELD_U8);
+    assert_eq!(resolve_count(&header_payload(0, 1, 0, false), &m), Ok(0));
 }
 
 #[test]
-fn count_from_base_offset_defaults_to_zero() {
-    let entry = "{ count_from: { offset: 1, size: 1, type: 'uint' }, size: 1 }";
-    let field = "{ id: 'a', label: 'A', offset: 0, size: 1, type: 'uint' }";
-    let m = module("little", 2, entry, field);
-    let p = vec![0xAA, 0x02, 0x55, 0x55];
-    assert_eq!(resolve_count(&p, &m), Ok(2));
-}
-
-#[test]
-fn count_from_region_outside_payload_is_rejected() {
-    let entry = "{ count_from: { offset: 6, size: 4, type: 'uint' }, size: 1 }";
-    let field = "{ id: 'a', label: 'A', offset: 0, size: 1, type: 'uint' }";
-    let m = module("little", 0, entry, field);
+fn header_region_outside_payload_is_rejected() {
+    let m = module("little", 0x10, HEADER_ENTRY, FIELD_U8);
+    // Payload too short to hold the 16-byte header.
     assert_eq!(
         resolve_count(&[0u8; 8], &m),
-        Err(RuntimeError::CountRegionOutOfBounds {
-            start: 6,
-            size: 4,
+        Err(RuntimeError::HeaderOutOfBounds {
+            base_offset: 0x10,
             payload_len: 8
         })
     );
 }
 
 #[test]
-fn count_from_resolved_table_outside_payload_is_rejected() {
-    let entry = "{ count_from: { offset: 0, size: 1, type: 'uint' }, size: 4 }";
-    let field = "{ id: 'a', label: 'A', offset: 0, size: 1, type: 'uint' }";
-    let m = module("little", 1, entry, field);
-    // Count byte says 200 entries of 4 bytes; payload is 9 bytes.
-    let p = vec![200, 0, 0, 0, 0, 0, 0, 0, 0];
+fn header_base_offset_below_the_header_size_is_rejected() {
+    // The loader's validation forbids this; the runtime must still guard
+    // against a hand-built module rather than underflow.
+    let m = module("little", 4, HEADER_ENTRY, FIELD_U8);
+    assert_eq!(
+        resolve_count(&header_payload(1, 1, 1, false), &m),
+        Err(RuntimeError::HeaderOutOfBounds {
+            base_offset: 4,
+            payload_len: 17
+        })
+    );
+}
+
+#[test]
+fn bad_header_magic_is_rejected() {
+    let m = module("little", 0x10, HEADER_ENTRY, FIELD_U8);
+    let mut p = header_payload(1, 1, 1, false);
+    p[0..4].copy_from_slice(b"XLCE");
+    assert_eq!(
+        resolve_count(&p, &m),
+        Err(RuntimeError::BadHeaderMagic { found: *b"XLCE" })
+    );
+}
+
+#[test]
+fn bad_header_data_offset_is_rejected() {
+    let m = module("little", 0x10, HEADER_ENTRY, FIELD_U8);
+    let mut p = header_payload(1, 1, 1, false);
+    p[8] = 0x20; // data start offset 0x20 instead of 0x10
+    assert_eq!(
+        resolve_count(&p, &m),
+        Err(RuntimeError::BadHeaderDataOffset { found: 0x20 })
+    );
+}
+
+#[test]
+fn header_entry_size_mismatch_is_rejected() {
+    // Header declares 4-byte entries; the module's field layout is 1-byte.
+    let m = module("little", 0x10, HEADER_ENTRY, FIELD_U8);
+    assert_eq!(
+        resolve_count(&header_payload(1, 4, 1, false), &m),
+        Err(RuntimeError::HeaderEntrySizeMismatch {
+            header_size: 4,
+            entry_size: 1
+        })
+    );
+}
+
+#[test]
+fn header_resolved_table_outside_payload_is_rejected() {
+    let m = module("little", 0x10, HEADER_ENTRY, FIELD_U8);
+    // Header count says 200 one-byte entries; payload holds 3.
+    let p = header_payload(200, 1, 3, false);
     assert_eq!(
         resolve_count(&p, &m),
         Err(RuntimeError::TableOutOfBounds {
-            required: 1 + 200 * 4,
-            payload_len: 9
+            required: 0x10 + 200,
+            payload_len: p.len(),
+        })
+    );
+}
+
+// --- count_divergence -----------------------------------------------------------------
+
+#[test]
+fn count_divergence_only_fires_for_differing_expected_counts() {
+    let fixed = module("little", 4, "{ count: 2, size: 8 }", FIELD_U8);
+    assert_eq!(count_divergence(&fixed, 5), None);
+
+    let no_expected = module("little", 0x10, HEADER_ENTRY, FIELD_U8);
+    assert_eq!(count_divergence(&no_expected, 5), None);
+
+    let expected = module(
+        "little",
+        0x10,
+        "{ header: true, count: 3, size: 1 }",
+        FIELD_U8,
+    );
+    assert_eq!(count_divergence(&expected, 3), None);
+    assert_eq!(
+        count_divergence(&expected, 5),
+        Some(CountDivergence {
+            expected: 3,
+            actual: 5
         })
     );
 }
@@ -627,20 +694,24 @@ fn overlapping_fields_see_each_others_writes() {
     );
 }
 
-// --- dynamic count end to end ----------------------------------------------------------------------
+// --- header-driven count end to end ----------------------------------------------------------------------
 
 #[test]
-fn battle_unit_style_dynamic_count_reads_and_writes() {
-    // Header count at 0x20 + 0x04 (LE u32), table at 0x30, 4-byte entries.
+fn battle_unit_style_header_count_reads_and_writes() {
+    // Block header at 0x20 (so the table base is 0x30), 4-byte entries —
+    // the BattleUnit layout.
     let m = module(
         "little",
         0x30,
-        "{ count_from: { base_offset: 0x20, offset: 0x04, size: 4, type: 'uint' }, size: 4 }",
+        "{ header: true, size: 4 }",
         "{ id: 'a', label: 'A', offset: 0, size: 4, type: 'uint' }",
     );
 
     let mut p = vec![0u8; 0x30 + 8]; // room for 2 entries
+    p[0x20..0x24].copy_from_slice(b"xlce");
     p[0x24] = 2; // count = 2
+    p[0x28] = 0x10; // data start offset
+    p[0x2c] = 4; // entry size
     p[0x30..0x34].copy_from_slice(&[0x01, 0, 0, 0]);
     p[0x34..0x38].copy_from_slice(&[0x02, 0, 0, 0]);
 
@@ -654,7 +725,7 @@ fn battle_unit_style_dynamic_count_reads_and_writes() {
     write_field(&mut p, &m, 1, "a", &FieldValue::Uint(0xDEAD)).unwrap();
     assert_eq!(read(&m, &p, 1), FieldValue::Uint(0xDEAD));
 
-    // Shrinking the stored count makes index 1 invalid.
+    // Shrinking the stored header count makes index 1 invalid.
     p[0x24] = 1;
     assert_eq!(
         write_field(&mut p, &m, 1, "a", &FieldValue::Uint(1)),

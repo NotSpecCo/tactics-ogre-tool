@@ -129,14 +129,26 @@ pub fn validate_module(file: &str, module: &ModuleFile, report: &mut ValidationR
         }
     }
 
-    // Module rule 12: fields non-empty.
+    // Module rule 6: base_offset must leave room for the 16-byte block
+    // header on header-driven tables.
+    if matches!(module.entry.count, CountSpec::Header { .. }) && module.base_offset < 0x10 {
+        report.errors.push(issue(
+            None,
+            format!(
+                "base_offset 0x{:02x} must be at least 0x10 when entry.header is true",
+                module.base_offset
+            ),
+        ));
+    }
+
+    // Module rule 11: fields non-empty.
     if module.fields.is_empty() {
         report
             .errors
             .push(issue(None, "fields must not be empty".to_string()));
     }
 
-    // Module rules 3 and 13: field id format and uniqueness.
+    // Module rules 3 and 12: field id format and uniqueness.
     let mut seen_field_ids: HashSet<&str> = HashSet::new();
     for field in &module.fields {
         if !is_valid_id(field.id()) {
@@ -272,17 +284,22 @@ pub fn report_option_size_overflow(
 }
 
 /// Sidecar validation rule 8: entry label values at or above a referencing
-/// module's fixed entry count are warnings. The spec explicitly supports
-/// sharing one entry file between modules with different counts, so these
-/// stay informational.
+/// module's declared `entry.count` are warnings. The spec explicitly
+/// supports sharing one entry file between modules with different counts,
+/// so these stay informational. Header-driven modules without an expected
+/// count have no static count to check against.
 pub fn report_entry_count_overflow(
     file: &str,
     module: &ModuleFile,
     labels: &[SidecarItem],
     report: &mut ValidationReport,
 ) {
-    let CountSpec::Fixed(count) = module.entry.count else {
-        return;
+    let count = match module.entry.count {
+        CountSpec::Fixed(count) => count,
+        CountSpec::Header {
+            expected: Some(count),
+        } => count,
+        CountSpec::Header { expected: None } => return,
     };
     let over = labels.iter().filter(|item| item.value >= count).count();
     if over > 0 {
@@ -291,7 +308,7 @@ pub fn report_entry_count_overflow(
             module_id: Some(module.id.clone()),
             field_id: None,
             message: format!(
-                "{over} entry label value(s) at or above the fixed entry count {count} \
+                "{over} entry label value(s) at or above the declared entry count {count} \
                  are never displayed"
             ),
         });

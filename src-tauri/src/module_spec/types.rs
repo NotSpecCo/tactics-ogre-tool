@@ -1,7 +1,7 @@
 //! Typed model for JSON5 module files, mirroring docs/MODULE-SPEC.md.
 //!
 //! A value of these types is well-formed by construction: per-field key
-//! legality, size sets, and the count/count_from exclusivity are enforced
+//! legality, size sets, and the header/count entry rules are enforced
 //! during parsing, so downstream code (validator, runtime reader/writer)
 //! only handles cross-field and cross-file rules.
 
@@ -61,22 +61,17 @@ pub struct Entry {
     pub labels_file: Option<String>,
 }
 
-/// Fixed entry count, or a count read from the target file.
+/// Fixed entry count, or a count read at runtime from the 16-byte `xlce`
+/// block header at `base_offset - 0x10`.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum CountSpec {
     Fixed(u64),
-    From(CountFrom),
-}
-
-/// Location of a dynamic entry count inside the matched target payload.
-/// The count is always an unsigned integer (`type: 'uint'` in version 1).
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct CountFrom {
-    pub base_offset: u64,
-    pub offset: u64,
-    pub size: u64,
-    /// `None` inherits the module's `endian`.
-    pub endian: Option<Endian>,
+    /// Header-driven table: the block header count is authoritative.
+    /// `expected`, when present, produces a non-fatal divergence warning
+    /// if the header count differs.
+    Header {
+        expected: Option<u64>,
+    },
 }
 
 /// A field or section definition, in file order.

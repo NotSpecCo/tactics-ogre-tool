@@ -16,6 +16,7 @@
     endian: 'little',
 
     entry: {
+        header: true,
         count: 16,
         size: 6,
         labels_file: 'entries/buff_card.json5'

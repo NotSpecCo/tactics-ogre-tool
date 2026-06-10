@@ -16,6 +16,7 @@
     endian: 'little',
 
     entry: {
+        header: true,
         count: 800,
         size: 102,
         labels_file: 'entries/skill.json5'

@@ -46,7 +46,7 @@ files: [
 
 `files` entries may be literal paths or glob patterns using `*` and `?`, with standard POSIX glob semantics: `*` and `?` match within a single path segment and never match `/`. Directory targets are not part of version `1`; a directory path is invalid. A glob matches files only, not directories. Target matching is case-insensitive, so `battle/entry/entry_unit_*.dat` matches both `entry_unit_0001.dat` and `ENTRY_UNIT_0001.dat`.
 
-The user selects a `.dat` file. The app decrypts and unpacks that file in the background, keeps the resulting payload in memory, and applies module offsets to that in-memory payload. Each supported `.dat` must resolve to exactly one editable payload. If the selected `.dat` resolves to zero payloads, multiple editable payloads, or an unpacking shape the app cannot map to one payload, the app must throw an error and leave UI presentation of that error to the caller. `base_offset`, field `offset`, and `entry.count_from` offsets are never relative to the encrypted `.dat` container or the intermediate zip wrapper.
+The user selects a `.dat` file. The app decrypts and unpacks that file in the background, keeps the resulting payload in memory, and applies module offsets to that in-memory payload. Each supported `.dat` must resolve to exactly one editable payload. If the selected `.dat` resolves to zero payloads, multiple editable payloads, or an unpacking shape the app cannot map to one payload, the app must throw an error and leave UI presentation of that error to the caller. `base_offset` and field `offset` values are never relative to the encrypted `.dat` container or the intermediate zip wrapper.
 
 Sidecar paths such as `entry.labels_file` and `options_file` are relative to the module file's directory and must stay within the module tree after normalization.
 
@@ -71,6 +71,7 @@ Sidecar paths such as `entry.labels_file` and `options_file` are relative to the
     endian: 'little',
 
     entry: {
+        header: true,
         count: 761,
         size: 152,
         labels_file: 'entries/armament.json5'
@@ -135,7 +136,7 @@ Sidecar paths such as `entry.labels_file` and `options_file` are relative to the
 | `files`          | yes      | Game-root-relative file paths or glob patterns this module applies to.          |
 | `base_offset`    | yes      | Byte offset of the first table entry in each matched target file.               |
 | `endian`         | no       | `little` or `big`. Defaults to `little`.                                        |
-| `entry`          | yes      | Entry count, size, and optional label sidecar.                                  |
+| `entry`          | yes      | Block header flag, entry count, size, and optional label sidecar.               |
 | `fields`         | yes      | Ordered field and section definitions.                                          |
 
 `id` values are persistence keys. They must not be generated from `label` at load time.
@@ -144,40 +145,53 @@ Sidecar paths such as `entry.labels_file` and `options_file` are relative to the
 
 ## Entry Definition
 
-Most tables have a fixed entry count:
+### Block Headers
+
+Most tables in the target files are immediately preceded by a 16-byte block header:
+
+| Offset | Size | Content                                                                         |
+| ------ | ---- | ------------------------------------------------------------------------------- |
+| `0x00` | 4    | Magic: the ASCII bytes `xlce`                                                   |
+| `0x04` | 4    | Entry count                                                                     |
+| `0x08` | 4    | Data start offset relative to the header. Always `0x10` in the reference files. |
+| `0x0c` | 4    | Entry size in bytes                                                             |
+
+Header integers use the module's `endian`. Table data begins at the end of the header, so `base_offset` (the address of the first entry) is the header address plus `0x10`.
+
+### Header-Driven Tables
+
+A table preceded by a block header sets `header: true`:
 
 ```json5
 entry: {
+    header: true,
     count: 256,
     size: 208,
     labels_file: 'entries/class.json5'
 },
 ```
 
-Tables whose count is stored in the target file use `count_from`:
+With `header: true`, the block header is at `base_offset - 0x10` and the entry count is read from the header at runtime. The header count is authoritative. This is how the battle unit tables, whose counts vary per file, resolve their real count, and it means a table edited to a non-vanilla length still loads with the correct number of entries.
+
+`count` is optional on header-driven tables. When present it is the expected count: if the header count differs, the reader uses the header count and surfaces a divergence warning to the caller. The warning tells the user the file diverges from the count the module author expected without blocking the edit.
+
+`size` is always required. It is the layout contract for `fields`: every field offset is authored against this entry width. The reader must verify the header's entry size equals `entry.size` and throw an error on mismatch, since a different stored width means the module's field layout does not apply to that file.
+
+### Fixed-Count Tables
+
+A table with no preceding block header omits `header` (or sets `header: false`) and must declare a fixed `count`:
 
 ```json5
 entry: {
-    count_from: {
-        base_offset: 0x20,
-        offset: 0x04,
-        size: 4,
-        type: 'uint'
-    },
-    size: 0xc4,
-    labels_file: null
+    count: 1,
+    size: 0x10,
+    labels_file: 'entries/battle_unit_header.json5'
 },
 ```
 
-`count` and `count_from` are mutually exclusive.
+The reference set needs this form for two cases: tables not preceded by an `xlce` header, and deliberate partial views that expose fewer entries than the block holds (see Converting Nightmare Modules).
 
-`labels_file` is optional. Omitting it and setting it to `null` are equivalent: the table has no entry labels.
-
-`count_from` requires `offset`, `size`, and `type`; `base_offset` and `endian` are optional.
-
-The count is always read from the current matched target file. `count_from.base_offset` defaults to `0`. The final count address is `count_from.base_offset + count_from.offset`.
-
-`count_from.type` must be `uint` in version `1`. `count_from.size` must be `1`, `2`, or `4`, and uses the module's `endian` unless `count_from.endian` is provided.
+`labels_file` is optional on both forms. Omitting it and setting it to `null` are equivalent: the table has no entry labels.
 
 ## Field Types
 
@@ -310,14 +324,13 @@ Module validation:
 3. Module `id` and field `id` values match `^[a-z][a-z0-9_]*$`.
 4. `files` is non-empty, and every item is a relative POSIX path or glob.
 5. `files` entries do not contain `..`, do not begin with `/`, and do not resolve outside the game root.
-6. `base_offset` is a non-negative integer.
+6. `base_offset` is a non-negative integer, and at least `0x10` when `entry.header` is `true`.
 7. `endian` is `little` or `big`.
 8. `entry.size` is a positive integer.
-9. Exactly one of `entry.count` or `entry.count_from` is present.
-10. Fixed `entry.count` is a positive integer.
-11. `entry.count_from`, when present, has a non-negative `offset`; a non-negative `base_offset` when present; a `size` of `1`, `2`, or `4`; a `type` of `uint`; and an `endian` of `little` or `big` when present.
-12. `fields` is non-empty.
-13. Field IDs are unique within a module.
+9. `entry.header`, when present, is a boolean.
+10. `entry.count` is required unless `entry.header` is `true`. When present, it is a positive integer.
+11. `fields` is non-empty.
+12. Field IDs are unique within a module.
 
 Field validation:
 
@@ -344,16 +357,18 @@ Sidecar validation:
 5. Duplicate values are warnings, not errors.
 6. Empty labels are warnings, not errors.
 7. Option values fit every dropdown size that references the option file.
-8. Entry values at or above a referencing module's fixed entry count are warnings, not errors.
+8. Entry values at or above a referencing module's `entry.count`, when one is declared, are warnings, not errors.
 
 Runtime payload validation:
 
-1. `base_offset + entry.count * entry.size` must be within the decrypted/unpacked in-memory payload length.
-2. For dynamic counts, the full `count_from` integer range must be within the matched target payload length before the count is read.
-3. After resolving a dynamic count, `base_offset + resolved_count * entry.size` must be within the matched target payload length.
+1. For header-driven tables, the block header range `base_offset - 0x10` through `base_offset` must be within the decrypted/unpacked in-memory payload length.
+2. For header-driven tables, the block header magic must be the ASCII bytes `xlce`, the data start offset must be `0x10`, and the entry size must equal `entry.size`.
+3. The resolved entry count is the block header count for header-driven tables and `entry.count` for fixed-count tables. `base_offset + resolved_count * entry.size` must be within the matched target payload length.
 4. Every stored field range for every resolved entry, `base_offset + entry_index * entry.size + field.offset` through `size`, must be within the matched target payload length.
 
 If any runtime payload validation check fails, the reader or writer must throw an error and leave UI presentation of that error to the caller.
+
+A divergence between a header-driven table's optional expected `entry.count` and the block header count is not a validation failure. The reader uses the header count and reports a non-fatal warning to the caller, which owns presenting it to the user.
 
 ## Converting Nightmare Modules
 
@@ -400,7 +415,7 @@ The first three comment lines in each module, followed by one blank line, are Ni
                    # BASEPOINTER flag, blank in these modules
 ```
 
-This metadata is not represented directly in the module file. Its file-verification role is replaced by the module's explicit `files` list. The converter skips the first three comment lines and never converts them to `notes`. It may preserve them under `source` if useful.
+In every module in the reference set, the ID string is `xlce` and the address points at a block header (see Block Headers). The converter uses these two lines to decide whether a module converts as a header-driven table (see Header-Driven Table Detection). The metadata is not otherwise represented in the module file: its file-verification role is replaced by the module's explicit `files` list plus the runtime header magic check, and the checksum line is dropped. The converter never converts these lines to `notes`. It may preserve them under `source` if useful.
 
 All other comments convert by position:
 
@@ -445,9 +460,31 @@ Target file conversion rules:
 | `menu_data / pack`                        | `menu/menu_data.dat`             |
 | `battle / entry / entry_unit_#### / pack` | `battle/entry/entry_unit_*.dat`  |
 
-### Dynamic Battle Unit Counts
+### Header-Driven Table Detection
 
-`battle/entry/BattleUnitHeader.nmm` converts as a normal fixed-count module:
+A module converts as a header-driven table (`entry.header: true`) when its metadata ID string is `xlce` and its metadata address equals `base_offset - 0x10`, except for the partial-view modules listed below. Any other module converts as a fixed-count table.
+
+For header-driven modules whose `files` target is a literal path, the declared `.nmm` entry count converts to the expected `count`, so a runtime divergence from vanilla data surfaces as a warning. For glob targets the declared count is dropped: it is a sample from one file, and per-file counts vary by design.
+
+Three modules are deliberate partial views and convert as fixed-count tables even though their metadata points at a block header: `battle/HealthDamageConfiguration.nmm`, `battle/HealthRestoreConfiguration.nmm`, and `battle/HitRateConfiguration.nmm`. Each shares its block with the corresponding full-table module and exposes only entry `0`, as a configuration record with its own field layout, so its declared count of `1` is intentionally smaller than the block header count. Converters must keep these declared counts. The general rule: when a module's declared count intentionally differs from its block header count, it is a partial view and stays fixed-count.
+
+Converters with access to the decrypted reference payloads should additionally verify that every header-driven module's block header matches: magic `xlce` at `base_offset - 0x10`, header entry size equal to the declared entry size, and header count equal to the declared count for literal-path targets. The full reference set has been verified this way; the check exists to catch regressions when modules are edited.
+
+### Battle Unit Tables
+
+`battle/entry/BattleUnit.nmm` converts as a header-driven table. Its `files` target is a glob and per-file counts vary, so no expected `count` is kept:
+
+```json5
+files: ['battle/entry/entry_unit_*.dat'],
+base_offset: 0x30,
+entry: {
+    header: true,
+    size: 0xc4,
+    labels_file: null
+},
+```
+
+`battle/entry/BattleUnitHeader.nmm` exposes that same block header as an editable one-entry table at `0x20`. No `xlce` header precedes it — its metadata address is `0x20`, its own `base_offset` — so it converts as a fixed-count table:
 
 ```json5
 files: ['battle/entry/entry_unit_*.dat'],
@@ -459,22 +496,7 @@ entry: {
 },
 ```
 
-`battle/entry/BattleUnit.nmm` uses the header's record count field:
-
-```json5
-files: ['battle/entry/entry_unit_*.dat'],
-base_offset: 0x30,
-entry: {
-    count_from: {
-        base_offset: 0x20,
-        offset: 0x04,
-        size: 4,
-        type: 'uint'
-    },
-    size: 0xc4,
-    labels_file: null
-},
-```
+Note that editing this module edits the BattleUnit block header itself, including the count that header-driven reads of the battle unit table resolve.
 
 ### .nmm Field Type Codes
 
@@ -570,5 +592,6 @@ These features are intentionally outside version `1`:
 4. Multi-file modules where one logical table is split across several files.
 5. Conditional field visibility.
 6. Computed fields.
-7. Cross-file `count_from` sources, where a table's count lives in a different file than the table.
-8. Read-only fields.
+7. Cross-file count sources, where a table's entry count lives in a different file than the table.
+8. Resizing tables: adding or removing entries requires rewriting the block header count and shifting every block after the table. Version `1` reads counts from block headers but never changes a table's length.
+9. Read-only fields.

@@ -20,15 +20,45 @@ pub enum FieldValue {
     Text(String),
 }
 
+/// Size in bytes of the `xlce` block header that precedes header-driven
+/// tables. The table's `base_offset` is the header address plus this.
+pub const BLOCK_HEADER_SIZE: u64 = 0x10;
+
+/// Magic bytes at the start of every block header.
+pub const BLOCK_HEADER_MAGIC: [u8; 4] = *b"xlce";
+
+/// A non-fatal divergence between a header-driven module's expected
+/// `entry.count` and the count read from the block header. The header count
+/// is authoritative; this is surfaced to the caller as a warning.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct CountDivergence {
+    pub expected: u64,
+    pub actual: u64,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum RuntimeError {
-    /// The `count_from` integer range is not within the payload (rule 2).
-    CountRegionOutOfBounds {
-        start: u64,
-        size: u64,
+    /// The block header range `base_offset - 0x10 .. base_offset` is not
+    /// within the payload (rule 1).
+    HeaderOutOfBounds {
+        base_offset: u64,
         payload_len: usize,
     },
-    /// `base_offset + count * entry.size` exceeds the payload (rules 1 and 3).
+    /// The block header magic is not the ASCII bytes `xlce` (rule 2).
+    BadHeaderMagic {
+        found: [u8; 4],
+    },
+    /// The block header data start offset is not `0x10` (rule 2).
+    BadHeaderDataOffset {
+        found: u64,
+    },
+    /// The block header entry size differs from `entry.size`, so the
+    /// module's field layout does not apply to this file (rule 2).
+    HeaderEntrySizeMismatch {
+        header_size: u64,
+        entry_size: u64,
+    },
+    /// `base_offset + count * entry.size` exceeds the payload (rule 3).
     TableOutOfBounds {
         required: u128,
         payload_len: usize,
@@ -76,13 +106,29 @@ pub enum RuntimeError {
 impl std::fmt::Display for RuntimeError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            RuntimeError::CountRegionOutOfBounds {
-                start,
-                size,
+            RuntimeError::HeaderOutOfBounds {
+                base_offset,
                 payload_len,
             } => write!(
                 f,
-                "count_from range 0x{start:x}+{size} is outside the payload ({payload_len} bytes)"
+                "block header range 0x{:x}..0x{base_offset:x} is outside the payload ({payload_len} bytes)",
+                base_offset.saturating_sub(BLOCK_HEADER_SIZE)
+            ),
+            RuntimeError::BadHeaderMagic { found } => write!(
+                f,
+                "block header magic is {found:02x?}, expected the ASCII bytes \"xlce\""
+            ),
+            RuntimeError::BadHeaderDataOffset { found } => write!(
+                f,
+                "block header data start offset is 0x{found:x}, expected 0x10"
+            ),
+            RuntimeError::HeaderEntrySizeMismatch {
+                header_size,
+                entry_size,
+            } => write!(
+                f,
+                "block header entry size 0x{header_size:x} does not match the module entry size \
+                 0x{entry_size:x}; the field layout does not apply to this file"
             ),
             RuntimeError::TableOutOfBounds {
                 required,
@@ -238,22 +284,15 @@ fn field_range(
 
 /// Resolves the entry count and validates the table extent against the
 /// payload (spec runtime payload validation rules 1–3).
+///
+/// For header-driven tables, the count comes from the `xlce` block header at
+/// `base_offset - 0x10` and is authoritative; an expected `entry.count` is
+/// not consulted here. Use [`count_divergence`] to surface the non-fatal
+/// expected-count warning.
 pub fn resolve_count(payload: &[u8], module: &ModuleFile) -> Result<u64, RuntimeError> {
     let count = match &module.entry.count {
         CountSpec::Fixed(n) => *n,
-        CountSpec::From(from) => {
-            let start = u128::from(from.base_offset) + u128::from(from.offset);
-            let end = start + u128::from(from.size);
-            if end > payload.len() as u128 {
-                return Err(RuntimeError::CountRegionOutOfBounds {
-                    start: start.min(u64::MAX as u128) as u64,
-                    size: from.size,
-                    payload_len: payload.len(),
-                });
-            }
-            let bytes = &payload[start as usize..end as usize];
-            read_unsigned(bytes, from.endian.unwrap_or(module.endian))
-        }
+        CountSpec::Header { .. } => read_block_header_count(payload, module)?,
     };
 
     let required =
@@ -265,6 +304,63 @@ pub fn resolve_count(payload: &[u8], module: &ModuleFile) -> Result<u64, Runtime
         });
     }
     Ok(count)
+}
+
+/// Validates the block header preceding a header-driven table and returns
+/// its entry count (spec runtime payload validation rules 1 and 2).
+fn read_block_header_count(payload: &[u8], module: &ModuleFile) -> Result<u64, RuntimeError> {
+    let out_of_bounds = || RuntimeError::HeaderOutOfBounds {
+        base_offset: module.base_offset,
+        payload_len: payload.len(),
+    };
+
+    // The loader's validation guarantees base_offset >= 0x10 for loaded
+    // modules; a hand-built ModuleFile may not honor that, so check anyway.
+    let start = module
+        .base_offset
+        .checked_sub(BLOCK_HEADER_SIZE)
+        .ok_or_else(out_of_bounds)?;
+    if module.base_offset > payload.len() as u64 {
+        return Err(out_of_bounds());
+    }
+    let header = &payload[start as usize..module.base_offset as usize];
+
+    if header[0..4] != BLOCK_HEADER_MAGIC {
+        return Err(RuntimeError::BadHeaderMagic {
+            found: header[0..4].try_into().expect("4-byte slice"),
+        });
+    }
+
+    let count = read_unsigned(&header[4..8], module.endian);
+    let data_offset = read_unsigned(&header[8..12], module.endian);
+    let header_size = read_unsigned(&header[12..16], module.endian);
+
+    if data_offset != BLOCK_HEADER_SIZE {
+        return Err(RuntimeError::BadHeaderDataOffset { found: data_offset });
+    }
+    if header_size != module.entry.size {
+        return Err(RuntimeError::HeaderEntrySizeMismatch {
+            header_size,
+            entry_size: module.entry.size,
+        });
+    }
+    Ok(count)
+}
+
+/// Compares a header-driven module's expected `entry.count` against the
+/// resolved count. A `Some` result is a non-fatal warning for the caller to
+/// present; the resolved count stays authoritative either way. Fixed-count
+/// tables and header-driven tables without an expected count never diverge.
+pub fn count_divergence(module: &ModuleFile, resolved_count: u64) -> Option<CountDivergence> {
+    match module.entry.count {
+        CountSpec::Header {
+            expected: Some(expected),
+        } if expected != resolved_count => Some(CountDivergence {
+            expected,
+            actual: resolved_count,
+        }),
+        _ => None,
+    }
 }
 
 pub fn find_field<'a>(module: &'a ModuleFile, field_id: &str) -> Option<&'a Field> {
