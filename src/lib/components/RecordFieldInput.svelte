@@ -26,17 +26,22 @@
         return bytes;
     }
 
-    const isHex = $derived(field.field_type === 'Hex');
-    const isUnsigned = $derived(field.value.type === 'Uint');
-    const numericValue = $derived(field.value.type === 'Uint' || field.value.type === 'Int' ? field.value.value : 0);
-    const hexValue = $derived(field.value.type === 'Hex' ? bytesToHex(field.value.value) : '');
+    const isBytes = $derived(field.type === 'bytes');
+    const isText = $derived(field.type === 'text');
+    const isUnsigned = $derived(field.value?.type === 'uint');
+    const numericValue = $derived(field.value?.type === 'uint' || field.value?.type === 'int' ? field.value.value : 0);
+    const hexValue = $derived(field.value?.type === 'bytes' ? bytesToHex(field.value.value) : '');
+    const textValue = $derived(field.value?.type === 'text' ? field.value.value : '');
+    const size = $derived(field.size ?? 0);
 
     const bounds = $derived.by(() => {
-        switch (field.size) {
+        switch (size) {
             case 1:
                 return isUnsigned ? { min: 0, max: 255 } : { min: -128, max: 127 };
             case 2:
                 return isUnsigned ? { min: 0, max: 65535 } : { min: -32768, max: 32767 };
+            case 3:
+                return { min: 0, max: 16777215 };
             case 4:
                 return isUnsigned ? { min: 0, max: 4294967295 } : { min: -2147483648, max: 2147483647 };
             default:
@@ -58,13 +63,19 @@
 
     function handleHexBlur() {
         const bytes = hexToBytes(displayValue);
-        if (bytes && bytes.length === field.size) {
+        if (bytes && bytes.length === size) {
             invalid = false;
             hasDraftHexValue = false;
-            onUpdate({ type: 'Hex', value: bytes });
+            onUpdate({ type: 'bytes', value: bytes });
         } else {
             invalid = true;
         }
+    }
+
+    function handleTextChange(e: Event) {
+        // Only ever sends what the user typed, never the displayed read-back
+        // of a lossy decode (the backend rejects non-ASCII anyway).
+        onUpdate({ type: 'text', value: (e.target as HTMLInputElement).value });
     }
 
     function handleNumberChange(e: Event) {
@@ -79,19 +90,26 @@
         const clamped = Math.max(bounds.min, Math.min(bounds.max, raw));
         target.value = String(clamped);
 
-        const value: FieldValue = isUnsigned ? { type: 'Uint', value: clamped } : { type: 'Int', value: clamped };
+        const value: FieldValue = isUnsigned ? { type: 'uint', value: clamped } : { type: 'int', value: clamped };
         onUpdate(value);
     }
 </script>
 
-{#if isHex}
+{#if isBytes}
     <Input
         type="text"
         value={renderedHexValue}
         inputClass="font-mono {invalid ? 'border-red-500' : isDirty ? 'border-indigo-400/60' : ''}"
         oninput={handleHexInput}
         onblur={handleHexBlur}
-        placeholder={Array.from({ length: field.size }, () => '00').join(' ')}
+        placeholder={Array.from({ length: size }, () => '00').join(' ')}
+    />
+{:else if isText}
+    <Input
+        type="text"
+        value={textValue}
+        inputClass="font-mono {isDirty ? 'border-indigo-400/60' : ''}"
+        onchange={handleTextChange}
     />
 {:else}
     <Input

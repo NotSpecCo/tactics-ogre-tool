@@ -1,4 +1,4 @@
-import type { DatSessionInfo, FileTreeNode, GameDirectoryInfo, ModuleSummary } from '$lib/tauri';
+import type { DatSessionInfo, FileTreeNode, GameDirectoryInfo, ModuleDiagnostics, ModuleSummary } from '$lib/tauri';
 import * as tauri from '$lib/tauri';
 import { open } from '@tauri-apps/plugin-dialog';
 import { editor } from './editor.svelte';
@@ -11,7 +11,11 @@ class SessionStore {
 
     datPath = $state<string | null>(null);
     modules = $state<ModuleSummary[]>([]);
+    /** Modules that matched the open dat but failed runtime validation. */
+    moduleErrors = $state<string[]>([]);
     dirty = $state(false);
+
+    diagnostics = $state<ModuleDiagnostics | null>(null);
 
     loading = $state(false);
     error = $state<string | null>(null);
@@ -45,6 +49,7 @@ class SessionStore {
             this.tree = info.tree;
             this.datPath = null;
             this.modules = [];
+            this.moduleErrors = [];
             this.dirty = false;
         } catch (e) {
             this.error = (e as Error).message ?? String(e);
@@ -68,6 +73,7 @@ class SessionStore {
             this.tree = [];
             this.datPath = null;
             this.modules = [];
+            this.moduleErrors = [];
             this.dirty = false;
         }
     }
@@ -83,9 +89,9 @@ class SessionStore {
         this.error = null;
         try {
             const info: DatSessionInfo = await tauri.openDat(this.sessionId, datPath, force);
-            const allModules = await tauri.getAllModules();
             this.datPath = info.dat_path;
-            this.modules = allModules.sort((a, b) => a.name.localeCompare(b.name));
+            this.modules = [...info.modules].sort((a, b) => a.label.localeCompare(b.label));
+            this.moduleErrors = info.module_errors;
             this.dirty = false;
         } catch (e) {
             this.error = (e as Error).message ?? String(e);
@@ -124,7 +130,27 @@ class SessionStore {
             await tauri.closeDat(this.sessionId);
             this.datPath = null;
             this.modules = [];
+            this.moduleErrors = [];
             this.dirty = false;
+        } catch (e) {
+            this.error = (e as Error).message ?? String(e);
+        }
+    }
+
+    async loadDiagnostics(): Promise<void> {
+        try {
+            this.diagnostics = await tauri.getModuleDiagnostics();
+        } catch (e) {
+            this.error = (e as Error).message ?? String(e);
+        }
+    }
+
+    async reloadModules(): Promise<void> {
+        try {
+            this.diagnostics = await tauri.reloadModules();
+            if (this.sessionId) {
+                this.tree = await tauri.getFileTree(this.sessionId);
+            }
         } catch (e) {
             this.error = (e as Error).message ?? String(e);
         }

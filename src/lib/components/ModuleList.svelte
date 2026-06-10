@@ -18,10 +18,12 @@
                 {isSelected ? ' text-violet-700' : 'hover:bg-violet-100'}"
             onclick={() => onSelect(mod.id)}
         >
-            <span class="font-medium">{mod.name}</span>
-            <span class="truncate text-sm {isSelected ? 'text-violet-400/70' : 'opacity-50'}">
-                {mod.description}
-            </span>
+            <span class="font-medium">{mod.label}</span>
+            {#if mod.notes}
+                <span class="truncate text-sm {isSelected ? 'text-violet-400/70' : 'opacity-50'}">
+                    {mod.notes}
+                </span>
+            {/if}
         </button>
     {/each}
 </nav>

@@ -1,6 +1,6 @@
 import { invoke } from '@tauri-apps/api/core';
 
-// --- IPC types matching Rust structs ---
+// --- IPC types matching Rust structs (src-tauri/src/pipeline/session.rs) ---
 
 export type FileTreeNode =
     | { type: 'Directory'; name: string; children: FileTreeNode[] }
@@ -16,41 +16,71 @@ export interface GameDirectoryInfo {
 export interface DatSessionInfo {
     dat_path: string;
     modules: ModuleSummary[];
+    /** Modules that matched this dat but failed runtime payload validation. */
+    module_errors: string[];
 }
 
 export interface ModuleSummary {
     id: string;
-    name: string;
-    description: string;
+    label: string;
+    notes: string | null;
     entry_count: number;
-    entry_names: string[];
+    /** Entry labels with values below the resolved count, in file order. */
+    entry_labels: LabeledValue[];
+}
+
+export interface LabeledValue {
+    value: number;
+    label: string;
+    notes: string | null;
 }
 
 export interface Record {
     module_id: string;
     index: number;
-    name: string;
+    /** Entry label for this index (first match by value), when present. */
+    label: string | null;
     fields: RecordField[];
 }
 
+export type FieldType = 'uint' | 'int' | 'bytes' | 'text' | 'dropdown' | 'section';
+
+export type DisplayFormat = 'decimal' | 'hex';
+
 export interface RecordField {
-    name: string;
-    value: FieldValue;
-    field_type: FieldType;
-    size: number;
-    options: FieldOption[] | null;
+    id: string;
+    label: string;
+    notes: string | null;
+    type: FieldType;
+    /** Stored size in bytes; null for sections. */
+    size: number | null;
+    /** Set for uint and dropdown fields. */
+    display: DisplayFormat | null;
+    /** Null for sections. */
+    value: FieldValue | null;
+    /** Options in file order for dropdown fields. */
+    options: LabeledValue[] | null;
 }
 
 export type FieldValue =
-    | { type: 'Uint'; value: number }
-    | { type: 'Int'; value: number }
-    | { type: 'Hex'; value: number[] };
+    | { type: 'uint'; value: number }
+    | { type: 'int'; value: number }
+    | { type: 'bytes'; value: number[] }
+    | { type: 'text'; value: string };
 
-export type FieldType = 'Uint' | 'Int' | 'Dropdown' | 'Hex';
+export interface Issue {
+    /** Path relative to the module set directory. */
+    file: string;
+    module_id: string | null;
+    field_id: string | null;
+    message: string;
+}
 
-export interface FieldOption {
-    value: number;
-    label: string;
+export interface ModuleDiagnostics {
+    dir: string;
+    module_count: number;
+    errors: Issue[];
+    warnings: Issue[];
 }
 
 export interface SaveResult {
@@ -86,10 +116,6 @@ export function getModules(sessionId: string): Promise<ModuleSummary[]> {
     return invoke('get_modules', { sessionId });
 }
 
-export function getAllModules(): Promise<ModuleSummary[]> {
-    return invoke('get_all_modules');
-}
-
 export function getRecord(sessionId: string, moduleId: string, index: number): Promise<Record> {
     return invoke('get_record', { sessionId, moduleId, index });
 }
@@ -98,10 +124,10 @@ export function setField(
     sessionId: string,
     moduleId: string,
     index: number,
-    fieldName: string,
+    fieldId: string,
     value: FieldValue
-): Promise<void> {
-    return invoke('set_field', { sessionId, moduleId, index, fieldName, value });
+): Promise<Record> {
+    return invoke('set_field', { sessionId, moduleId, index, fieldId, value });
 }
 
 export function saveDat(sessionId: string): Promise<SaveResult> {
@@ -114,6 +140,14 @@ export function closeDat(sessionId: string): Promise<boolean> {
 
 export function getFiletableStatus(sessionId: string): Promise<FileTableStatus> {
     return invoke('get_filetable_status', { sessionId });
+}
+
+export function getModuleDiagnostics(): Promise<ModuleDiagnostics> {
+    return invoke('get_module_diagnostics');
+}
+
+export function reloadModules(): Promise<ModuleDiagnostics> {
+    return invoke('reload_modules');
 }
 
 export function decryptFile(inputPath: string, outputPath: string): Promise<void> {

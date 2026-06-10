@@ -10,7 +10,7 @@
 
     let { field, isDirty, onUpdate }: Props = $props();
 
-    const numericValue = $derived(field.value.type === 'Uint' || field.value.type === 'Int' ? field.value.value : 0);
+    const numericValue = $derived(field.value?.type === 'uint' ? field.value.value : 0);
     const options = $derived.by(() => {
         const ops = field.options ?? [];
         return ops.map((opt) => ({
@@ -22,10 +22,8 @@
 
     function handleChange(e: Event) {
         const target = e.target as HTMLSelectElement;
-        const raw = parseInt(target.value, 10);
-        const value: FieldValue =
-            field.value.type === 'Uint' ? { type: 'Uint', value: raw } : { type: 'Int', value: raw };
-        onUpdate(value);
+        // Dropdown fields always store an unsigned integer.
+        onUpdate({ type: 'uint', value: parseInt(target.value, 10) });
     }
 </script>
 
