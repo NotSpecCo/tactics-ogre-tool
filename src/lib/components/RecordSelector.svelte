@@ -18,6 +18,8 @@
 
 <Select class="" value={String(selectedIndex ?? 0)} onchange={handleChange}>
     {#each entries as entry (entry.index)}
-        <option value={String(entry.index)}>{entry.index}: {entry.label}</option>
+        <option value={String(entry.index)} title={entry.notes ?? undefined}>
+            {entry.label !== null ? `${entry.index}: ${entry.label}` : entry.index}
+        </option>
     {/each}
 </Select>
