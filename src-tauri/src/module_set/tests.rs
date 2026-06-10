@@ -482,6 +482,112 @@ fn committed_module_set_is_valid() {
     assert_eq!(found, expected, "warnings: {:#?}", report.warnings);
 }
 
+// --- file matching ----------------------------------------------------------------------
+
+/// One-module set with the given files patterns, for matcher tests.
+fn matching_set(patterns: &str) -> (ModuleSet, ValidationReport) {
+    let text = valid_module("test_module").replace(
+        "files: ['battle/battle_data_release.dat'],",
+        &format!("files: [{patterns}],"),
+    );
+    load_owned(&[
+        ("test_module.json5", text),
+        ("options/no_yes.json5", OPTIONS.to_string()),
+        ("entries/test.json5", ENTRIES.to_string()),
+    ])
+}
+
+#[test]
+fn literal_paths_match_case_insensitively() {
+    let (set, report) = matching_set("'battle/battle_data_release.dat'");
+    assert!(report.is_valid());
+
+    assert_eq!(set.modules_for("battle/battle_data_release.dat").len(), 1);
+    assert_eq!(set.modules_for("BATTLE/Battle_Data_Release.DAT").len(), 1);
+    assert_eq!(set.modules_for("battle/other.dat").len(), 0);
+    assert_eq!(set.modules_for("menu/menu_data.dat").len(), 0);
+}
+
+#[test]
+fn glob_star_matches_within_a_single_segment() {
+    let (set, report) = matching_set("'battle/entry/entry_unit_*.dat'");
+    assert!(report.is_valid());
+
+    assert_eq!(set.modules_for("battle/entry/entry_unit_0001.dat").len(), 1);
+    assert_eq!(set.modules_for("BATTLE/ENTRY/ENTRY_UNIT_0001.DAT").len(), 1);
+    // '*' must not cross '/' boundaries.
+    assert_eq!(
+        set.modules_for("battle/entry/sub/entry_unit_0001.dat")
+            .len(),
+        0
+    );
+    assert_eq!(set.modules_for("battle/entry_unit_0001.dat").len(), 0);
+}
+
+#[test]
+fn glob_question_mark_matches_exactly_one_non_separator_char() {
+    let (set, report) = matching_set("'menu/menu_?.dat'");
+    assert!(report.is_valid());
+
+    assert_eq!(set.modules_for("menu/menu_a.dat").len(), 1);
+    assert_eq!(set.modules_for("menu/menu_ab.dat").len(), 0);
+    assert_eq!(set.modules_for("menu/menu_.dat").len(), 0);
+    assert_eq!(set.modules_for("menu/menu_/.dat").len(), 0);
+}
+
+#[test]
+fn multiple_patterns_match_any() {
+    let (set, report) = matching_set("'battle/a.dat', 'menu/b.dat'");
+    assert!(report.is_valid());
+    assert_eq!(set.modules_for("battle/a.dat").len(), 1);
+    assert_eq!(set.modules_for("menu/b.dat").len(), 1);
+    assert_eq!(set.modules_for("other/c.dat").len(), 0);
+}
+
+#[test]
+fn dat_path_input_is_normalized_before_matching() {
+    let (set, report) = matching_set("'battle/battle_data_release.dat'");
+    assert!(report.is_valid());
+
+    assert_eq!(set.modules_for("battle\\battle_data_release.dat").len(), 1);
+    assert_eq!(set.modules_for("./battle/battle_data_release.dat").len(), 1);
+    assert_eq!(set.modules_for("/battle/battle_data_release.dat").len(), 1);
+}
+
+#[test]
+fn invalid_glob_patterns_are_validation_errors() {
+    let (set, report) = matching_set("'battle/[bad.dat'");
+    assert_eq!(set.modules.len(), 0);
+    assert!(report
+        .errors
+        .iter()
+        .any(|i| i.message.contains("not a valid glob")));
+}
+
+#[test]
+fn committed_set_matches_dats_per_module_family() {
+    let dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("../modules");
+    let (set, _) = load_module_set(&dir).unwrap();
+
+    // 24 modules: 20 battle, 2 menu, 2 entry_unit.
+    assert_eq!(set.modules_for("battle/battle_data_release.dat").len(), 20);
+    assert_eq!(set.modules_for("menu/menu_data.dat").len(), 2);
+
+    let entry_unit = set.modules_for("battle/entry/entry_unit_0042.dat");
+    let ids: Vec<&str> = entry_unit.iter().map(|m| m.module.id.as_str()).collect();
+    assert_eq!(
+        ids,
+        vec![
+            "battle_entry_battle_unit",
+            "battle_entry_battle_unit_header"
+        ]
+    );
+    assert_eq!(set.modules_for("BATTLE/ENTRY/ENTRY_UNIT_0001.DAT").len(), 2);
+
+    assert_eq!(set.modules_for("FileTable.bin").len(), 0);
+    assert_eq!(set.modules_for("battle/entry/other.dat").len(), 0);
+}
+
 #[test]
 fn committed_set_exposes_armament_with_sidecars() {
     let dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("../modules");

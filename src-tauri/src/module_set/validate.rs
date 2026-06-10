@@ -8,9 +8,28 @@
 
 use std::collections::{BTreeMap, HashSet};
 
+use globset::{GlobBuilder, GlobSet, GlobSetBuilder};
+
 use crate::module_spec::{CountSpec, Field, ModuleFile, SidecarItem};
 
 use super::{Issue, ValidationReport};
+
+/// Compiles a module's `files` patterns into a matcher with the spec's glob
+/// semantics: `*` and `?` never match `/`, and matching is case-insensitive.
+pub fn build_matcher(files: &[String]) -> Result<GlobSet, (String, String)> {
+    let mut builder = GlobSetBuilder::new();
+    for pattern in files {
+        let glob = GlobBuilder::new(pattern)
+            .literal_separator(true)
+            .case_insensitive(true)
+            .build()
+            .map_err(|err| (pattern.clone(), err.to_string()))?;
+        builder.add(glob);
+    }
+    builder
+        .build()
+        .map_err(|err| (String::new(), err.to_string()))
+}
 
 /// Module validation rule 3: `^[a-z][a-z0-9_]*$`.
 fn is_valid_id(id: &str) -> bool {

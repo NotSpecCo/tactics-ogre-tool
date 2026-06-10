@@ -59,6 +59,15 @@ pub struct LoadedModule {
     /// Dropdown options keyed by the `options_file` path as written in the
     /// module (normalized), shared across modules referencing the same file.
     pub options: BTreeMap<String, Arc<Vec<SidecarItem>>>,
+    /// Compiled `files` patterns (case-insensitive, `*`/`?` never match `/`).
+    matcher: globset::GlobSet,
+}
+
+impl LoadedModule {
+    /// Whether this module applies to a game-root-relative dat path.
+    pub fn matches(&self, dat_path: &str) -> bool {
+        self.matcher.is_match(normalize_dat_path(dat_path))
+    }
 }
 
 impl LoadedModule {
@@ -79,6 +88,27 @@ impl ModuleSet {
     pub fn find(&self, module_id: &str) -> Option<&LoadedModule> {
         self.modules.iter().find(|m| m.module.id == module_id)
     }
+
+    /// Modules whose `files` patterns match a game-root-relative dat path,
+    /// in file-name order. Pure in-memory filtering; no I/O.
+    pub fn modules_for(&self, dat_path: &str) -> Vec<&LoadedModule> {
+        let normalized = normalize_dat_path(dat_path);
+        self.modules
+            .iter()
+            .filter(|m| m.matcher.is_match(&normalized))
+            .collect()
+    }
+}
+
+/// Normalizes a dat path for matching: POSIX separators, no leading `/` or
+/// `./` segments.
+fn normalize_dat_path(path: &str) -> String {
+    let posix = path.replace('\\', "/");
+    let mut trimmed = posix.trim_start_matches('/');
+    while let Some(rest) = trimmed.strip_prefix("./") {
+        trimmed = rest;
+    }
+    trimmed.to_string()
 }
 
 /// Cached sidecar files: parsed items, or `None` when the file failed to
@@ -196,6 +226,19 @@ pub fn load_module_set(dir: &Path) -> std::io::Result<(ModuleSet, ValidationRepo
 
         validate::validate_module(&file, &module, &mut report);
 
+        let matcher = match validate::build_matcher(&module.files) {
+            Ok(matcher) => Some(matcher),
+            Err((pattern, err)) => {
+                report.errors.push(Issue {
+                    file: file.clone(),
+                    module_id: Some(module.id.clone()),
+                    field_id: None,
+                    message: format!("files entry '{pattern}' is not a valid glob: {err}"),
+                });
+                None
+            }
+        };
+
         if let Some(prev_file) = seen_ids.get(&module.id) {
             report.errors.push(Issue {
                 file: file.clone(),
@@ -216,6 +259,7 @@ pub fn load_module_set(dir: &Path) -> std::io::Result<(ModuleSet, ValidationRepo
                 module,
                 entry_labels,
                 options,
+                matcher: matcher.expect("matcher compiles when no errors were reported"),
             });
         }
     }
