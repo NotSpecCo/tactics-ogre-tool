@@ -6,7 +6,7 @@ pub mod module_set;
 pub mod module_spec;
 pub mod pipeline;
 
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 
 use tauri::Manager;
@@ -325,10 +325,36 @@ fn resolve_modules_dir(app: &tauri::AppHandle) -> PathBuf {
     if let Ok(dir) = std::env::var("TO_TOOL_MODULES_DIR") {
         return PathBuf::from(dir);
     }
-    app.path()
+
+    let resource_modules = app
+        .path()
         .resource_dir()
-        .map(|dir| dir.join("modules"))
-        .unwrap_or_else(|_| PathBuf::from("modules"))
+        .ok()
+        .map(|dir| dir.join("modules"));
+    let exe_modules = std::env::current_exe()
+        .ok()
+        .and_then(|path| path.parent().map(|parent| parent.join("modules")));
+    let repo_modules = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../modules");
+
+    for candidate in [&resource_modules, &exe_modules, &Some(repo_modules.clone())]
+        .into_iter()
+        .flatten()
+    {
+        if has_module_files(candidate) {
+            return candidate.clone();
+        }
+    }
+
+    resource_modules.unwrap_or(repo_modules)
+}
+
+fn has_module_files(dir: &Path) -> bool {
+    let Ok(entries) = std::fs::read_dir(dir) else {
+        return false;
+    };
+    entries
+        .filter_map(Result::ok)
+        .any(|entry| entry.path().extension().and_then(|ext| ext.to_str()) == Some("json5"))
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -362,4 +388,27 @@ pub fn run() {
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+}
+
+#[cfg(test)]
+mod tests {
+    use super::has_module_files;
+
+    #[test]
+    fn module_file_detection_requires_top_level_json5() {
+        let dir = tempfile::tempdir().unwrap();
+        assert!(!has_module_files(dir.path()));
+
+        std::fs::write(dir.path().join("battle_armament.json5"), "{}").unwrap();
+        assert!(has_module_files(dir.path()));
+    }
+
+    #[test]
+    fn module_file_detection_ignores_sidecar_only_dirs() {
+        let dir = tempfile::tempdir().unwrap();
+        std::fs::create_dir(dir.path().join("options")).unwrap();
+        std::fs::write(dir.path().join("options/item_type.json5"), "[]").unwrap();
+
+        assert!(!has_module_files(dir.path()));
+    }
 }
