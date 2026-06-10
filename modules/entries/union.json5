@@ -1,0 +1,23 @@
+[
+    { value: 0x00, label: '<Nothing>' },
+    { value: 0x01, label: 'Walister Resistance' },
+    { value: 0x02, label: 'Kingdom of Galgastan' },
+    { value: 0x03, label: 'Bakram-Valerian Kingdom' },
+    { value: 0x04, label: 'New Walister Alliance' },
+    { value: 0x05, label: 'The Liberation Front' },
+    { value: 0x06, label: 'Holy Lodissian Empire' },
+    { value: 0x07, label: 'Kingdom of New Xenobia' },
+    { value: 0x08, label: 'Order of Philaha' },
+    { value: 0x09, label: 'Headhunters' },
+    { value: 0x0a, label: 'Highwaymen' },
+    { value: 0x0b, label: 'Pirates' },
+    { value: 0x0c, label: 'Tigers of Burnham' },
+    { value: 0x0d, label: 'Remnants' },
+    { value: 0x0e, label: 'Commons' },
+    { value: 0x0f, label: 'Unknown' },
+    { value: 0x10, label: '<not used>' },
+    { value: 0x11, label: '<not used>' },
+    { value: 0x12, label: '<not used>' },
+    { value: 0x13, label: 'Player\'s Order' },
+    { value: 0x14, label: 'Challenger' }
+]

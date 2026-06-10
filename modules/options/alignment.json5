@@ -1,0 +1,6 @@
+[
+    { value: 0x00, label: 'NONE' },
+    { value: 0x01, label: 'Lawful' },
+    { value: 0x02, label: 'Neutral' },
+    { value: 0x03, label: 'Chaotic' }
+]

@@ -1,0 +1,9 @@
+[
+    { value: 0x00, label: 'None / Innate' },
+    { value: 0x01, label: 'Melee Weapon' },
+    { value: 0x02, label: 'Ranged Weapon' },
+    { value: 0x03, label: 'Armor' },
+    { value: 0x04, label: 'Arcana' },
+    { value: 0x05, label: 'Sundry' },
+    { value: 0x06, label: 'Charm' }
+]

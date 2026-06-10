@@ -1,0 +1,10 @@
+[
+    { value: 0x0000, label: 'Class-Dependent' },
+    { value: 0x0183, label: 'Cast Stones' },
+    { value: 0x0184, label: 'Throwing Dagger' },
+    { value: 0x0185, label: 'Sling Stone' },
+    { value: 0x0186, label: 'Rail Against' },
+    { value: 0x0187, label: 'Boulder Blow' },
+    { value: 0x0188, label: 'Boulder Toss' },
+    { value: 0x02ac, label: 'Cast Stones [Aym]' }
+]

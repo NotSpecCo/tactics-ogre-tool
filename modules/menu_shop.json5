@@ -1,0 +1,227 @@
+{
+    schema_version: 1,
+    id: 'menu_shop',
+    label: 'Shop',
+    notes: 'Tactics Ogre: Reborn - Shop module for Nightmare Table Editor',
+
+    source: {
+        format: 'nightmare',
+        path: 'menu/Shop.nmm',
+        title: 'Tactics Ogre: Reborn ==> menu_data / pack ==> Shop'
+    },
+
+    files: ['menu/menu_data.dat'],
+
+    base_offset: 0x00069350,
+    endian: 'little',
+
+    entry: {
+        count: 515,
+        size: 38,
+        labels_file: 'entries/shop.json5'
+    },
+
+    fields: [
+        {
+            id: 'item',
+            label: 'Item',
+            offset: 0x00,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/ingredient.json5'
+        },
+        {
+            id: 'crafting_recipe_obtained',
+            label: 'Crafting Recipe Obtained',
+            offset: 0x02,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/commodity_recipe.json5'
+        },
+        {
+            id: 'character_recruited',
+            label: 'Character Recruited',
+            offset: 0x04,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/unit_template.json5'
+        },
+        {
+            id: 'global_bought_counter',
+            label: 'Global Bought Counter',
+            offset: 0x06,
+            size: 2,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'global_sold_counter',
+            label: 'Global Sold Counter',
+            offset: 0x08,
+            size: 2,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'unknown_flag',
+            label: 'Unknown Flag',
+            offset: 0x0a,
+            size: 2,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'shop_locations',
+            label: '____Shop Locations___________',
+            type: 'section'
+        },
+        {
+            id: 'brigantys',
+            label: 'Brigantys',
+            offset: 0x13,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'port_asyton',
+            label: 'Port Asyton',
+            offset: 0x14,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'coritanae',
+            label: 'Coritanae',
+            offset: 0x15,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'balmamusa',
+            label: 'Balmamusa',
+            offset: 0x16,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'phidoch_castle',
+            label: 'Phidoch Castle',
+            offset: 0x17,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'krysaro',
+            label: 'Krysaro',
+            offset: 0x18,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'rhime',
+            label: 'Rhime',
+            offset: 0x19,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'almorica_castle',
+            label: 'Almorica Castle',
+            offset: 0x1a,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'golyat',
+            label: 'Golyat',
+            offset: 0x1b,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'barnicia_castle',
+            label: 'Barnicia Castle',
+            offset: 0x1c,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'oeram',
+            label: 'Oeram',
+            offset: 0x1d,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'heim',
+            label: 'Heim',
+            offset: 0x1e,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'grimsby',
+            label: 'Grimsby',
+            offset: 0x1f,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'port_omish',
+            label: 'Port Omish',
+            offset: 0x20,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'deneb_s_shop',
+            label: 'Deneb\'s Shop',
+            offset: 0x22,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'pot_d_floor_24',
+            label: 'PotD Floor 24',
+            offset: 0x23,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'pot_d_floor_65',
+            label: 'PotD Floor 65',
+            offset: 0x24,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'pot_d_floor_103',
+            label: 'PotD Floor 103',
+            offset: 0x25,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'unknown_unused',
+            label: '____Unknown/Unused___________',
+            type: 'section'
+        },
+        {
+            id: 'unused_0c_12',
+            label: '<unused> 0C - 12',
+            offset: 0x0c,
+            size: 7,
+            type: 'bytes'
+        },
+        {
+            id: 'unused_shop',
+            label: '<unused> Shop',
+            offset: 0x21,
+            size: 1,
+            type: 'uint'
+        }
+    ]
+}

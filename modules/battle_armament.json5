@@ -1,0 +1,991 @@
+{
+    schema_version: 1,
+    id: 'battle_armament',
+    label: 'Armament (Equipment)',
+    notes: 'Tactics Ogre: Reborn - Armament module for Nightmare Table Editor',
+
+    source: {
+        format: 'nightmare',
+        path: 'battle/Armament.nmm',
+        title: 'Tactics Ogre: Reborn ==> battle_data_release / pack ==> Armament (Equipment)'
+    },
+
+    files: ['battle/battle_data_release.dat'],
+
+    base_offset: 0x00393f20,
+    endian: 'little',
+
+    entry: {
+        count: 761,
+        size: 152,
+        labels_file: 'entries/armament.json5'
+    },
+
+    fields: [
+        {
+            id: 'item_type',
+            label: 'Item Type',
+            offset: 0x02,
+            size: 1,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/item_type.json5'
+        },
+        {
+            id: 'name',
+            label: 'Name',
+            offset: 0x86,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/name_armament.json5'
+        },
+        {
+            id: 'description',
+            label: 'Description',
+            offset: 0x62,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/name_armament.json5'
+        },
+        {
+            id: 'default_sort_order',
+            label: 'Default Sort Order',
+            notes: 'Numeric order for Default sorted Inventory; does not have to be unique.',
+            offset: 0x6a,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'found_flag',
+            label: 'Found Flag',
+            notes: 'Index of the value proving you have found this item for the 100% Achievement.',
+            offset: 0x90,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'general_flags',
+            label: '____General Flags____________',
+            type: 'section'
+        },
+        {
+            id: 'unique',
+            label: 'Unique',
+            notes: 'Cannot obtain more than 1 at a time; additional copies are automatically sold.',
+            offset: 0x50,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'key',
+            label: 'Key',
+            notes: 'Cannot be sold, as it is important to the story.',
+            offset: 0x51,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'require_gender',
+            label: 'Require Gender',
+            offset: 0x0f,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/gender_require.json5'
+        },
+        {
+            id: 'disallow_auto_generate',
+            label: 'Disallow Auto-Generate',
+            notes: 'Cannot be used to fill units\' non-specified equipment slots.',
+            offset: 0x0e,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'weapon_flags',
+            label: '____Weapon Flags____________',
+            type: 'section'
+        },
+        {
+            id: 'can_target_units',
+            label: 'Can Target Units',
+            offset: 0x03,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'can_target_tiles',
+            label: 'Can Target Tiles',
+            offset: 0x04,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'can_target_obstacles',
+            label: 'Can Target Obstacles',
+            offset: 0x05,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'can_target_shadows',
+            label: 'Can Target Shadows',
+            offset: 0x06,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'two_handed',
+            label: 'Two-Handed',
+            offset: 0x0d,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'arc_trajectory',
+            label: 'Arc Trajectory',
+            offset: 0x0c,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'exceed_range',
+            label: 'Exceed Range',
+            offset: 0x10,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'arc_throw_flags',
+            label: 'Arc/Throw Flags',
+            notes: 'There was a lot more Thrown stuff back in LUCT, so this isn\'t much used so I\'m not sure if this is a Type or Flag value.\nIt may also be non-functional, as there was an additional Throwing-related Type/Flag field that has been overwritten in Reborn.',
+            offset: 0x61,
+            size: 1,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'weapon_stats',
+            label: '____Weapon Stats____________',
+            type: 'section'
+        },
+        {
+            id: 'damage_scaling',
+            label: 'Damage Scaling',
+            offset: 0x12,
+            size: 1,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/health_damage.json5'
+        },
+        {
+            id: 'accuracy',
+            label: 'Accuracy',
+            offset: 0x11,
+            size: 1,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/hit_rate.json5'
+        },
+        {
+            id: 'targeting_type',
+            label: 'Targeting Type',
+            offset: 0x0a,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/target_type.json5'
+        },
+        {
+            id: 'range_minimum',
+            label: 'Range Minimum',
+            notes: 'Value of 0 means you may target yourself.',
+            offset: 0x08,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'range_maximum_1',
+            label: 'Range Maximum + 1',
+            notes: 'Value must be 1 greater than in-game value: 1=0, 2=1, 3=2, etc.',
+            offset: 0x07,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'range_area_0_1_1',
+            label: 'Range Area (0,1 = 1)',
+            notes: 'Value of either 0 or 1 equal Area of 1.',
+            offset: 0x09,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'rt_delay_recovery_time',
+            label: 'RT Delay : Recovery Time',
+            offset: 0x18,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'physical_affinity',
+            label: 'Physical Affinity',
+            offset: 0x27,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/physical_affinity.json5'
+        },
+        {
+            id: 'physical_affinity_bonus',
+            label: 'Physical Affinity Bonus %',
+            offset: 0x28,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'element_affinity',
+            label: 'Element Affinity',
+            offset: 0x39,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/element.json5'
+        },
+        {
+            id: 'element_affinity_bonus',
+            label: 'Element Affinity Bonus %',
+            offset: 0x3a,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'tribe_affinity',
+            label: 'Tribe Affinity',
+            offset: 0x2e,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/tribe.json5'
+        },
+        {
+            id: 'tribe_affinity_bonus',
+            label: 'Tribe Affinity Bonus %',
+            offset: 0x2f,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'damage_to_obstacle',
+            label: 'Damage To Obstacle',
+            offset: 0x2c,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'undead_bane',
+            label: 'Undead Bane',
+            offset: 0x2d,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'general_stats',
+            label: '____General Stats_____________',
+            type: 'section'
+        },
+        {
+            id: 'weight',
+            label: 'Weight',
+            offset: 0x26,
+            size: 1,
+            type: 'int'
+        },
+        {
+            id: 'atk_attack',
+            label: 'ATK : Attack',
+            offset: 0x19,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'def_defense',
+            label: 'DEF : Defense',
+            offset: 0x1a,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'hp_health_points',
+            label: 'HP : Health Points',
+            offset: 0x1b,
+            size: 1,
+            type: 'int'
+        },
+        {
+            id: 'mp_magic_points',
+            label: 'MP : Magic Points',
+            offset: 0x1c,
+            size: 1,
+            type: 'int'
+        },
+        {
+            id: 'luk_luck',
+            label: 'LUK : Luck',
+            offset: 0x25,
+            size: 1,
+            type: 'int'
+        },
+        {
+            id: 'str_strength',
+            label: 'STR : Strength',
+            offset: 0x1d,
+            size: 1,
+            type: 'int'
+        },
+        {
+            id: 'vit_vitality',
+            label: 'VIT : Vitality',
+            offset: 0x1e,
+            size: 1,
+            type: 'int'
+        },
+        {
+            id: 'dex_dexterity',
+            label: 'DEX : Dexterity',
+            offset: 0x1f,
+            size: 1,
+            type: 'int'
+        },
+        {
+            id: 'agi_agility',
+            label: 'AGI : Agility',
+            offset: 0x20,
+            size: 1,
+            type: 'int'
+        },
+        {
+            id: 'avd_avoidance',
+            label: 'AVD : Avoidance',
+            offset: 0x21,
+            size: 1,
+            type: 'int'
+        },
+        {
+            id: 'int_intelligence',
+            label: 'INT : Intelligence',
+            offset: 0x22,
+            size: 1,
+            type: 'int'
+        },
+        {
+            id: 'mnd_mind',
+            label: 'MND : Mind',
+            offset: 0x23,
+            size: 1,
+            type: 'int'
+        },
+        {
+            id: 'res_resistance',
+            label: 'RES : Resistance',
+            offset: 0x24,
+            size: 1,
+            type: 'int'
+        },
+        {
+            id: 'special_effects',
+            label: '____Special Effects___________',
+            type: 'section'
+        },
+        {
+            id: 'skill_rank_bonus_type',
+            label: 'Skill Rank Bonus Type',
+            offset: 0x4c,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/skill.json5'
+        },
+        {
+            id: 'skill_rank_bonus_amount',
+            label: 'Skill Rank Bonus Amount',
+            offset: 0x4e,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'on_hit_process',
+            label: 'On Hit Process',
+            offset: 0x13,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/process.json5'
+        },
+        {
+            id: 'on_hit_argument_status',
+            label: 'On Hit Argument - Status',
+            offset: 0x14,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/status.json5'
+        },
+        {
+            id: 'on_hit_chance',
+            label: 'On Hit Chance %',
+            offset: 0x15,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'on_hit_value_type',
+            label: 'On Hit Value Type',
+            offset: 0x16,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/value_type.json5'
+        },
+        {
+            id: 'on_hit_value',
+            label: 'On Hit Value',
+            offset: 0x17,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'knockback_chance',
+            label: 'Knockback Chance %',
+            offset: 0x8c,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'on_use_effect',
+            label: 'On Use Effect',
+            offset: 0x44,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/effect.json5'
+        },
+        {
+            id: 'on_use_charges',
+            label: 'On Use Charges',
+            offset: 0x46,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'unused_passive_skill',
+            label: '<unused> Passive Skill',
+            offset: 0x47,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/skill.json5'
+        },
+        {
+            id: 'battle_ability',
+            label: 'Battle Ability',
+            notes: 'Does the same thing as the old, now-unused Passive Skill field.',
+            offset: 0x88,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/skill.json5'
+        },
+        {
+            id: 'move_stride',
+            label: 'Move Stride',
+            offset: 0x8a,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/move_stride.json5'
+        },
+        {
+            id: 'spell_range_bonus',
+            label: 'Spell Range Bonus',
+            offset: 0x84,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'equipment_set',
+            label: 'Equipment Set',
+            notes: 'Equipping 3+ pieces of a set grants temporary acess to a Skill.',
+            offset: 0x77,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/equipment_set.json5'
+        },
+        {
+            id: 'armor_stats',
+            label: '____Armor Stats_____________',
+            type: 'section'
+        },
+        {
+            id: 'resist_crushing_damage',
+            label: 'Resist Crushing Damage',
+            offset: 0x29,
+            size: 1,
+            type: 'int'
+        },
+        {
+            id: 'resist_slashing_damage',
+            label: 'Resist Slashing Damage',
+            offset: 0x2a,
+            size: 1,
+            type: 'int'
+        },
+        {
+            id: 'resist_piercing_damage',
+            label: 'Resist Piercing Damage',
+            offset: 0x2b,
+            size: 1,
+            type: 'int'
+        },
+        {
+            id: 'resist_earth_element',
+            label: 'Resist Earth Element',
+            notes: 'Because Element Resist is now Element "Strength", field names are rotated to show actual effect.\nResist Air Element',
+            offset: 0x3b,
+            size: 1,
+            type: 'int'
+        },
+        {
+            id: 'resist_lightning_element',
+            label: 'Resist Lightning Element',
+            notes: 'Resist Earth Element',
+            offset: 0x3c,
+            size: 1,
+            type: 'int'
+        },
+        {
+            id: 'resist_water_element',
+            label: 'Resist Water Element',
+            notes: 'Resist Lightning Element',
+            offset: 0x3d,
+            size: 1,
+            type: 'int'
+        },
+        {
+            id: 'resist_fire_element',
+            label: 'Resist Fire Element',
+            notes: 'Resist Water Element',
+            offset: 0x3e,
+            size: 1,
+            type: 'int'
+        },
+        {
+            id: 'resist_ice_element',
+            label: 'Resist Ice Element',
+            notes: 'Resist Fire Element',
+            offset: 0x3f,
+            size: 1,
+            type: 'int'
+        },
+        {
+            id: 'resist_air_element',
+            label: 'Resist Air Element',
+            notes: 'Resist Ice Element',
+            offset: 0x40,
+            size: 1,
+            type: 'int'
+        },
+        {
+            id: 'resist_dark_element',
+            label: 'Resist Dark Element',
+            notes: 'Resist Light Element',
+            offset: 0x41,
+            size: 1,
+            type: 'int'
+        },
+        {
+            id: 'resist_light_element',
+            label: 'Resist Light Element',
+            notes: 'Resist Dark Element',
+            offset: 0x42,
+            size: 1,
+            type: 'int'
+        },
+        {
+            id: 'resist_human_tribe',
+            label: 'Resist Human Tribe',
+            offset: 0x30,
+            size: 1,
+            type: 'int'
+        },
+        {
+            id: 'resist_beast_tribe',
+            label: 'Resist Beast Tribe',
+            offset: 0x31,
+            size: 1,
+            type: 'int'
+        },
+        {
+            id: 'resist_reptile_tribe',
+            label: 'Resist Reptile Tribe',
+            offset: 0x32,
+            size: 1,
+            type: 'int'
+        },
+        {
+            id: 'resist_dragon_tribe',
+            label: 'Resist Dragon Tribe',
+            offset: 0x33,
+            size: 1,
+            type: 'int'
+        },
+        {
+            id: 'resist_divine_tribe',
+            label: 'Resist Divine Tribe',
+            offset: 0x34,
+            size: 1,
+            type: 'int'
+        },
+        {
+            id: 'resist_umbra_tribe',
+            label: 'Resist Umbra Tribe',
+            offset: 0x35,
+            size: 1,
+            type: 'int'
+        },
+        {
+            id: 'resist_faerie_tribe',
+            label: 'Resist Faerie Tribe',
+            offset: 0x36,
+            size: 1,
+            type: 'int'
+        },
+        {
+            id: 'resist_phantom_tribe',
+            label: 'Resist Phantom Tribe',
+            offset: 0x37,
+            size: 1,
+            type: 'int'
+        },
+        {
+            id: 'resist_golem_tribe',
+            label: 'Resist Golem Tribe',
+            offset: 0x38,
+            size: 1,
+            type: 'int'
+        },
+        {
+            id: 'restriction',
+            label: '____Restriction______________',
+            type: 'section'
+        },
+        {
+            id: 'include_in_arms_set',
+            label: 'Include in Arms Set',
+            notes: 'This is the best I can do while keeping Nightmare 1 support.',
+            offset: 0x58,
+            size: 8,
+            type: 'bytes'
+        },
+        {
+            id: 'arms_set_reference',
+            label: 'Arms Set Reference',
+            notes: 'Well, I suppose I can also add this.',
+            offset: 0x00,
+            size: 1,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/armament_set_ref.json5'
+        },
+        {
+            id: 'ai_cost',
+            label: 'AI Cost',
+            offset: 0x76,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'level_required',
+            label: 'Level Required',
+            notes: 'Ignored for player\'s party in Reborn, but obeyed for auto-generated equipment.',
+            offset: 0x60,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'level_sync_group',
+            label: 'Level Sync Group',
+            offset: 0x8e,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/level_sync_group.json5'
+        },
+        {
+            id: 'exclude_from_level_sync_calc',
+            label: 'Exclude from Level Sync Calc',
+            offset: 0x8b,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'acquisition',
+            label: '____Acquisition______________',
+            type: 'section'
+        },
+        {
+            id: 'equip_drop_chance',
+            label: 'Equip Drop Chance',
+            notes: 'This might be /255 instead of /100.',
+            offset: 0x69,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'price',
+            label: 'Price',
+            offset: 0x64,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'sale_at_shop',
+            label: 'Sale % at Shop',
+            offset: 0x92,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'sale_from_inventory',
+            label: 'Sale % from Inventory',
+            offset: 0x93,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'crafting_recipe',
+            label: 'Crafting Recipe',
+            offset: 0x78,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/commodity_recipe.json5'
+        },
+        {
+            id: 'craft_ingriedient_1',
+            label: 'Craft Ingriedient 1',
+            offset: 0x7a,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/ingredient.json5'
+        },
+        {
+            id: 'craft_ingriedient_2',
+            label: 'Craft Ingriedient 2',
+            offset: 0x7c,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/ingredient.json5'
+        },
+        {
+            id: 'craft_ingriedient_3',
+            label: 'Craft Ingriedient 3',
+            offset: 0x7e,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/ingredient.json5'
+        },
+        {
+            id: 'craft_ingriedient_4',
+            label: 'Craft Ingriedient 4',
+            offset: 0x80,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/ingredient.json5'
+        },
+        {
+            id: 'unused_craft_success_chance',
+            label: '<unused> Craft Success Chance %',
+            notes: 'Crafting always succeeds in Reborn, so these fields are not used.',
+            offset: 0x82,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'unused_craft_success_stat',
+            label: '<unused> Craft Success Stat',
+            offset: 0x83,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/statistic.json5'
+        },
+        {
+            id: 'visuals',
+            label: '____Visuals__________________',
+            type: 'section'
+        },
+        {
+            id: 'animation_type',
+            label: 'Animation Type',
+            offset: 0x66,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'animation_hit_effect',
+            label: 'Animation Hit Effect',
+            offset: 0x67,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'animation_projectile_speed',
+            label: 'Animation Projectile Speed',
+            offset: 0x68,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'battle_sprite',
+            label: 'Battle Sprite',
+            offset: 0x6c,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'sprite_palette',
+            label: 'Sprite Palette',
+            offset: 0x72,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'projectile_sprite',
+            label: 'Projectile Sprite',
+            offset: 0x6e,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'inventory_icon',
+            label: 'Inventory Icon',
+            offset: 0x70,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'icon_palette',
+            label: 'Icon Palette',
+            offset: 0x73,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'icon_background',
+            label: 'Icon Background',
+            offset: 0x74,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/inventory_icon_background.json5'
+        },
+        {
+            id: 'unused_icon_foreground',
+            label: '<unused> Icon Foreground',
+            notes: 'These fields were not used in LUCT, and Foreground seems yet-unimplemented.',
+            offset: 0x75,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'unknown_unused',
+            label: '____Unknown/Unused___________',
+            type: 'section'
+        },
+        {
+            id: 'unused_00_01_padding',
+            label: '<unused> 00 - 01 Padding?',
+            offset: 0x00,
+            size: 2,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'unused_0b_flag',
+            label: '<unused> 0B Flag?',
+            offset: 0x0b,
+            size: 1,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'unused_43',
+            label: '<unused> 43',
+            offset: 0x43,
+            size: 1,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'unused_49_4b',
+            label: '<unused> 49 - 4B',
+            offset: 0x49,
+            size: 3,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'unused_4f',
+            label: '<unused> 4F',
+            offset: 0x4f,
+            size: 1,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'unused_52_57_flags',
+            label: '<unused> 52 - 57 Flags',
+            offset: 0x52,
+            size: 6,
+            type: 'bytes'
+        },
+        {
+            id: 'unused_85',
+            label: '<unused> 85',
+            offset: 0x85,
+            size: 1,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'unused_8d',
+            label: '<unused> 8D',
+            offset: 0x8d,
+            size: 1,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'unused_8f',
+            label: '<unused> 8F',
+            offset: 0x8f,
+            size: 1,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'unused_94_97',
+            label: '<unused> 94 - 97',
+            offset: 0x94,
+            size: 4,
+            type: 'uint',
+            display: 'hex'
+        }
+    ]
+}

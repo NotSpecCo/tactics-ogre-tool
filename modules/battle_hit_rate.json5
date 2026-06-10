@@ -1,0 +1,1041 @@
+{
+    schema_version: 1,
+    id: 'battle_hit_rate',
+    label: 'Hit Rate',
+    notes: 'Tactics Ogre: Reborn - Hit Rate module for Nightmare Table Editor\nDo not edit the top row with this module; though it is valid for editing, its fields have different value types and is only present here to preserve the correct ID for other rows.\nField names and visibility were changed to reflect the default configuration values in the top row.\nRows seem to be in pairs: first is an attacker configuration, and next is the defender configuration for that attacker type.',
+
+    source: {
+        format: 'nightmare',
+        path: 'battle/HitRate.nmm',
+        title: 'Tactics Ogre: Reborn ==> battle_data_release / pack ==> Hit Rate'
+    },
+
+    files: ['battle/battle_data_release.dat'],
+
+    base_offset: 0x00416ba0,
+    endian: 'little',
+
+    entry: {
+        count: 33,
+        size: 252,
+        labels_file: 'entries/hit_rate.json5'
+    },
+
+    fields: [
+        {
+            id: 'dex_dexterity',
+            label: '____DEX : Dexterity',
+            type: 'section'
+        },
+        {
+            id: 'dex_unit',
+            label: 'DEX % - Unit',
+            offset: 0x00,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'dex_weapon',
+            label: 'DEX % - Weapon',
+            offset: 0x02,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'dex_shield_off_hand',
+            label: 'DEX % - Shield (Off-hand?)',
+            offset: 0x04,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'dex_helm',
+            label: 'DEX % - Helm',
+            offset: 0x06,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'dex_body_armor',
+            label: 'DEX % - Body Armor',
+            offset: 0x08,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'dex_armguard',
+            label: 'DEX % - Armguard',
+            offset: 0x0a,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'dex_legguard',
+            label: 'DEX % - Legguard',
+            offset: 0x0c,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'dex_jewelry',
+            label: 'DEX % - Jewelry',
+            offset: 0x0e,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'agi_agility',
+            label: '____AGI : Agility',
+            type: 'section'
+        },
+        {
+            id: 'agi_unit',
+            label: 'AGI % - Unit',
+            offset: 0x10,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'agi_weapon',
+            label: 'AGI % - Weapon',
+            offset: 0x12,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'agi_shield_off_hand',
+            label: 'AGI % - Shield (Off-hand?)',
+            offset: 0x14,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'agi_helm',
+            label: 'AGI % - Helm',
+            offset: 0x16,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'agi_body_armor',
+            label: 'AGI % - Body Armor',
+            offset: 0x18,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'agi_armguard',
+            label: 'AGI % - Armguard',
+            offset: 0x1a,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'agi_legguard',
+            label: 'AGI % - Legguard',
+            offset: 0x1c,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'agi_jewelry',
+            label: 'AGI % - Jewelry',
+            offset: 0x1e,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'int_intelligence',
+            label: '____INT : Intelligence',
+            type: 'section'
+        },
+        {
+            id: 'int_unit',
+            label: 'INT % - Unit',
+            offset: 0x20,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'int_weapon',
+            label: 'INT % - Weapon',
+            offset: 0x22,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'int_shield_off_hand',
+            label: 'INT % - Shield (Off-hand?)',
+            offset: 0x24,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'int_helm',
+            label: 'INT % - Helm',
+            offset: 0x26,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'int_body_armor',
+            label: 'INT % - Body Armor',
+            offset: 0x28,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'int_armguard',
+            label: 'INT % - Armguard',
+            offset: 0x2a,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'int_legguard',
+            label: 'INT % - Legguard',
+            offset: 0x2c,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'int_jewelry',
+            label: 'INT % - Jewelry',
+            offset: 0x2e,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'mnd_mind',
+            label: '____MND : Mind',
+            type: 'section'
+        },
+        {
+            id: 'mnd_unit',
+            label: 'MND % - Unit',
+            offset: 0x30,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'mnd_weapon',
+            label: 'MND % - Weapon',
+            offset: 0x32,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'mnd_shield_off_hand',
+            label: 'MND % - Shield (Off-hand?)',
+            offset: 0x34,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'mnd_helm',
+            label: 'MND % - Helm',
+            offset: 0x36,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'mnd_body_armor',
+            label: 'MND % - Body Armor',
+            offset: 0x38,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'mnd_armguard',
+            label: 'MND % - Armguard',
+            offset: 0x3a,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'mnd_legguard',
+            label: 'MND % - Legguard',
+            offset: 0x3c,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'mnd_jewelry',
+            label: 'MND % - Jewelry',
+            offset: 0x3e,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'avd_avoidance',
+            label: '____AVD : Avoidance',
+            type: 'section'
+        },
+        {
+            id: 'avd_unit',
+            label: 'AVD % - Unit',
+            offset: 0x40,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'avd_weapon',
+            label: 'AVD % - Weapon',
+            offset: 0x42,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'avd_shield_off_hand',
+            label: 'AVD % - Shield (Off-hand?)',
+            offset: 0x44,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'avd_helm',
+            label: 'AVD % - Helm',
+            offset: 0x46,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'avd_body_armor',
+            label: 'AVD % - Body Armor',
+            offset: 0x48,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'avd_armguard',
+            label: 'AVD % - Armguard',
+            offset: 0x4a,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'avd_legguard',
+            label: 'AVD % - Legguard',
+            offset: 0x4c,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'avd_jewelry',
+            label: 'AVD % - Jewelry',
+            offset: 0x4e,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'section_6',
+            label: '____',
+            type: 'section'
+        },
+        {
+            id: 'melee_attack',
+            label: '? melee attack ?',
+            offset: 0x50,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'ranged_attack',
+            label: '? ranged attack ?',
+            offset: 0x52,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'status_accuracy_side_effect',
+            label: '====Status: Accuracy Side-Effect',
+            type: 'section'
+        },
+        {
+            id: 'status_asleep',
+            label: 'Status: Asleep',
+            notes: 'Status 1',
+            offset: 0x54,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'status_paranoia',
+            label: 'Status: Paranoia',
+            notes: 'Status 2',
+            offset: 0x56,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'status_stunned',
+            label: 'Status: Stunned',
+            notes: 'Status 3',
+            offset: 0x58,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'status_petrified',
+            label: 'Status: Petrified',
+            notes: 'Status 4',
+            offset: 0x5a,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'status_leadened',
+            label: 'Status: Leadened',
+            notes: 'Status 5',
+            offset: 0x5c,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'weapon_skill',
+            label: '====Weapon Skill, ?',
+            type: 'section'
+        },
+        {
+            id: 'skill_nothing_0000',
+            label: 'Skill: <nothing> 0000',
+            notes: 'Skill 1',
+            offset: 0x5e,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_fists',
+            label: 'Skill: Fists',
+            notes: 'Skill 2',
+            offset: 0x60,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_daggers',
+            label: 'Skill: Daggers',
+            notes: 'Skill 3',
+            offset: 0x62,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_swords_1h',
+            label: 'Skill: Swords 1H',
+            notes: 'Skill 4',
+            offset: 0x64,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_swords_2h',
+            label: 'Skill: Swords 2H',
+            notes: 'Skill 5',
+            offset: 0x66,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_axes',
+            label: 'Skill: Axes',
+            notes: 'Skill 6',
+            offset: 0x68,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_not_used_0006',
+            label: 'Skill: <not used> 0006',
+            notes: 'Skill 7',
+            offset: 0x6a,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_spears',
+            label: 'Skill: Spears',
+            notes: 'Skill 8',
+            offset: 0x6c,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_hammers',
+            label: 'Skill: Hammers',
+            notes: 'Skill 9',
+            offset: 0x6e,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_not_used_0009',
+            label: 'Skill: <not used> 0009',
+            notes: 'Skill 10',
+            offset: 0x70,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_katana_1h',
+            label: 'Skill: Katana 1H',
+            notes: 'Skill 11',
+            offset: 0x72,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_katana_2h',
+            label: 'Skill: Katana 2H',
+            notes: 'Skill 12',
+            offset: 0x74,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_cudgels',
+            label: 'Skill: Cudgels',
+            notes: 'Skill 13',
+            offset: 0x76,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_not_used_000d',
+            label: 'Skill: <not used> 000D',
+            notes: 'Skill 14',
+            offset: 0x78,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_whips',
+            label: 'Skill: Whips',
+            notes: 'Skill 15',
+            offset: 0x7a,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_spellbooks',
+            label: 'Skill: Spellbooks',
+            notes: 'Skill 16',
+            offset: 0x7c,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_instruments',
+            label: 'Skill: Instruments',
+            notes: 'Skill 17',
+            offset: 0x7e,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_blowguns',
+            label: 'Skill: Blowguns',
+            notes: 'Skill 18',
+            offset: 0x80,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_bows',
+            label: 'Skill: Bows',
+            notes: 'Skill 19',
+            offset: 0x82,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_crossbows',
+            label: 'Skill: Crossbows',
+            notes: 'Skill 20',
+            offset: 0x84,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_fusils',
+            label: 'Skill: Fusils',
+            notes: 'Skill 21',
+            offset: 0x86,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_not_used_thrown',
+            label: 'Skill: <not used> {Thrown}',
+            notes: 'Skill 22',
+            offset: 0x88,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'weapon_skill_accuracy_by_rank',
+            label: '==Weapon Skill, Accuracy by Rank',
+            type: 'section'
+        },
+        {
+            id: 'skill_nothing_0000_2',
+            label: 'Skill: <nothing> 0000',
+            notes: 'Skill 1',
+            offset: 0x8a,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_fists_2',
+            label: 'Skill: Fists',
+            notes: 'Skill 2',
+            offset: 0x8c,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_daggers_2',
+            label: 'Skill: Daggers',
+            notes: 'Skill 3',
+            offset: 0x8e,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_swords_1h_2',
+            label: 'Skill: Swords 1H',
+            notes: 'Skill 4',
+            offset: 0x90,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_swords_2h_2',
+            label: 'Skill: Swords 2H',
+            notes: 'Skill 5',
+            offset: 0x92,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_axes_2',
+            label: 'Skill: Axes',
+            notes: 'Skill 6',
+            offset: 0x94,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_not_used_0006_2',
+            label: 'Skill: <not used> 0006',
+            notes: 'Skill 7',
+            offset: 0x96,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_spears_2',
+            label: 'Skill: Spears',
+            notes: 'Skill 8',
+            offset: 0x98,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_hammers_2',
+            label: 'Skill: Hammers',
+            notes: 'Skill 9',
+            offset: 0x9a,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_not_used_0009_2',
+            label: 'Skill: <not used> 0009',
+            notes: 'Skill 10',
+            offset: 0x9c,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_katana_1h_2',
+            label: 'Skill: Katana 1H',
+            notes: 'Skill 11',
+            offset: 0x9e,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_katana_2h_2',
+            label: 'Skill: Katana 2H',
+            notes: 'Skill 12',
+            offset: 0xa0,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_cudgels_2',
+            label: 'Skill: Cudgels',
+            notes: 'Skill 13',
+            offset: 0xa2,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_not_used_000d_2',
+            label: 'Skill: <not used> 000D',
+            notes: 'Skill 14',
+            offset: 0xa4,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_whips_2',
+            label: 'Skill: Whips',
+            notes: 'Skill 15',
+            offset: 0xa6,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_spellbooks_2',
+            label: 'Skill: Spellbooks',
+            notes: 'Skill 16',
+            offset: 0xa8,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_instruments_2',
+            label: 'Skill: Instruments',
+            notes: 'Skill 17',
+            offset: 0xaa,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_blowguns_2',
+            label: 'Skill: Blowguns',
+            notes: 'Skill 18',
+            offset: 0xac,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_bows_2',
+            label: 'Skill: Bows',
+            notes: 'Skill 19',
+            offset: 0xae,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_crossbows_2',
+            label: 'Skill: Crossbows',
+            notes: 'Skill 20',
+            offset: 0xb0,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_fusils_2',
+            label: 'Skill: Fusils',
+            notes: 'Skill 21',
+            offset: 0xb2,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_not_used_thrown_2',
+            label: 'Skill: <not used> {Thrown}',
+            notes: 'Skill 22',
+            offset: 0xb4,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_resist_status',
+            label: '====Skill: Resist Status',
+            type: 'section'
+        },
+        {
+            id: 'skill_resist_petrify',
+            label: 'Skill: Resist Petrify',
+            notes: 'Skill 1',
+            offset: 0xb6,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_resist_stun',
+            label: 'Skill: Resist Stun',
+            notes: 'Skill 2',
+            offset: 0xb8,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_resist_sleep',
+            label: 'Skill: Resist Sleep',
+            notes: 'Skill 3',
+            offset: 0xba,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_resist_charm',
+            label: 'Skill: Resist Charm',
+            notes: 'Skill 4',
+            offset: 0xbc,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_resist_poison',
+            label: 'Skill: Resist Poison',
+            notes: 'Skill 5',
+            offset: 0xbe,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_resist_silence',
+            label: 'Skill: Resist Silence',
+            notes: 'Skill 6',
+            offset: 0xc0,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_resist_slow',
+            label: 'Skill: Resist Slow',
+            notes: 'Skill 7',
+            offset: 0xc2,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_not_used_resist_bind',
+            label: 'Skill: <not used> {Resist Bind}',
+            notes: 'Skill 8',
+            offset: 0xc4,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_not_used_resist_shackle',
+            label: 'Skill: <not used> {Resist Shackle}',
+            notes: 'Skill 9',
+            offset: 0xc6,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_resist_stop',
+            label: 'Skill: Resist Stop',
+            notes: 'Skill 10',
+            offset: 0xc8,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_resist_leaden',
+            label: 'Skill: Resist Leaden',
+            notes: 'Skill 11',
+            offset: 0xca,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_resist_fear',
+            label: 'Skill: Resist Fear',
+            notes: 'Skill 12',
+            offset: 0xcc,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_not_used_resist_venom',
+            label: 'Skill: <not used> {Resist Venom}',
+            notes: 'Skill 13',
+            offset: 0xce,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_resist_curse',
+            label: 'Skill: Resist Curse',
+            notes: 'Skill 14',
+            offset: 0xd0,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'section_11',
+            label: '____',
+            type: 'section'
+        },
+        {
+            id: 'finisher_attack',
+            label: '? finisher attack ?',
+            offset: 0xd2,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'weapon_attack',
+            label: '? weapon attack..?',
+            offset: 0xd4,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'd6',
+            label: 'D6',
+            offset: 0xd6,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'd8',
+            label: 'D8',
+            offset: 0xd8,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'da',
+            label: 'DA',
+            offset: 0xda,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'dc',
+            label: 'DC',
+            offset: 0xdc,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'de',
+            label: 'DE',
+            offset: 0xde,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'defend',
+            label: '? defend ?',
+            offset: 0xe0,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'minimum_1',
+            label: 'Minimum 1 ?',
+            offset: 0xe2,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'minimum_2',
+            label: 'Minimum 2 ?',
+            offset: 0xe4,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'minimum_3',
+            label: 'Minimum 3 ?',
+            offset: 0xe6,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'status_accuracy_bonus_malus',
+            label: '==Status: Accuracy Bonus/Malus',
+            type: 'section'
+        },
+        {
+            id: 'status_truestrike',
+            label: 'Status: Truestrike',
+            notes: 'Status 1',
+            offset: 0xe8,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'status_falsestrike',
+            label: 'Status: Falsestrike',
+            notes: 'Status 2',
+            offset: 0xea,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'status_dodge',
+            label: 'Status: Dodge',
+            notes: 'Status 7',
+            offset: 0xf4,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'status_stagger',
+            label: 'Status: Stagger',
+            notes: 'Status 8',
+            offset: 0xf6,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'status_trueflight',
+            label: 'Status: Trueflight',
+            notes: 'Status 3',
+            offset: 0xec,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'status_falseflight',
+            label: 'Status: Falseflight',
+            notes: 'Status 4',
+            offset: 0xee,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'status_sidestep',
+            label: 'Status: Sidestep',
+            notes: 'Status 9',
+            offset: 0xf8,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'status_misstep',
+            label: 'Status: Misstep',
+            notes: 'Status 10',
+            offset: 0xfa,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'status_spellstrike',
+            label: 'Status: Spellstrike',
+            notes: 'Status 5',
+            offset: 0xf0,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'status_spellslip',
+            label: 'Status: Spellslip',
+            notes: 'Status 6',
+            offset: 0xf2,
+            size: 2,
+            type: 'int'
+        }
+    ]
+}

@@ -1,0 +1,9 @@
+[
+    { value: 0x00, label: 'None' },
+    { value: 0x01, label: 'Invisibility' },
+    { value: 0x02, label: 'Invincible' },
+    { value: 0x03, label: 'Evil Deeds' },
+    { value: 0x04, label: 'Eagle Eye 2' },
+    { value: 0x05, label: 'Dragonslayer' },
+    { value: 0x06, label: 'Charmproof' }
+]

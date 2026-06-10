@@ -1,0 +1,19 @@
+[
+    { value: 0x00, label: 'None' },
+    { value: 0x03, label: 'Number' },
+    { value: 0x04, label: 'Ticks' },
+    { value: 0x06, label: 'Turns' },
+    { value: 0x07, label: 'Chance to Apply' },
+    { value: 0x08, label: 'Chance to Remove' },
+    { value: 0x09, label: 'HP -%' },
+    { value: 0x0a, label: 'HP -% Current' },
+    { value: 0x0c, label: 'HP +X' },
+    { value: 0x0e, label: 'HP +%' },
+    { value: 0x10, label: 'HP split' },
+    { value: 0x11, label: 'MP -%' },
+    { value: 0x12, label: 'MP -% Current' },
+    { value: 0x13, label: 'MP +X' },
+    { value: 0x15, label: 'MP +%' },
+    { value: 0x16, label: 'MP +% Current?' },
+    { value: 0x1a, label: 'Stat +X' }
+]

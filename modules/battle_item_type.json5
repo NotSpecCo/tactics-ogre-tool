@@ -1,0 +1,104 @@
+{
+    schema_version: 1,
+    id: 'battle_item_type',
+    label: 'Item Type',
+    notes: 'Tactics Ogre: Reborn - Item Type module for Nightmare Table Editor',
+
+    source: {
+        format: 'nightmare',
+        path: 'battle/ItemType.nmm',
+        title: 'Tactics Ogre: Reborn ==> battle_data_release / pack ==> Item Type'
+    },
+
+    files: ['battle/battle_data_release.dat'],
+
+    base_offset: 0x004a7780,
+    endian: 'little',
+
+    entry: {
+        count: 39,
+        size: 10,
+        labels_file: 'entries/item_type.json5'
+    },
+
+    fields: [
+        {
+            id: 'attack_short',
+            label: 'Attack Short',
+            offset: 0x00,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'attack_long',
+            label: 'Attack Long',
+            offset: 0x01,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'weapon_short',
+            label: 'Weapon Short',
+            offset: 0x02,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'weapon_long',
+            label: 'Weapon Long',
+            offset: 0x03,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'parry_short',
+            label: 'Parry Short',
+            offset: 0x04,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'parry_long',
+            label: 'Parry Long',
+            offset: 0x05,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'guard_short',
+            label: 'Guard Short',
+            offset: 0x06,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'elevation_up',
+            label: 'Elevation Up',
+            offset: 0x07,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'elevation_down',
+            label: 'Elevation Down',
+            offset: 0x08,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'category',
+            label: 'Category',
+            offset: 0x09,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/item_type_category.json5'
+        }
+    ]
+}

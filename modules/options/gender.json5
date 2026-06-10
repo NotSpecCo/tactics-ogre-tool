@@ -1,0 +1,4 @@
+[
+    { value: 0x00, label: 'Male' },
+    { value: 0x01, label: 'Female' }
+]

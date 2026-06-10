@@ -1,0 +1,1287 @@
+{
+    schema_version: 1,
+    id: 'battle_effect',
+    label: 'Effect (Spell / Ability)',
+    notes: 'Tactics Ogre: Reborn - Effect module for Nightmare Table Editor',
+
+    source: {
+        format: 'nightmare',
+        path: 'battle/Effect.nmm',
+        title: 'Tactics Ogre: Reborn ==> battle_data_release / pack ==> Effect (Spell / Ability)'
+    },
+
+    files: ['battle/battle_data_release.dat'],
+
+    base_offset: 0x003cfbe0,
+    endian: 'little',
+
+    entry: {
+        count: 902,
+        size: 180,
+        labels_file: 'entries/effect.json5'
+    },
+
+    fields: [
+        {
+            id: 'unused_00_01_padding',
+            label: '<unused> 00 - 01 Padding?',
+            offset: 0x00,
+            size: 2,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'effect_type',
+            label: 'Effect Type',
+            offset: 0x02,
+            size: 1,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/effect_type.json5'
+        },
+        {
+            id: 'rt_delay_recovery_time',
+            label: 'RT Delay : Recovery Time',
+            offset: 0x03,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'unused_04_05',
+            label: '<unused> 04 - 05',
+            offset: 0x04,
+            size: 2,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'field_0x06',
+            label: '?? 06 Power ?',
+            offset: 0x06,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'cost_type',
+            label: 'Cost Type',
+            offset: 0x07,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_cost.json5'
+        },
+        {
+            id: 'cost_amount',
+            label: 'Cost Amount',
+            offset: 0x08,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'reagent',
+            label: 'Reagent',
+            offset: 0x0a,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/ingredient.json5'
+        },
+        {
+            id: 'reagent_amount',
+            label: 'Reagent Amount',
+            offset: 0x0c,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'targeting_type',
+            label: 'Targeting Type',
+            offset: 0x0d,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/target_type.json5'
+        },
+        {
+            id: 'range_maximum_1',
+            label: 'Range Maximum + 1',
+            notes: 'Value must be 1 greater than in-game value: 1=0, 2=1, 3=2, etc.',
+            offset: 0x0e,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'range_minimum',
+            label: 'Range Minimum',
+            notes: 'Value of 0 means you may target yourself.',
+            offset: 0x0f,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'target_area_0_1_1',
+            label: 'Target Area (0,1 = 1)',
+            notes: 'Value of either 0 or 1 equal Area of 1.',
+            offset: 0x10,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'strikes_0_1_1',
+            label: 'Strikes (0,1 = 1)',
+            notes: 'Default only has > 0 values for Summon Effects, so I assume this is similar to Area.',
+            offset: 0x11,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'target_restrict',
+            label: 'Target Restrict',
+            offset: 0x12,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/target_restrict.json5'
+        },
+        {
+            id: 'unused_13',
+            label: '<unused> 13',
+            offset: 0x13,
+            size: 1,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'spell_chant',
+            label: 'Spell Chant',
+            offset: 0x14,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/name_spell.json5'
+        },
+        {
+            id: 'description',
+            label: 'Description',
+            offset: 0x16,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/name_effect.json5'
+        },
+        {
+            id: 'terrain_restrict',
+            label: 'Terrain Restrict',
+            offset: 0x18,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/terrain_type.json5'
+        },
+        {
+            id: 'spell_category',
+            label: '? Spell Category?',
+            offset: 0x19,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'field_0x1a',
+            label: '?? 1A Group/ID/Type ?',
+            offset: 0x1a,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'flags',
+            label: '____Flags____________________',
+            type: 'section'
+        },
+        {
+            id: 'female_caster',
+            label: '? Female Caster?',
+            offset: 0x1c,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'can_target_units',
+            label: 'Can Target Units',
+            offset: 0x1d,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'can_target_tiles',
+            label: 'Can Target Tiles',
+            offset: 0x1e,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'can_target_obstacles',
+            label: 'Can Target Obstacles',
+            offset: 0x1f,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'can_target_shadows',
+            label: 'Can Target Shadows',
+            offset: 0x20,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'projectile',
+            label: 'Projectile?',
+            offset: 0x21,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'weapon',
+            label: '? Weapon ?',
+            offset: 0x22,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'field_0x23',
+            label: '? 23 Flag ?',
+            offset: 0x23,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'field_0x24',
+            label: '? 24 Flag ?',
+            offset: 0x24,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'magic',
+            label: '? Magic ?',
+            offset: 0x25,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'use_facing',
+            label: '? Use Facing ?',
+            offset: 0x26,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'redact_on_recruit',
+            label: 'Redact on Recruit',
+            offset: 0x27,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'weapon_2',
+            label: '? Weapon ?',
+            offset: 0x28,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'unused_29',
+            label: '<unused> 29',
+            offset: 0x29,
+            size: 1,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'effect_1',
+            label: '====Effect 1=================',
+            type: 'section'
+        },
+        {
+            id: 'process',
+            label: 'Process',
+            offset: 0x2a,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/process.json5'
+        },
+        {
+            id: 'unused_2b',
+            label: '<unused> 2B',
+            offset: 0x2b,
+            size: 1,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'argument_status',
+            label: 'Argument - Status',
+            offset: 0x2c,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/status.json5'
+        },
+        {
+            id: 'argument_condition',
+            label: 'Argument - Condition',
+            offset: 0x2c,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_status.json5'
+        },
+        {
+            id: 'argument_statistic',
+            label: 'Argument - Statistic',
+            offset: 0x2c,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/statistic.json5'
+        },
+        {
+            id: 'argument_also_set_here',
+            label: 'Argument (also set here)',
+            offset: 0x2c,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'revive_type',
+            label: 'Revive Type?',
+            offset: 0x2d,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'target_restrict_2',
+            label: 'Target Restrict',
+            offset: 0x2e,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/target_restrict.json5'
+        },
+        {
+            id: 'hit_rate',
+            label: 'Hit Rate',
+            offset: 0x2f,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_hit_rate1.json5'
+        },
+        {
+            id: 'chance',
+            label: 'Chance %',
+            offset: 0x30,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'accuracy',
+            label: 'Accuracy',
+            offset: 0x31,
+            size: 1,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/hit_rate.json5'
+        },
+        {
+            id: 'value_type',
+            label: 'Value Type',
+            offset: 0x32,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/value_type.json5'
+        },
+        {
+            id: 'damage_scaling',
+            label: 'Damage Scaling',
+            notes: 'This field is currently configured as Health Point Damage type to support the common HP Damage (1) Process.\nIt should also be able to support Health Point Restore and Magic Point Damage type values, but I do not have a list for the first or a module for the second.',
+            offset: 0x33,
+            size: 1,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/health_damage.json5'
+        },
+        {
+            id: 'minimum_value',
+            label: 'Minimum Value',
+            offset: 0x34,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'unused_36_39',
+            label: '<unused> 36 - 39',
+            offset: 0x36,
+            size: 4,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'maximum_value',
+            label: 'Maximum Value',
+            offset: 0x3a,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'physical_affinity',
+            label: 'Physical Affinity',
+            offset: 0x3c,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/physical_affinity.json5'
+        },
+        {
+            id: 'element_affinity',
+            label: 'Element Affinity',
+            offset: 0x3d,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/element.json5'
+        },
+        {
+            id: 'not_used_flag',
+            label: '<not used> Flag',
+            offset: 0x3e,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'target_caster',
+            label: 'Target Caster',
+            offset: 0x3f,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'text_delay_not_used',
+            label: 'Text Delay? <not used>',
+            offset: 0x40,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'unused_41',
+            label: '<unused> 41',
+            offset: 0x41,
+            size: 1,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'field_0x42',
+            label: '?? 42 Bonus/Rate ?',
+            offset: 0x42,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'unused_43',
+            label: '<unused> 43',
+            offset: 0x43,
+            size: 1,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'effect_2',
+            label: '====Effect 2=================',
+            type: 'section'
+        },
+        {
+            id: 'process_2',
+            label: 'Process',
+            offset: 0x44,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/process.json5'
+        },
+        {
+            id: 'unused_45',
+            label: '<unused> 45',
+            offset: 0x45,
+            size: 1,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'argument_status_2',
+            label: 'Argument - Status',
+            offset: 0x46,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/status.json5'
+        },
+        {
+            id: 'argument_condition_2',
+            label: 'Argument - Condition',
+            offset: 0x46,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_status.json5'
+        },
+        {
+            id: 'argument_statistic_2',
+            label: 'Argument - Statistic',
+            offset: 0x46,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/statistic.json5'
+        },
+        {
+            id: 'argument_also_set_here_2',
+            label: 'Argument (also set here)',
+            offset: 0x46,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'revive_type_2',
+            label: 'Revive Type?',
+            offset: 0x47,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'target_restrict_3',
+            label: 'Target Restrict',
+            offset: 0x48,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/target_restrict.json5'
+        },
+        {
+            id: 'hit_rate_2',
+            label: 'Hit Rate',
+            offset: 0x49,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_hit_rate2.json5'
+        },
+        {
+            id: 'chance_2',
+            label: 'Chance %',
+            offset: 0x4a,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'accuracy_2',
+            label: 'Accuracy',
+            offset: 0x4b,
+            size: 1,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/hit_rate.json5'
+        },
+        {
+            id: 'value_type_2',
+            label: 'Value Type',
+            offset: 0x4c,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/value_type.json5'
+        },
+        {
+            id: 'damage_scaling_2',
+            label: 'Damage Scaling',
+            notes: 'See note for this field in Effect 1.',
+            offset: 0x4d,
+            size: 1,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/health_damage.json5'
+        },
+        {
+            id: 'minimum_value_2',
+            label: 'Minimum Value',
+            offset: 0x4e,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'unused_50_53',
+            label: '<unused> 50 -53',
+            offset: 0x50,
+            size: 4,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'maximum_value_2',
+            label: 'Maximum Value',
+            offset: 0x54,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'physical_affinity_2',
+            label: 'Physical Affinity',
+            offset: 0x56,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/physical_affinity.json5'
+        },
+        {
+            id: 'element_affinity_2',
+            label: 'Element Affinity',
+            offset: 0x57,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/element.json5'
+        },
+        {
+            id: 'same_targets_value',
+            label: 'Same Targets/Value?',
+            offset: 0x58,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'target_caster_2',
+            label: 'Target Caster',
+            offset: 0x59,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'text_delay',
+            label: 'Text Delay?',
+            offset: 0x5a,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'unused_5b',
+            label: '<unused> 5B',
+            offset: 0x5b,
+            size: 1,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'field_0x5c',
+            label: '?? 5C Bonus/Rate ? <not used>',
+            offset: 0x5c,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'unused_5d',
+            label: '<unused> 5D',
+            offset: 0x5d,
+            size: 1,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'effect_3',
+            label: '====Effect 3=================',
+            type: 'section'
+        },
+        {
+            id: 'process_3',
+            label: 'Process',
+            offset: 0x5e,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/process.json5'
+        },
+        {
+            id: 'unused_5f',
+            label: '<unused> 5F',
+            offset: 0x5f,
+            size: 1,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'argument_status_3',
+            label: 'Argument - Status',
+            offset: 0x60,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/status.json5'
+        },
+        {
+            id: 'argument_condition_3',
+            label: 'Argument - Condition',
+            offset: 0x60,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_status.json5'
+        },
+        {
+            id: 'argument_statistic_3',
+            label: 'Argument - Statistic',
+            offset: 0x60,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/statistic.json5'
+        },
+        {
+            id: 'argument_also_set_here_3',
+            label: 'Argument (also set here)',
+            offset: 0x60,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'revive_type_3',
+            label: 'Revive Type?',
+            offset: 0x61,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'target_restrict_4',
+            label: 'Target Restrict',
+            offset: 0x62,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/target_restrict.json5'
+        },
+        {
+            id: 'hit_rate_3',
+            label: 'Hit Rate',
+            offset: 0x63,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_hit_rate2.json5'
+        },
+        {
+            id: 'chance_3',
+            label: 'Chance %',
+            offset: 0x64,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'accuracy_3',
+            label: 'Accuracy',
+            offset: 0x65,
+            size: 1,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/hit_rate.json5'
+        },
+        {
+            id: 'value_type_3',
+            label: 'Value Type',
+            offset: 0x66,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/value_type.json5'
+        },
+        {
+            id: 'damage_scaling_3',
+            label: 'Damage Scaling',
+            notes: 'See note for this field in Effect 1.',
+            offset: 0x67,
+            size: 1,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/health_damage.json5'
+        },
+        {
+            id: 'minimum_value_3',
+            label: 'Minimum Value',
+            offset: 0x68,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'unused_6a_6d',
+            label: '<unused> 6A - 6D',
+            offset: 0x6a,
+            size: 4,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'maximum_value_3',
+            label: 'Maximum Value',
+            offset: 0x6e,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'physical_affinity_3',
+            label: 'Physical Affinity',
+            offset: 0x70,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/physical_affinity.json5'
+        },
+        {
+            id: 'element_affinity_3',
+            label: 'Element Affinity',
+            offset: 0x71,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/element.json5'
+        },
+        {
+            id: 'same_targets_value_2',
+            label: 'Same Targets/Value?',
+            offset: 0x72,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'target_caster_3',
+            label: 'Target Caster',
+            offset: 0x73,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'text_delay_2',
+            label: 'Text Delay?',
+            offset: 0x74,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'unused_75',
+            label: '<unused> 75',
+            offset: 0x75,
+            size: 1,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'field_0x76',
+            label: '?? 76 Bonus/Rate ? <not used>',
+            offset: 0x76,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'unused_77',
+            label: '<unused> 77',
+            offset: 0x77,
+            size: 1,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'section_5',
+            label: '=============================',
+            type: 'section'
+        },
+        {
+            id: 'damage_to_obstacle',
+            label: 'Damage To Obstacle?',
+            offset: 0x78,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'damage_to_shadow',
+            label: 'Damage to Shadow??',
+            offset: 0x79,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'battlefield_element',
+            label: 'Battlefield Element?',
+            offset: 0x7a,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'battlefield_element_power',
+            label: 'Battlefield Element Power?',
+            offset: 0x7b,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'restrict_to_class',
+            label: 'Restrict to Class?',
+            offset: 0x7c,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'unused_7d',
+            label: '<unused> 7D',
+            offset: 0x7d,
+            size: 1,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'field_0x7e',
+            label: '? 7E Flag ?',
+            offset: 0x7e,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'field_0x7f',
+            label: '?? 7F Flag/Type ?',
+            offset: 0x7f,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'field_0x80',
+            label: '?? 80 Type/ID ?',
+            offset: 0x80,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'field_0x81',
+            label: '?? 81 Flag/Type ?',
+            offset: 0x81,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'prerequisite_rank',
+            label: 'Prerequisite Rank',
+            offset: 0x82,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'animation_caster',
+            label: 'Animation, Caster',
+            offset: 0x83,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'animation_ability',
+            label: 'Animation, Ability',
+            offset: 0x84,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'density_palette_modifier',
+            label: 'Density/Palette Modifier',
+            offset: 0x86,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'field_0x87',
+            label: '??',
+            offset: 0x87,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'sort_order',
+            label: 'Sort Order?',
+            offset: 0x88,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'flag',
+            label: '? Flag',
+            offset: 0x8a,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'flag_2',
+            label: '? Flag',
+            offset: 0x8b,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'flag_3',
+            label: '? Flag',
+            offset: 0x8c,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'unused_8f',
+            label: '<unused> 8F',
+            offset: 0x8d,
+            size: 1,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'activation_chance',
+            label: 'Activation Chance %',
+            offset: 0x8e,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'unused_8f_2',
+            label: '<unused> 8F',
+            offset: 0x8f,
+            size: 1,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'include_in_effect_set',
+            label: 'Include in Effect Set',
+            offset: 0x90,
+            size: 2,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'field_0x92',
+            label: '??',
+            offset: 0x92,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'unused_93',
+            label: '<unused> 93',
+            offset: 0x93,
+            size: 1,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'name',
+            label: 'Name',
+            offset: 0x94,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/name_effect.json5'
+        },
+        {
+            id: 'ai_cost',
+            label: 'AI Cost?',
+            offset: 0x96,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'unused_97',
+            label: '<unused> 97',
+            offset: 0x97,
+            size: 1,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'field_0x98',
+            label: '??',
+            offset: 0x98,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'unused_99',
+            label: '<unused> 99',
+            offset: 0x99,
+            size: 1,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'field_0x9a',
+            label: '??',
+            offset: 0x9a,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'unused_9b_9d',
+            label: '<unused> 9B - 9D',
+            offset: 0x9b,
+            size: 3,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'field_0x9e',
+            label: '??',
+            offset: 0x9e,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'field_0x9f',
+            label: '??',
+            offset: 0x9f,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'flag_4',
+            label: '? Flag',
+            offset: 0xa0,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'field_0xa1',
+            label: '??',
+            offset: 0xa1,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'field_0xa2',
+            label: '??',
+            offset: 0xa2,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'unused_a3',
+            label: '<unused> A3',
+            offset: 0xa3,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'field_0xa4',
+            label: '??',
+            offset: 0xa4,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'unused_a5',
+            label: '<unused> A5',
+            offset: 0xa5,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'flag_5',
+            label: '? Flag',
+            offset: 0xa6,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'flag_6',
+            label: '? Flag',
+            offset: 0xa7,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'field_0xa8',
+            label: '??',
+            offset: 0xa8,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'unused_a9',
+            label: '<unused> A9',
+            offset: 0xa9,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'field_0xaa',
+            label: '??',
+            offset: 0xaa,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'field_0xab',
+            label: '??',
+            offset: 0xab,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'field_0xac',
+            label: '??',
+            offset: 0xac,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'unused_ad',
+            label: '<unused> AD',
+            offset: 0xad,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'field_0xae',
+            label: '??',
+            offset: 0xae,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'field_0xaf',
+            label: '??',
+            offset: 0xaf,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'field_0xb0',
+            label: '??',
+            offset: 0xb0,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'field_0xb1',
+            label: '??',
+            offset: 0xb1,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'flag_7',
+            label: '? Flag',
+            offset: 0xb2,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'unused_b3',
+            label: '<unused> B3',
+            offset: 0xb3,
+            size: 1,
+            type: 'uint',
+            display: 'hex'
+        }
+    ]
+}

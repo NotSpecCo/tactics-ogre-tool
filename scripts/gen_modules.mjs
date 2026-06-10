@@ -9,79 +9,79 @@ const MODULES = [
         nmm: 'TOReborn Entry Unit.nmm',
         id: 'entry_unit',
         name: 'Entry Unit Editor',
-        desc: 'Edit starting unit configurations for battles',
+        desc: 'Edit starting unit configurations for battles'
     },
     {
         nmm: 'TOReborn Equipment Editor.nmm',
         id: 'equipment',
         name: 'Equipment Editor',
-        desc: 'Edit weapon and armor properties',
+        desc: 'Edit weapon and armor properties'
     },
     {
         nmm: 'TOReborn Item Editor.nmm',
         id: 'items',
         name: 'Item Editor',
-        desc: 'Edit consumable item properties',
+        desc: 'Edit consumable item properties'
     },
     {
         nmm: 'TOReborn Class Editor.nmm',
         id: 'classes',
         name: 'Class Editor',
-        desc: 'Edit class stats, sprites, and properties',
+        desc: 'Edit class stats, sprites, and properties'
     },
     {
         nmm: 'TOReborn Spell Editor.nmm',
         id: 'spells',
         name: 'Spell Editor',
-        desc: 'Edit spell properties and effects',
+        desc: 'Edit spell properties and effects'
     },
     {
         nmm: 'TOReborn Finisher Editor.nmm',
         id: 'finishers',
         name: 'Finisher Editor',
-        desc: 'Edit finisher move properties',
+        desc: 'Edit finisher move properties'
     },
     {
         nmm: 'TOReborn Action Skill Editor.nmm',
         id: 'skills',
         name: 'Action Skill Editor',
-        desc: 'Edit action skill properties',
+        desc: 'Edit action skill properties'
     },
     {
         nmm: 'TOReborn Ease II Editor.nmm',
         id: 'ease2',
         name: 'Ease II Editor',
-        desc: 'Edit Ease II spell properties',
+        desc: 'Edit Ease II spell properties'
     },
     {
         nmm: 'TOReborn Character Editor.nmm',
         id: 'characters',
         name: 'Character Editor',
-        desc: 'Edit character stats and properties',
+        desc: 'Edit character stats and properties'
     },
     {
         nmm: 'TOReborn Skill Access Editor.nmm',
         id: 'skill_access',
         name: 'Skill Access Editor',
-        desc: 'Edit which classes can learn each skill',
+        desc: 'Edit which classes can learn each skill'
     },
     {
         nmm: 'TOReborn Spell Access Editor.nmm',
         id: 'spell_access',
         name: 'Spell Access Editor',
-        desc: 'Edit which classes can use each spell',
+        desc: 'Edit which classes can use each spell'
     },
     {
         nmm: 'TOReborn Ease II Access Editor.nmm',
         id: 'ease2_access',
         name: 'Ease II Access Editor',
-        desc: 'Edit Ease II spell class access',
+        desc: 'Edit Ease II spell class access'
     },
     {
         nmm: 'TOReborn Shop Editor.nmm',
         id: 'shop',
         name: 'Shop Editor',
-        desc: 'Edit shop inventory and availability',
+        desc: 'Edit shop inventory and availability'
     }
 ];
 

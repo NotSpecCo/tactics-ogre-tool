@@ -1,0 +1,407 @@
+{
+    schema_version: 1,
+    id: 'battle_health_restore_configuration',
+    label: 'Health Restore Configuration',
+    notes: 'Tactics Ogre: Reborn - Health Restore Configuration module for Nightmare Table Editor\nThis edits the top row in the Health Restore table which contains configuration for the other rows.\nWhile it is the same size/width as other rows, only fields that have configuration are present.\nIf you make any changes here, you should edit HealthRestore.nmm to adjust field names and visibility.',
+
+    source: {
+        format: 'nightmare',
+        path: 'battle/HealthRestoreConfiguration.nmm',
+        title: 'Tactics Ogre: Reborn ==> battle_data_release / pack ==> Health Restore Configuration'
+    },
+
+    files: ['battle/battle_data_release.dat'],
+
+    base_offset: 0x0041de90,
+    endian: 'little',
+
+    entry: {
+        count: 1,
+        size: 268,
+        labels_file: 'entries/configuration.json5'
+    },
+
+    fields: [
+        {
+            id: 'base',
+            label: '====Base===================',
+            type: 'section'
+        },
+        {
+            id: 'skill_element',
+            label: '======Skill: Element',
+            type: 'section'
+        },
+        {
+            id: 'air',
+            label: 'Air',
+            offset: 0x30,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'earth',
+            label: 'Earth',
+            offset: 0x32,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'lightning',
+            label: 'Lightning',
+            offset: 0x34,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'water',
+            label: 'Water',
+            offset: 0x36,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'fire',
+            label: 'Fire',
+            offset: 0x38,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'ice',
+            label: 'Ice',
+            offset: 0x3a,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'light',
+            label: 'Light',
+            offset: 0x3c,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'dark',
+            label: 'Dark',
+            offset: 0x3e,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'skill_tribe',
+            label: '======Skill: Tribe',
+            type: 'section'
+        },
+        {
+            id: 'human',
+            label: 'Human',
+            offset: 0x40,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'beast',
+            label: 'Beast',
+            offset: 0x42,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'reptile',
+            label: 'Reptile',
+            offset: 0x44,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'dragon',
+            label: 'Dragon',
+            offset: 0x46,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'divine',
+            label: 'Divine',
+            offset: 0x48,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'umbra',
+            label: 'Umbra',
+            offset: 0x4a,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'faerie',
+            label: 'Faerie',
+            offset: 0x4c,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'phantom',
+            label: 'Phantom',
+            offset: 0x4e,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'golem',
+            label: 'Golem',
+            offset: 0x50,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'status',
+            label: '======Status',
+            type: 'section'
+        },
+        {
+            id: 'status_1',
+            label: 'Status 1',
+            offset: 0x52,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_status.json5'
+        },
+        {
+            id: 'status_2',
+            label: 'Status 2',
+            offset: 0x54,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_status.json5'
+        },
+        {
+            id: 'bonus',
+            label: '====Bonus=================',
+            type: 'section'
+        },
+        {
+            id: 'status_3',
+            label: '======Status',
+            type: 'section'
+        },
+        {
+            id: 'status_1_2',
+            label: 'Status 1',
+            offset: 0x56,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_status.json5'
+        },
+        {
+            id: 'status_2_2',
+            label: 'Status 2',
+            offset: 0x58,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_status.json5'
+        },
+        {
+            id: 'skill',
+            label: '======Skill',
+            type: 'section'
+        },
+        {
+            id: 'skill_1',
+            label: 'Skill 1',
+            offset: 0x5a,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'skill_2',
+            label: 'Skill 2',
+            offset: 0x5c,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'skill_3',
+            label: 'Skill 3',
+            offset: 0x5e,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'skill_4',
+            label: 'Skill 4',
+            offset: 0x60,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'skill_5',
+            label: 'Skill 5',
+            offset: 0x62,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'status_element_up',
+            label: '======Status: Element Up',
+            type: 'section'
+        },
+        {
+            id: 'air_2',
+            label: 'Air',
+            offset: 0x64,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_status.json5'
+        },
+        {
+            id: 'earth_2',
+            label: 'Earth',
+            offset: 0x66,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_status.json5'
+        },
+        {
+            id: 'lightning_2',
+            label: 'Lightning',
+            offset: 0x68,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_status.json5'
+        },
+        {
+            id: 'water_2',
+            label: 'Water',
+            offset: 0x6a,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_status.json5'
+        },
+        {
+            id: 'fire_2',
+            label: 'Fire',
+            offset: 0x6c,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_status.json5'
+        },
+        {
+            id: 'ice_2',
+            label: 'Ice',
+            offset: 0x6e,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_status.json5'
+        },
+        {
+            id: 'light_2',
+            label: 'Light',
+            offset: 0x70,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_status.json5'
+        },
+        {
+            id: 'dark_2',
+            label: 'Dark',
+            offset: 0x72,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_status.json5'
+        },
+        {
+            id: 'status_element_down',
+            label: '======Status: Element Down',
+            type: 'section'
+        },
+        {
+            id: 'air_3',
+            label: 'Air',
+            offset: 0x74,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_status.json5'
+        },
+        {
+            id: 'earth_3',
+            label: 'Earth',
+            offset: 0x76,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_status.json5'
+        },
+        {
+            id: 'lightning_3',
+            label: 'Lightning',
+            offset: 0x78,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_status.json5'
+        },
+        {
+            id: 'water_3',
+            label: 'Water',
+            offset: 0x7a,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_status.json5'
+        },
+        {
+            id: 'fire_3',
+            label: 'Fire',
+            offset: 0x7c,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_status.json5'
+        },
+        {
+            id: 'ice_3',
+            label: 'Ice',
+            offset: 0x7e,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_status.json5'
+        },
+        {
+            id: 'light_3',
+            label: 'Light',
+            offset: 0x80,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_status.json5'
+        },
+        {
+            id: 'dark_3',
+            label: 'Dark',
+            offset: 0x82,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_status.json5'
+        }
+    ]
+}

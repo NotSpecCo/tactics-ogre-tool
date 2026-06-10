@@ -1,0 +1,5 @@
+[
+    { value: 0x00, label: 'Accuracy' },
+    { value: 0x02, label: 'Chance %' },
+    { value: 0x08, label: '<not used> Rank * 10 + Chance %' }
+]

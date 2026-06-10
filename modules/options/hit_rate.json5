@@ -1,0 +1,19 @@
+[
+    { value: 0x00, label: 'Nothing' },
+    { value: 0x01, label: 'Melee Weapon' },
+    { value: 0x03, label: 'Ranged Weapon' },
+    { value: 0x05, label: '<not used>' },
+    { value: 0x07, label: 'Attack Spell' },
+    { value: 0x09, label: 'Apocrypha Spell' },
+    { value: 0x0b, label: 'Status Spell' },
+    { value: 0x0d, label: 'Secondary Status' },
+    { value: 0x0f, label: '<not used>' },
+    { value: 0x11, label: 'Melee Skill/Finisher' },
+    { value: 0x13, label: 'Ranged Skill/Finisher' },
+    { value: 0x15, label: '<not used>' },
+    { value: 0x17, label: '<not used>' },
+    { value: 0x19, label: '<not used>' },
+    { value: 0x1b, label: 'Melee Skill/Finisher Status' },
+    { value: 0x1d, label: 'Ranged Skill/Finisher Status' },
+    { value: 0x1f, label: 'Song/Dance' }
+]

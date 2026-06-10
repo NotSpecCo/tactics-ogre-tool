@@ -1,0 +1,538 @@
+{
+    schema_version: 1,
+    id: 'battle_effect_set',
+    label: 'Effect (Spell / Ability) Set',
+    notes: 'Tactics Ogre: Reborn - Effect Set module for Nightmare Table Editor',
+
+    source: {
+        format: 'nightmare',
+        path: 'battle/EffectSet.nmm',
+        title: 'Tactics Ogre: Reborn ==> battle_data_release / pack ==> Effect (Spell / Ability) Set'
+    },
+
+    files: ['battle/battle_data_release.dat'],
+
+    base_offset: 0x004aea30,
+    endian: 'little',
+
+    entry: {
+        count: 268,
+        size: 64,
+        labels_file: 'entries/effect_set.json5'
+    },
+
+    fields: [
+        {
+            id: 'all',
+            label: 'All',
+            offset: 0x00,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'wizard',
+            label: 'Wizard',
+            offset: 0x01,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'cleric',
+            label: 'Cleric',
+            offset: 0x02,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'rune_fencer',
+            label: 'Rune Fencer',
+            offset: 0x03,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'knight',
+            label: 'Knight',
+            offset: 0x04,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'terror_knight',
+            label: 'Terror Knight',
+            offset: 0x05,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'swordmaster',
+            label: 'Swordmaster',
+            offset: 0x06,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'ninja',
+            label: 'Ninja',
+            offset: 0x07,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'warlock',
+            label: 'Warlock',
+            offset: 0x08,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'necromancer',
+            label: 'Necromancer',
+            offset: 0x09,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'lich',
+            label: 'Lich',
+            offset: 0x0a,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'divine_knight',
+            label: 'Divine Knight',
+            offset: 0x0b,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'patriarch',
+            label: 'Patriarch',
+            offset: 0x0c,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'familiar',
+            label: 'Familiar',
+            offset: 0x0d,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'cyclops',
+            label: 'Cyclops',
+            offset: 0x0e,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'boogeyman',
+            label: 'Boogeyman',
+            offset: 0x0f,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'not_used',
+            label: '<not used>',
+            offset: 0x10,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'lord',
+            label: 'Lord',
+            offset: 0x11,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'priest',
+            label: 'Priest',
+            offset: 0x12,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'dark_priest',
+            label: 'Dark Priest',
+            offset: 0x13,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'princess',
+            label: 'Princess',
+            offset: 0x14,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'paladin',
+            label: 'Paladin',
+            offset: 0x15,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'astromancer',
+            label: 'Astromancer',
+            offset: 0x16,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'vartan',
+            label: 'Vartan',
+            offset: 0x17,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'white_knight',
+            label: 'White Knight',
+            offset: 0x18,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'shaman',
+            label: 'Shaman',
+            offset: 0x19,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'wicce',
+            label: 'Wicce',
+            offset: 0x1a,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'songstress',
+            label: 'Songstress',
+            offset: 0x1b,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'knight_commander',
+            label: 'Knight Commander',
+            offset: 0x1c,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'phoenix',
+            label: 'Phoenix',
+            offset: 0x1d,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'rukh',
+            label: 'Rukh',
+            offset: 0x1e,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'not_used_2',
+            label: '<not used>',
+            offset: 0x1f,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'not_used_3',
+            label: '<not used>',
+            offset: 0x20,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'not_used_4',
+            label: '<not used>',
+            offset: 0x21,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'not_used_5',
+            label: '<not used>',
+            offset: 0x22,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'not_used_6',
+            label: '<not used>',
+            offset: 0x23,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'not_used_7',
+            label: '<not used>',
+            offset: 0x24,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'not_used_8',
+            label: '<not used>',
+            offset: 0x25,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'not_used_9',
+            label: '<not used>',
+            offset: 0x26,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'not_used_10',
+            label: '<not used>',
+            offset: 0x27,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'not_used_11',
+            label: '<not used>',
+            offset: 0x28,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'not_used_12',
+            label: '<not used>',
+            offset: 0x29,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'not_used_13',
+            label: '<not used>',
+            offset: 0x2a,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'not_used_14',
+            label: '<not used>',
+            offset: 0x2b,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'not_used_15',
+            label: '<not used>',
+            offset: 0x2c,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'not_used_16',
+            label: '<not used>',
+            offset: 0x2d,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'not_used_17',
+            label: '<not used>',
+            offset: 0x2e,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'not_used_18',
+            label: '<not used>',
+            offset: 0x2f,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'not_used_19',
+            label: '<not used>',
+            offset: 0x30,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'not_used_20',
+            label: '<not used>',
+            offset: 0x31,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'not_used_21',
+            label: '<not used>',
+            offset: 0x32,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'not_used_22',
+            label: '<not used>',
+            offset: 0x33,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'not_used_23',
+            label: '<not used>',
+            offset: 0x34,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'not_used_24',
+            label: '<not used>',
+            offset: 0x35,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'not_used_25',
+            label: '<not used>',
+            offset: 0x36,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'not_used_26',
+            label: '<not used>',
+            offset: 0x37,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'not_used_27',
+            label: '<not used>',
+            offset: 0x38,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'not_used_28',
+            label: '<not used>',
+            offset: 0x39,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'not_used_29',
+            label: '<not used>',
+            offset: 0x3a,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'not_used_30',
+            label: '<not used>',
+            offset: 0x3b,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'not_used_31',
+            label: '<not used>',
+            offset: 0x3c,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'not_used_32',
+            label: '<not used>',
+            offset: 0x3d,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'not_used_33',
+            label: '<not used>',
+            offset: 0x3e,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        },
+        {
+            id: 'impossible_none',
+            label: 'Impossible/None',
+            offset: 0x3f,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_usability.json5'
+        }
+    ]
+}

@@ -9,3 +9,5 @@ bun.lockb
 /static/
 /drizzle/
 /src-tauri
+# Generated module set (formatted deterministically by scripts/convert_nmm_modules.mjs)
+/modules/
