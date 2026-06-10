@@ -64,6 +64,10 @@ pub struct LoadedModule {
 }
 
 impl LoadedModule {
+    pub fn id(&self) -> &str {
+        &self.module.id
+    }
+
     /// Whether this module applies to a game-root-relative dat path.
     pub fn matches(&self, dat_path: &str) -> bool {
         self.matcher.is_match(normalize_dat_path(dat_path))
@@ -78,24 +82,27 @@ impl LoadedModule {
     }
 }
 
-/// All valid modules of a set, in file-name order.
+/// All valid modules of a set, in file-name order. Modules are shared via
+/// `Arc`, so cloning the set (or handing out matches) copies pointers, not
+/// module data.
 #[derive(Debug, Clone, Default)]
 pub struct ModuleSet {
-    pub modules: Vec<LoadedModule>,
+    pub modules: Vec<Arc<LoadedModule>>,
 }
 
 impl ModuleSet {
-    pub fn find(&self, module_id: &str) -> Option<&LoadedModule> {
+    pub fn find(&self, module_id: &str) -> Option<&Arc<LoadedModule>> {
         self.modules.iter().find(|m| m.module.id == module_id)
     }
 
     /// Modules whose `files` patterns match a game-root-relative dat path,
     /// in file-name order. Pure in-memory filtering; no I/O.
-    pub fn modules_for(&self, dat_path: &str) -> Vec<&LoadedModule> {
+    pub fn modules_for(&self, dat_path: &str) -> Vec<Arc<LoadedModule>> {
         let normalized = normalize_dat_path(dat_path);
         self.modules
             .iter()
             .filter(|m| m.matcher.is_match(&normalized))
+            .cloned()
             .collect()
     }
 }
@@ -183,7 +190,7 @@ impl SidecarCache {
 pub fn load_module_set(dir: &Path) -> std::io::Result<(ModuleSet, ValidationReport)> {
     let mut report = ValidationReport::default();
     let mut cache = SidecarCache::new();
-    let mut modules: Vec<LoadedModule> = Vec::new();
+    let mut modules: Vec<Arc<LoadedModule>> = Vec::new();
     // Module id -> file that introduced it, for the uniqueness rule.
     let mut seen_ids: HashMap<String, String> = HashMap::new();
 
@@ -254,13 +261,13 @@ pub fn load_module_set(dir: &Path) -> std::io::Result<(ModuleSet, ValidationRepo
             load_module_sidecars(dir, &file, &module, &mut cache, &mut report);
 
         if report.errors.len() == errors_before {
-            modules.push(LoadedModule {
+            modules.push(Arc::new(LoadedModule {
                 file,
                 module,
                 entry_labels,
                 options,
                 matcher: matcher.expect("matcher compiles when no errors were reported"),
-            });
+            }));
         }
     }
 

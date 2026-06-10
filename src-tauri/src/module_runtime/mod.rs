@@ -161,15 +161,23 @@ fn write_unsigned(dest: &mut [u8], value: u64, endian: Endian) {
     }
 }
 
+// Sizes are guaranteed by `module_spec::parse` (uint/dropdown 1–4, int
+// 1/2/4); these helpers panic on anything else so a hand-built `ModuleFile`
+// that bypasses parsing fails loudly instead of degrading silently.
+
 fn max_unsigned(size: u64) -> u64 {
-    (1u64 << (8 * size)) - 1
+    match size {
+        1..=4 => (1u64 << (8 * size)) - 1,
+        _ => panic!("invalid integer field size {size} (expected 1-4)"),
+    }
 }
 
 fn signed_range(size: u64) -> (i64, i64) {
     match size {
         1 => (i64::from(i8::MIN), i64::from(i8::MAX)),
         2 => (i64::from(i16::MIN), i64::from(i16::MAX)),
-        _ => (i64::from(i32::MIN), i64::from(i32::MAX)),
+        4 => (i64::from(i32::MIN), i64::from(i32::MAX)),
+        _ => panic!("invalid int field size {size} (expected 1, 2, or 4)"),
     }
 }
 
@@ -177,7 +185,8 @@ fn sign_extend(raw: u64, size: u64) -> i64 {
     match size {
         1 => i64::from(raw as u8 as i8),
         2 => i64::from(raw as u16 as i16),
-        _ => i64::from(raw as u32 as i32),
+        4 => i64::from(raw as u32 as i32),
+        _ => panic!("invalid int field size {size} (expected 1, 2, or 4)"),
     }
 }
 

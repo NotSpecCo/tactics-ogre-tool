@@ -137,6 +137,23 @@ class SessionStore {
         }
     }
 
+    /**
+     * Refreshes module summaries from the live payload. Entry counts of
+     * count_from modules live in editable bytes, so they can change with
+     * any field write.
+     */
+    async refreshModules(): Promise<void> {
+        if (!this.sessionId || !this.datPath) return;
+
+        try {
+            const info = await tauri.getModules(this.sessionId);
+            this.modules = [...info.modules].sort((a, b) => a.label.localeCompare(b.label));
+            this.moduleErrors = info.module_errors;
+        } catch (e) {
+            this.error = (e as Error).message ?? String(e);
+        }
+    }
+
     async loadDiagnostics(): Promise<void> {
         try {
             this.diagnostics = await tauri.getModuleDiagnostics();

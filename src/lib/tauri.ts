@@ -112,7 +112,11 @@ export function openDat(sessionId: string, datPath: string, force?: boolean): Pr
     return invoke('open_dat', { sessionId, datPath, force });
 }
 
-export function getModules(sessionId: string): Promise<ModuleSummary[]> {
+/**
+ * Re-summarizes the open dat's modules against the live payload, so entry
+ * counts reflect edits to the bytes a `count_from` count reads.
+ */
+export function getModules(sessionId: string): Promise<DatSessionInfo> {
     return invoke('get_modules', { sessionId });
 }
 

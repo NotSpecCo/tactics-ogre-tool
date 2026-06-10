@@ -661,3 +661,60 @@ fn battle_unit_style_dynamic_count_reads_and_writes() {
         Err(RuntimeError::IndexOutOfRange { index: 1, count: 1 })
     );
 }
+
+// --- size helper guards ------------------------------------------------------------
+//
+// Sizes are normally guaranteed by module_spec::parse; these helpers must
+// panic (not silently degrade) when a hand-built ModuleFile bypasses it.
+
+#[test]
+fn integer_helpers_accept_every_valid_size() {
+    assert_eq!(max_unsigned(1), 0xff);
+    assert_eq!(max_unsigned(2), 0xffff);
+    assert_eq!(max_unsigned(3), 0xff_ffff);
+    assert_eq!(max_unsigned(4), 0xffff_ffff);
+
+    assert_eq!(signed_range(1), (i64::from(i8::MIN), i64::from(i8::MAX)));
+    assert_eq!(signed_range(2), (i64::from(i16::MIN), i64::from(i16::MAX)));
+    assert_eq!(signed_range(4), (i64::from(i32::MIN), i64::from(i32::MAX)));
+
+    assert_eq!(sign_extend(0xff, 1), -1);
+    assert_eq!(sign_extend(0xffff, 2), -1);
+    assert_eq!(sign_extend(0xffff_ffff, 4), -1);
+}
+
+#[test]
+#[should_panic(expected = "invalid integer field size 0")]
+fn max_unsigned_panics_on_zero_size() {
+    max_unsigned(0);
+}
+
+#[test]
+#[should_panic(expected = "invalid integer field size 5")]
+fn max_unsigned_panics_on_oversized() {
+    max_unsigned(5);
+}
+
+#[test]
+#[should_panic(expected = "invalid int field size 3")]
+fn signed_range_panics_on_three_byte_int() {
+    signed_range(3);
+}
+
+#[test]
+#[should_panic(expected = "invalid int field size 0")]
+fn signed_range_panics_on_zero_size() {
+    signed_range(0);
+}
+
+#[test]
+#[should_panic(expected = "invalid int field size 3")]
+fn sign_extend_panics_on_three_byte_int() {
+    sign_extend(0, 3);
+}
+
+#[test]
+#[should_panic(expected = "invalid int field size 8")]
+fn sign_extend_panics_on_oversized() {
+    sign_extend(0, 8);
+}

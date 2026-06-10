@@ -1,4 +1,5 @@
 use std::path::{Path, PathBuf};
+use std::sync::Arc;
 use std::{fs, io};
 
 use serde::{Deserialize, Serialize};
@@ -99,17 +100,12 @@ pub struct DatSession {
     pub dat_path: String,
     pub pack_data: PackData,
     pub dirty: bool,
-    /// Modules matched to this dat at open time, with counts resolved
-    /// against the unpacked payload. Record and field commands resolve
-    /// module IDs only through this list, never through the global set.
-    pub modules: Vec<MatchedModule>,
-}
-
-/// One module that applies to the open dat.
-#[derive(Debug, Clone)]
-pub struct MatchedModule {
-    pub module: LoadedModule,
-    pub resolved_count: u64,
+    /// Modules matched to this dat at open time. Record and field commands
+    /// resolve module IDs only through this list, never through the global
+    /// set. Entry counts are never cached here: `count_from` counts live in
+    /// payload bytes the user can edit, so they are resolved against the
+    /// live payload on every use.
+    pub modules: Vec<Arc<LoadedModule>>,
 }
 
 // --- IPC types ---
@@ -295,23 +291,20 @@ fn scan_dir_recursive(root: &Path, dir: &Path, set: &ModuleSet) -> Vec<FileTreeN
 
 // --- Module matching ---
 
-/// Matches the module set against a dat path and resolves entry counts on
+/// Matches the module set against a dat path and validates entry counts on
 /// the unpacked payload. Modules whose runtime validation fails are
 /// reported in the second value instead of being silently dropped.
 pub fn match_modules(
     set: &ModuleSet,
     dat_path: &str,
     payload: &[u8],
-) -> (Vec<MatchedModule>, Vec<String>) {
+) -> (Vec<Arc<LoadedModule>>, Vec<String>) {
     let mut matched = Vec::new();
     let mut errors = Vec::new();
     for loaded in set.modules_for(dat_path) {
         match module_runtime::resolve_count(payload, &loaded.module) {
-            Ok(resolved_count) => matched.push(MatchedModule {
-                module: loaded.clone(),
-                resolved_count,
-            }),
-            Err(err) => errors.push(format!("module '{}': {err}", loaded.module.id)),
+            Ok(_) => matched.push(loaded),
+            Err(err) => errors.push(format!("module '{}': {err}", loaded.id())),
         }
     }
     (matched, errors)
@@ -321,11 +314,11 @@ pub fn match_modules(
 pub fn find_matched<'a>(
     session: &'a DatSession,
     module_id: &str,
-) -> Result<&'a MatchedModule, String> {
+) -> Result<&'a Arc<LoadedModule>, String> {
     session
         .modules
         .iter()
-        .find(|m| m.module.module.id == module_id)
+        .find(|m| m.id() == module_id)
         .ok_or_else(|| {
             format!(
                 "module '{module_id}' does not apply to '{}'",
@@ -334,29 +327,51 @@ pub fn find_matched<'a>(
         })
 }
 
-pub fn module_summary(matched: &MatchedModule) -> ModuleSummary {
-    let module = &matched.module.module;
+/// Builds a summary with the entry count resolved against the live payload
+/// (a `count_from` count may sit in bytes the user has edited since open).
+pub fn module_summary(loaded: &LoadedModule, payload: &[u8]) -> Result<ModuleSummary, String> {
+    let count =
+        module_runtime::resolve_count(payload, &loaded.module).map_err(|e| e.to_string())?;
+
     // Entry labels at or above the resolved count are never displayed.
-    let entry_labels = matched
-        .module
+    let entry_labels = loaded
         .entry_labels
         .as_ref()
         .map(|labels| {
             labels
                 .iter()
-                .filter(|item| item.value < matched.resolved_count)
+                .filter(|item| item.value < count)
                 .map(LabeledValue::from)
                 .collect()
         })
         .unwrap_or_default();
 
-    ModuleSummary {
-        id: module.id.clone(),
-        label: module.label.clone(),
-        notes: module.notes.clone(),
-        entry_count: matched.resolved_count,
+    Ok(ModuleSummary {
+        id: loaded.module.id.clone(),
+        label: loaded.module.label.clone(),
+        notes: loaded.module.notes.clone(),
+        entry_count: count,
         entry_labels,
+    })
+}
+
+/// Summarizes every module against the live payload. Modules whose counts
+/// no longer resolve are reported in the second value instead of being
+/// silently dropped (the user can break a `count_from` count by editing the
+/// bytes it reads).
+pub fn summarize_modules(
+    modules: &[Arc<LoadedModule>],
+    payload: &[u8],
+) -> (Vec<ModuleSummary>, Vec<String>) {
+    let mut summaries = Vec::new();
+    let mut errors = Vec::new();
+    for loaded in modules {
+        match module_summary(loaded, payload) {
+            Ok(summary) => summaries.push(summary),
+            Err(err) => errors.push(format!("module '{}': {err}", loaded.id())),
+        }
     }
+    (summaries, errors)
 }
 
 // --- Record reading ---
@@ -376,8 +391,7 @@ fn display_name(field: &Field) -> Option<String> {
     )
 }
 
-pub fn read_record(payload: &[u8], matched: &MatchedModule, index: u64) -> Result<Record, String> {
-    let loaded = &matched.module;
+pub fn read_record(payload: &[u8], loaded: &LoadedModule, index: u64) -> Result<Record, String> {
     let values =
         module_runtime::read_record(payload, &loaded.module, index).map_err(|e| e.to_string())?;
 
@@ -425,19 +439,13 @@ pub fn read_record(payload: &[u8], matched: &MatchedModule, index: u64) -> Resul
 
 pub fn write_field(
     payload: &mut [u8],
-    matched: &MatchedModule,
+    loaded: &LoadedModule,
     index: u64,
     field_id: &str,
     value: &FieldValue,
 ) -> Result<(), String> {
-    module_runtime::write_field(
-        payload,
-        &matched.module.module,
-        index,
-        field_id,
-        &value.into(),
-    )
-    .map_err(|e| e.to_string())
+    module_runtime::write_field(payload, &loaded.module, index, field_id, &value.into())
+        .map_err(|e| e.to_string())
 }
 
 // --- Save pipeline ---
@@ -711,7 +719,7 @@ mod tests {
         p
     }
 
-    fn matched(set: &ModuleSet, dat_path: &str, payload: &[u8]) -> Vec<MatchedModule> {
+    fn matched(set: &ModuleSet, dat_path: &str, payload: &[u8]) -> Vec<Arc<LoadedModule>> {
         let (matched, errors) = match_modules(set, dat_path, payload);
         assert!(errors.is_empty(), "unexpected module errors: {errors:?}");
         matched
@@ -741,8 +749,7 @@ mod tests {
 
         let battle = matched(&set, "battle/test.dat", &payload);
         assert_eq!(battle.len(), 1);
-        assert_eq!(battle[0].module.module.id, "battle_test");
-        assert_eq!(battle[0].resolved_count, 3);
+        assert_eq!(battle[0].id(), "battle_test");
 
         let (none, errors) = match_modules(&set, "battle/unknown.dat", &payload);
         assert!(none.is_empty());
@@ -782,7 +789,7 @@ mod tests {
     fn module_summary_exposes_labels_below_the_resolved_count() {
         let set = test_set();
         let session = battle_session(&set);
-        let summary = module_summary(&session.modules[0]);
+        let summary = module_summary(&session.modules[0], &session.pack_data.bytes).unwrap();
 
         assert_eq!(summary.id, "battle_test");
         assert_eq!(summary.label, "Battle Test");
@@ -792,6 +799,73 @@ mod tests {
         assert_eq!(summary.entry_labels.len(), 2);
         assert_eq!(summary.entry_labels[0].label, "Alpha");
         assert_eq!(summary.entry_labels[1].label, "Beta");
+    }
+
+    /// A set with one count_from module: a u8 count at offset 0, table at
+    /// offset 1 with 2-byte entries.
+    fn count_from_set() -> ModuleSet {
+        load_set(&[
+            (
+                "dynamic.json5",
+                "{
+                    schema_version: 1,
+                    id: 'dynamic',
+                    label: 'Dynamic',
+                    files: ['battle/dyn.dat'],
+                    base_offset: 1,
+                    entry: {
+                        count_from: { base_offset: 0, offset: 0, size: 1, type: 'uint' },
+                        size: 2,
+                        labels_file: 'entries/dyn.json5'
+                    },
+                    fields: [ { id: 'a', label: 'A', offset: 0, size: 1, type: 'uint' } ]
+                }",
+            ),
+            (
+                "entries/dyn.json5",
+                "[ { value: 0, label: 'First' }, { value: 1, label: 'Second' }, { value: 2, label: 'Third' } ]",
+            ),
+        ])
+    }
+
+    #[test]
+    fn module_summary_resolves_count_from_the_live_payload() {
+        let set = count_from_set();
+        // Count byte says 3; room for exactly 3 entries.
+        let mut payload = vec![3u8, 0, 0, 0, 0, 0, 0];
+        let modules = matched(&set, "battle/dyn.dat", &payload);
+
+        let summary = module_summary(&modules[0], &payload).unwrap();
+        assert_eq!(summary.entry_count, 3);
+        assert_eq!(summary.entry_labels.len(), 3);
+
+        // Editing the stored count must be visible without re-matching, and
+        // labels at or above the new count disappear.
+        payload[0] = 2;
+        let summary = module_summary(&modules[0], &payload).unwrap();
+        assert_eq!(summary.entry_count, 2);
+        assert_eq!(summary.entry_labels.len(), 2);
+        assert_eq!(summary.entry_labels[1].label, "Second");
+    }
+
+    #[test]
+    fn summarize_modules_reports_counts_broken_by_edits() {
+        let set = count_from_set();
+        let mut payload = vec![3u8, 0, 0, 0, 0, 0, 0];
+        let modules = matched(&set, "battle/dyn.dat", &payload);
+
+        let (summaries, errors) = summarize_modules(&modules, &payload);
+        assert_eq!(summaries.len(), 1);
+        assert!(errors.is_empty());
+
+        // A count edit that pushes the table past the payload must surface
+        // as an error for that module, not silently drop or stale-cache it.
+        payload[0] = 200;
+        let (summaries, errors) = summarize_modules(&modules, &payload);
+        assert!(summaries.is_empty());
+        assert_eq!(errors.len(), 1);
+        assert!(errors[0].contains("dynamic"));
+        assert!(errors[0].contains("payload"));
     }
 
     // --- read_record ---
@@ -1379,9 +1453,10 @@ mod tests {
 
         let armament = matched
             .iter()
-            .find(|m| m.module.module.id == "battle_armament")
+            .find(|m| m.id() == "battle_armament")
             .unwrap();
-        assert_eq!(armament.resolved_count, 761);
+        let summary = module_summary(armament, &pack.bytes).unwrap();
+        assert_eq!(summary.entry_count, 761);
 
         let record = read_record(&pack.bytes, armament, 0).unwrap();
         assert_eq!(record.module_id, "battle_armament");
@@ -1408,7 +1483,7 @@ mod tests {
         let (matched, _) = match_modules(&set, "battle/battle_data_release.dat", &pack.bytes);
         let armament = matched
             .iter()
-            .find(|m| m.module.module.id == "battle_armament")
+            .find(|m| m.id() == "battle_armament")
             .unwrap();
 
         let original = read_record(&bytes, armament, 0).unwrap();
@@ -1470,12 +1545,13 @@ mod tests {
         assert!(errors.is_empty(), "module errors: {errors:?}");
 
         for module in &matched {
-            for index in 0..module.resolved_count {
+            let count = module_runtime::resolve_count(&pack.bytes, &module.module).unwrap();
+            for index in 0..count {
                 let record = read_record(&pack.bytes, module, index);
                 assert!(
                     record.is_ok(),
                     "failed to read module '{}' record {}: {}",
-                    module.module.module.id,
+                    module.id(),
                     index,
                     record.unwrap_err()
                 );

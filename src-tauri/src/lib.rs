@@ -13,7 +13,7 @@ use tauri::Manager;
 
 use pipeline::session::{
     self, AppState, DatSessionInfo, FieldValue, FileTableStatus, GameDirectoryInfo,
-    ModuleDiagnostics, ModuleSummary, ModulesState, Record, SaveResult,
+    ModuleDiagnostics, ModulesState, Record, SaveResult,
 };
 
 fn with_session<F, R>(
@@ -35,8 +35,9 @@ where
     f(game_dir)
 }
 
-/// Clones the loaded module set out of state. Lock order is always modules
-/// before game_directory; cloning keeps the scopes disjoint.
+/// Clones the loaded module set out of state — a cheap pointer copy, since
+/// modules are `Arc`-shared. Lock order is always modules before
+/// game_directory; cloning keeps the scopes disjoint.
 fn current_module_set(state: &tauri::State<'_, AppState>) -> Result<module_set::ModuleSet, String> {
     let guard = state
         .modules
@@ -155,8 +156,10 @@ fn open_dat(
         let pack_data = pipeline::unpack_dat(&encrypted)
             .map_err(|e| format!("failed to unpack '{}': {e}", dat_path))?;
 
-        let (matched, module_errors) = session::match_modules(&set, &dat_path, &pack_data.bytes);
-        let modules: Vec<ModuleSummary> = matched.iter().map(session::module_summary).collect();
+        let (matched, mut module_errors) =
+            session::match_modules(&set, &dat_path, &pack_data.bytes);
+        let (modules, summary_errors) = session::summarize_modules(&matched, &pack_data.bytes);
+        module_errors.extend(summary_errors);
 
         gd.dat_session = Some(session::DatSession {
             dat_path: dat_path.clone(),
@@ -173,14 +176,21 @@ fn open_dat(
     })
 }
 
+/// Re-summarizes the open dat's modules against the live payload, so entry
+/// counts reflect any edits to the bytes a `count_from` count reads.
 #[tauri::command]
 fn get_modules(
     state: tauri::State<'_, AppState>,
     session_id: String,
-) -> Result<Vec<ModuleSummary>, String> {
+) -> Result<DatSessionInfo, String> {
     with_session(&state, &session_id, |gd| {
         let ds = gd.dat_session.as_ref().ok_or("no dat file is open")?;
-        Ok(ds.modules.iter().map(session::module_summary).collect())
+        let (modules, module_errors) = session::summarize_modules(&ds.modules, &ds.pack_data.bytes);
+        Ok(DatSessionInfo {
+            dat_path: ds.dat_path.clone(),
+            modules,
+            module_errors,
+        })
     })
 }
 
@@ -217,7 +227,7 @@ fn set_field(
         } = ds;
         let matched = modules
             .iter()
-            .find(|m| m.module.module.id == module_id)
+            .find(|m| m.id() == module_id)
             .ok_or_else(|| format!("module '{module_id}' does not apply to the open dat"))?;
 
         session::write_field(&mut pack_data.bytes, matched, index, &field_id, &value)?;
