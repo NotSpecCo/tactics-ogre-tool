@@ -1,0 +1,135 @@
+{
+    schema_version: 1,
+    id: 'battle_treasure',
+    label: 'Treasure',
+    notes: 'Tactics Ogre: Reborn - Treasure module for Nightmare Table Editor\nI have not investigated where these are referenced, and so have  not provided record descriptions.',
+
+    source: {
+        format: 'nightmare',
+        path: 'battle/Treasure.nmm',
+        title: 'Tactics Ogre: Reborn ==> battle_data_release / pack ==> Treasure'
+    },
+
+    files: ['battle/battle_data_release.dat'],
+
+    base_offset: 0x004a9cb0,
+    endian: 'little',
+
+    entry: {
+        header: true,
+        count: 31,
+        size: 24,
+        labels_file: null
+    },
+
+    fields: [
+        {
+            id: 'treasure_1',
+            label: 'Treasure 1',
+            offset: 0x00,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/ingredient.json5'
+        },
+        {
+            id: 'treasure_2',
+            label: 'Treasure 2',
+            offset: 0x02,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/ingredient.json5'
+        },
+        {
+            id: 'treasure_3',
+            label: 'Treasure 3',
+            offset: 0x04,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/ingredient.json5'
+        },
+        {
+            id: 'treasure_4',
+            label: 'Treasure 4',
+            offset: 0x06,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/ingredient.json5'
+        },
+        {
+            id: 'treasure_5',
+            label: 'Treasure 5',
+            offset: 0x08,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/ingredient.json5'
+        },
+        {
+            id: 'treasure_6',
+            label: 'Treasure 6',
+            offset: 0x0a,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/ingredient.json5'
+        },
+        {
+            id: 'treasure_7',
+            label: 'Treasure 7',
+            offset: 0x0c,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/ingredient.json5'
+        },
+        {
+            id: 'treasure_8',
+            label: 'Treasure 8',
+            offset: 0x0e,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/ingredient.json5'
+        },
+        {
+            id: 'treasure_9',
+            label: 'Treasure 9',
+            offset: 0x10,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/ingredient.json5'
+        },
+        {
+            id: 'treasure_10',
+            label: 'Treasure 10',
+            offset: 0x12,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/ingredient.json5'
+        },
+        {
+            id: 'treasure_11',
+            label: 'Treasure 11',
+            offset: 0x14,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/ingredient.json5'
+        },
+        {
+            id: 'treasure_12',
+            label: 'Treasure 12',
+            offset: 0x16,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/ingredient.json5'
+        }
+    ]
+}

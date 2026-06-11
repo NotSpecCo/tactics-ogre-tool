@@ -1,0 +1,7 @@
+[
+    { value: 0x00, label: 'None' },
+    { value: 0x01, label: 'Weapon Proficiency' },
+    { value: 0x02, label: 'Magic School' },
+    { value: 0x03, label: 'Tribe/Element Familiarity' },
+    { value: 0x04, label: 'Other' }
+]

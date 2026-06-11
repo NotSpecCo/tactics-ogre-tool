@@ -1,0 +1,36 @@
+{
+    schema_version: 1,
+    id: 'menu_classmark',
+    label: 'Classmark',
+    notes: 'Tactics Ogre: Reborn - Classmark module for Nightmare Table Editor',
+
+    source: {
+        format: 'nightmare',
+        path: 'menu/Classmark.nmm',
+        title: 'Tactics Ogre: Reborn ==> menu_data / pack ==> Classmark'
+    },
+
+    files: ['menu/menu_data.dat'],
+
+    base_offset: 0x0006e810,
+    endian: 'little',
+
+    entry: {
+        header: true,
+        count: 80,
+        size: 2,
+        labels_file: 'entries/class.json5'
+    },
+
+    fields: [
+        {
+            id: 'item',
+            label: 'Item',
+            offset: 0x00,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/ingredient.json5'
+        }
+    ]
+}

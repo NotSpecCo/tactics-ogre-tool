@@ -1,0 +1,393 @@
+{
+    schema_version: 1,
+    id: 'battle_commodity',
+    label: 'Commodity (Arcana / Sundries)',
+    notes: 'Tactics Ogre: Reborn - Commodity module for Nightmare Table Editor',
+
+    source: {
+        format: 'nightmare',
+        path: 'battle/Commodity.nmm',
+        title: 'Tactics Ogre: Reborn ==> battle_data_release / pack ==> Commodity (Arcana / Sundries)'
+    },
+
+    files: ['battle/battle_data_release.dat'],
+
+    base_offset: 0x003b0460,
+    endian: 'little',
+
+    entry: {
+        header: true,
+        count: 732,
+        size: 56,
+        labels_file: 'entries/commodity.json5'
+    },
+
+    fields: [
+        {
+            id: 'item_type',
+            label: 'Item Type',
+            offset: 0x02,
+            size: 1,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/item_type.json5'
+        },
+        {
+            id: 'name',
+            label: 'Name',
+            offset: 0x2a,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/name_commodity.json5'
+        },
+        {
+            id: 'description',
+            label: 'Description',
+            offset: 0x0a,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/name_commodity.json5'
+        },
+        {
+            id: 'default_sort_order',
+            label: 'Default Sort Order',
+            offset: 0x14,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'found_flag',
+            label: 'Found Flag',
+            offset: 0x30,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'general_flags',
+            label: '____General Flags____________',
+            type: 'section'
+        },
+        {
+            id: 'unique',
+            label: 'Unique',
+            notes: 'Cannot obtain more than 1 at a time; additional copies are automatically sold.',
+            offset: 0x0c,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'key',
+            label: 'Key',
+            notes: 'Cannot be sold, as it is important to the story.',
+            offset: 0x0d,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'use_type_range',
+            label: 'Use Type Range',
+            offset: 0x12,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'special_effects',
+            label: '____Special Effects___________',
+            type: 'section'
+        },
+        {
+            id: 'on_use_effect',
+            label: 'On Use Effect',
+            offset: 0x04,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/effect.json5'
+        },
+        {
+            id: 'on_use_charges',
+            label: 'On Use Charges',
+            offset: 0x06,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'delay_to_target_s_turn',
+            label: 'Delay to Target\'s Turn',
+            offset: 0x36,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'charm_type',
+            label: 'Charm Type',
+            offset: 0x2c,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/charm.json5'
+        },
+        {
+            id: 'charm_value_statistic',
+            label: 'Charm Value - Statistic',
+            notes: 'These 3 fields are pointing to the same location, editing the same value.',
+            offset: 0x2e,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/statistic.json5'
+        },
+        {
+            id: 'charm_value_element',
+            label: 'Charm Value - Element',
+            offset: 0x2e,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/element.json5'
+        },
+        {
+            id: 'charm_value_copy_stat_elem_here',
+            label: 'Charm Value (copy Stat/Elem here)',
+            notes: 'The last field \'wins\'--if Charm Type = Statistic | Element, also set the value of this field.\nNeed only change this field for Charm Type = Level | Experience.',
+            offset: 0x2e,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'restriction',
+            label: '____Restriction______________',
+            type: 'section'
+        },
+        {
+            id: 'ai_cost',
+            label: 'AI Cost',
+            offset: 0x1b,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'restrict_use_to_battle_id',
+            label: 'Restrict Use to Battle ID',
+            offset: 0x32,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'ai_unusable',
+            label: 'AI Unusable',
+            offset: 0x11,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'throwable',
+            label: 'Throwable',
+            offset: 0x0f,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'ai_throwable',
+            label: 'AI Throwable',
+            offset: 0x10,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'acquisition',
+            label: '____Acquisition______________',
+            type: 'section'
+        },
+        {
+            id: 'price',
+            label: 'Price',
+            offset: 0x08,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'sale_at_shop',
+            label: 'Sale % at Shop',
+            offset: 0x34,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'sale_from_inventory',
+            label: 'Sale % from Inventory',
+            offset: 0x35,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'crafting_recipe',
+            label: 'Crafting Recipe',
+            offset: 0x1e,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/commodity_recipe.json5'
+        },
+        {
+            id: 'craft_ingriedient_1',
+            label: 'Craft Ingriedient 1',
+            offset: 0x20,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/ingredient.json5'
+        },
+        {
+            id: 'craft_ingriedient_2',
+            label: 'Craft Ingriedient 2',
+            offset: 0x22,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/ingredient.json5'
+        },
+        {
+            id: 'craft_ingriedient_3',
+            label: 'Craft Ingriedient 3',
+            offset: 0x24,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/ingredient.json5'
+        },
+        {
+            id: 'craft_ingriedient_4',
+            label: 'Craft Ingriedient 4',
+            offset: 0x26,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/ingredient.json5'
+        },
+        {
+            id: 'unused_craft_success_chance',
+            label: '<unused> Craft Success Chance %',
+            notes: 'Crafting always succeeds in Reborn, so these fields are not used.',
+            offset: 0x28,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'unused_craft_success_stat',
+            label: '<unused> Craft Success Stat',
+            offset: 0x29,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/statistic.json5'
+        },
+        {
+            id: 'visuals',
+            label: '____Visuals__________________',
+            type: 'section'
+        },
+        {
+            id: 'inventory_icon',
+            label: 'Inventory Icon',
+            offset: 0x16,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'icon_palette',
+            label: 'Icon Palette',
+            offset: 0x18,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'icon_background',
+            label: 'Icon Background',
+            offset: 0x19,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/inventory_icon_background.json5'
+        },
+        {
+            id: 'unused_icon_foreground',
+            label: '<unused> Icon Foreground',
+            offset: 0x1a,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'unknown_unused',
+            label: '____Unknown/Unused___________',
+            type: 'section'
+        },
+        {
+            id: 'unused_00_01_padding',
+            label: '<unused> 00 - 01 Padding?',
+            offset: 0x00,
+            size: 2,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'unused_03',
+            label: '<unused> 03',
+            offset: 0x03,
+            size: 1,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'unused_07',
+            label: '<unused> 07',
+            offset: 0x07,
+            size: 1,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'unused_0e_flag',
+            label: '<unused> 0E Flag',
+            offset: 0x0e,
+            size: 1,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'unused_13_flag',
+            label: '<unused> 13 Flag',
+            offset: 0x13,
+            size: 1,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'unused_1c_1d',
+            label: '<unused> 1C - 1D',
+            offset: 0x1c,
+            size: 2,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'unused_2d_charm',
+            label: '<unused> 2D Charm...?',
+            offset: 0x2d,
+            size: 1,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'unused_37',
+            label: '<unused> 37',
+            offset: 0x37,
+            size: 1,
+            type: 'uint',
+            display: 'hex'
+        }
+    ]
+}

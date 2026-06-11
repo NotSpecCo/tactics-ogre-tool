@@ -74,13 +74,13 @@
         {#if editor.selectedModule}
             <Panel.Root class="min-w-0 flex-1">
                 <Panel.Header
-                    title={editor.selectedModule?.name ?? 'No Module Selected'}
+                    title={editor.selectedModule?.label ?? 'No Module Selected'}
                     icon="square-pen"
-                    subtitle={editor.selectedModule?.description ?? ''}
+                    subtitle={editor.selectedModule?.notes ?? ''}
                 >
-                    {#if editor.selectedModule.entry_names.length > 0}
+                    {#if editor.selectedModule.entry_count > 0}
                         <RecordSelector
-                            entryNames={editor.selectedModule.entry_names}
+                            entries={editor.entryOptions}
                             selectedIndex={editor.selectedRecordIndex}
                             onSelect={(i) => editor.selectRecord(i)}
                         />

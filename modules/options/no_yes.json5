@@ -1,0 +1,4 @@
+[
+    { value: 0x00, label: 'No' },
+    { value: 0x01, label: 'Yes' }
+]

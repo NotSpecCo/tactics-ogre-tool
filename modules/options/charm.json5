@@ -1,0 +1,7 @@
+[
+    { value: 0x00, label: 'None' },
+    { value: 0x01, label: 'Level' },
+    { value: 0x02, label: 'Experience' },
+    { value: 0x03, label: 'Statistic' },
+    { value: 0x04, label: 'Element' }
+]

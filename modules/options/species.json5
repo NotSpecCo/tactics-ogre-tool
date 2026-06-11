@@ -1,0 +1,19 @@
+[
+    { value: 0x00, label: 'None' },
+    { value: 0x01, label: 'Human' },
+    { value: 0x02, label: 'Hawkman' },
+    { value: 0x03, label: 'Lizardman' },
+    { value: 0x04, label: 'Lamia' },
+    { value: 0x05, label: 'Orc' },
+    { value: 0x06, label: 'Phantom' },
+    { value: 0x07, label: 'Faerie' },
+    { value: 0x08, label: 'Gremlin' },
+    { value: 0x09, label: 'Pumpkin' },
+    { value: 0x0a, label: 'Dragon' },
+    { value: 0x0b, label: 'Hydra' },
+    { value: 0x0c, label: 'Golem' },
+    { value: 0x0d, label: 'Gryphon' },
+    { value: 0x0e, label: 'Cockatrice' },
+    { value: 0x0f, label: 'Octopus' },
+    { value: 0x10, label: 'Cyclops' }
+]

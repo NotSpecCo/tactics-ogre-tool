@@ -1,17 +1,64 @@
 use std::path::{Path, PathBuf};
+use std::sync::Arc;
 use std::{fs, io};
 
 use serde::{Deserialize, Serialize};
 
-use crate::binary::{reader, writer, Endian};
 use crate::filetable;
-use crate::modules::types::{FieldDefinition, FieldOption, FieldType, ModuleDefinition};
+use crate::module_runtime;
+use crate::module_set::{load_module_set, Issue, LoadedModule, ModuleSet, ValidationReport};
+use crate::module_spec::{DisplayFormat, Field, SidecarItem};
 use crate::pipeline::dat::{pack_dat, PackData};
 
 // --- App state ---
 
 pub struct AppState {
     pub game_directory: std::sync::Mutex<Option<GameDirectory>>,
+    pub modules: std::sync::Mutex<ModulesState>,
+}
+
+/// The loaded module set and its validation report. Loaded once at startup
+/// and replaced wholesale by `reload_modules`.
+pub struct ModulesState {
+    pub dir: PathBuf,
+    pub set: ModuleSet,
+    pub report: ValidationReport,
+}
+
+impl ModulesState {
+    /// Loads the module set from `dir`. A directory-level read failure
+    /// produces an empty set with the failure recorded in the report, so
+    /// the app still starts and can show the problem.
+    pub fn load(dir: PathBuf) -> Self {
+        match load_module_set(&dir) {
+            Ok((set, report)) => Self { dir, set, report },
+            Err(err) => {
+                let report = ValidationReport {
+                    errors: vec![Issue {
+                        file: dir.display().to_string(),
+                        module_id: None,
+                        field_id: None,
+                        message: format!("failed to read module directory: {err}"),
+                    }],
+                    warnings: Vec::new(),
+                };
+                Self {
+                    dir,
+                    set: ModuleSet::default(),
+                    report,
+                }
+            }
+        }
+    }
+
+    pub fn diagnostics(&self) -> ModuleDiagnostics {
+        ModuleDiagnostics {
+            dir: self.dir.display().to_string(),
+            module_count: self.set.modules.len(),
+            errors: self.report.errors.clone(),
+            warnings: self.report.warnings.clone(),
+        }
+    }
 }
 
 // --- Path validation ---
@@ -53,6 +100,12 @@ pub struct DatSession {
     pub dat_path: String,
     pub pack_data: PackData,
     pub dirty: bool,
+    /// Modules matched to this dat at open time. Record and field commands
+    /// resolve module IDs only through this list, never through the global
+    /// set. Entry counts are never cached here: block header counts live in
+    /// payload bytes the user can edit, so they are resolved against the
+    /// live payload on every use.
+    pub modules: Vec<Arc<LoadedModule>>,
 }
 
 // --- IPC types ---
@@ -83,25 +136,45 @@ pub struct GameDirectoryInfo {
 pub struct DatSessionInfo {
     pub dat_path: String,
     pub modules: Vec<ModuleSummary>,
+    /// Modules that matched this dat but failed runtime payload validation
+    /// (for example a table extent outside the payload). They are not
+    /// usable for this dat; the messages explain why.
+    pub module_errors: Vec<String>,
 }
 
 #[derive(Debug, Clone, Serialize)]
 pub struct ModuleSummary {
     pub id: String,
-    pub name: String,
-    pub description: String,
-    pub entry_count: usize,
-    pub entry_names: Vec<String>,
+    pub label: String,
+    pub notes: Option<String>,
+    pub entry_count: u64,
+    /// Non-fatal warning: a header-driven module's expected `entry.count`
+    /// differs from the block header count. `entry_count` (the header
+    /// count) stays authoritative.
+    pub count_divergence: Option<CountDivergenceInfo>,
+    /// Entry labels with values below the resolved count, in file order.
+    pub entry_labels: Vec<LabeledValue>,
 }
 
-impl From<&ModuleDefinition> for ModuleSummary {
-    fn from(m: &ModuleDefinition) -> Self {
+#[derive(Debug, Clone, Serialize)]
+pub struct CountDivergenceInfo {
+    pub expected: u64,
+    pub actual: u64,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct LabeledValue {
+    pub value: u64,
+    pub label: String,
+    pub notes: Option<String>,
+}
+
+impl From<&SidecarItem> for LabeledValue {
+    fn from(item: &SidecarItem) -> Self {
         Self {
-            id: m.id.clone(),
-            name: m.name.clone(),
-            description: m.description.clone(),
-            entry_count: m.entry_count,
-            entry_names: m.entry_names.clone(),
+            value: item.value,
+            label: item.label.clone(),
+            notes: item.notes.clone(),
         }
     }
 }
@@ -109,26 +182,66 @@ impl From<&ModuleDefinition> for ModuleSummary {
 #[derive(Debug, Clone, Serialize)]
 pub struct Record {
     pub module_id: String,
-    pub index: usize,
-    pub name: String,
+    pub index: u64,
+    /// Entry label for this index (first match by value), when present.
+    pub label: Option<String>,
     pub fields: Vec<RecordField>,
 }
 
 #[derive(Debug, Clone, Serialize)]
 pub struct RecordField {
-    pub name: String,
-    pub value: FieldValue,
-    pub field_type: FieldType,
-    pub size: usize,
-    pub options: Option<Vec<FieldOption>>,
+    pub id: String,
+    pub label: String,
+    pub notes: Option<String>,
+    #[serde(rename = "type")]
+    pub field_type: String,
+    /// Stored size in bytes; `None` for sections.
+    pub size: Option<u64>,
+    /// `decimal` or `hex` for uint and dropdown fields.
+    pub display: Option<String>,
+    /// `None` for sections.
+    pub value: Option<FieldValue>,
+    /// Options in file order for dropdown fields.
+    pub options: Option<Vec<LabeledValue>>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-#[serde(tag = "type", content = "value")]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(tag = "type", content = "value", rename_all = "lowercase")]
 pub enum FieldValue {
     Uint(u64),
     Int(i64),
-    Hex(Vec<u8>),
+    Bytes(Vec<u8>),
+    Text(String),
+}
+
+impl From<module_runtime::FieldValue> for FieldValue {
+    fn from(value: module_runtime::FieldValue) -> Self {
+        match value {
+            module_runtime::FieldValue::Uint(v) => FieldValue::Uint(v),
+            module_runtime::FieldValue::Int(v) => FieldValue::Int(v),
+            module_runtime::FieldValue::Bytes(v) => FieldValue::Bytes(v),
+            module_runtime::FieldValue::Text(v) => FieldValue::Text(v),
+        }
+    }
+}
+
+impl From<&FieldValue> for module_runtime::FieldValue {
+    fn from(value: &FieldValue) -> Self {
+        match value {
+            FieldValue::Uint(v) => module_runtime::FieldValue::Uint(*v),
+            FieldValue::Int(v) => module_runtime::FieldValue::Int(*v),
+            FieldValue::Bytes(v) => module_runtime::FieldValue::Bytes(v.clone()),
+            FieldValue::Text(v) => module_runtime::FieldValue::Text(v.clone()),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct ModuleDiagnostics {
+    pub dir: String,
+    pub module_count: usize,
+    pub errors: Vec<Issue>,
+    pub warnings: Vec<Issue>,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -140,11 +253,11 @@ pub struct FileTableStatus {
 
 // --- Directory scanning ---
 
-pub fn scan_directory(root: &Path) -> Vec<FileTreeNode> {
-    scan_dir_recursive(root, root)
+pub fn scan_directory(root: &Path, set: &ModuleSet) -> Vec<FileTreeNode> {
+    scan_dir_recursive(root, root, set)
 }
 
-fn scan_dir_recursive(root: &Path, dir: &Path) -> Vec<FileTreeNode> {
+fn scan_dir_recursive(root: &Path, dir: &Path, set: &ModuleSet) -> Vec<FileTreeNode> {
     let entries = match fs::read_dir(dir) {
         Ok(e) => e,
         Err(_) => return Vec::new(),
@@ -166,7 +279,7 @@ fn scan_dir_recursive(root: &Path, dir: &Path) -> Vec<FileTreeNode> {
         let name = entry.file_name().to_string_lossy().to_string();
 
         if path.is_dir() {
-            let children = scan_dir_recursive(root, &path);
+            let children = scan_dir_recursive(root, &path, set);
             nodes.push(FileTreeNode::Directory { name, children });
         } else {
             let rel_path = path
@@ -174,7 +287,7 @@ fn scan_dir_recursive(root: &Path, dir: &Path) -> Vec<FileTreeNode> {
                 .unwrap_or(&path)
                 .to_string_lossy()
                 .replace('\\', "/");
-            let has_modules = rel_path.ends_with(".dat");
+            let has_modules = !set.modules_for(&rel_path).is_empty();
             nodes.push(FileTreeNode::File {
                 name,
                 path: rel_path,
@@ -186,177 +299,170 @@ fn scan_dir_recursive(root: &Path, dir: &Path) -> Vec<FileTreeNode> {
     nodes
 }
 
-// --- Record reading ---
+// --- Module matching ---
 
-pub fn read_record(
-    pack_bytes: &[u8],
-    module: &ModuleDefinition,
-    index: usize,
-) -> Result<Record, String> {
-    if index >= module.entry_count {
-        return Err(format!(
-            "record index {} out of range (module has {} entries)",
-            index, module.entry_count
-        ));
+/// Matches the module set against a dat path and validates entry counts on
+/// the unpacked payload. Modules whose runtime validation fails are
+/// reported in the second value instead of being silently dropped.
+pub fn match_modules(
+    set: &ModuleSet,
+    dat_path: &str,
+    payload: &[u8],
+) -> (Vec<Arc<LoadedModule>>, Vec<String>) {
+    let mut matched = Vec::new();
+    let mut errors = Vec::new();
+    for loaded in set.modules_for(dat_path) {
+        match module_runtime::resolve_count(payload, &loaded.module) {
+            Ok(_) => matched.push(loaded),
+            Err(err) => errors.push(format!("module '{}': {err}", loaded.id())),
+        }
     }
+    (matched, errors)
+}
 
-    let record_offset = module.base_offset + (index * module.entry_size);
+/// Resolves a module ID through the matched set of the open dat only.
+pub fn find_matched<'a>(
+    session: &'a DatSession,
+    module_id: &str,
+) -> Result<&'a Arc<LoadedModule>, String> {
+    session
+        .modules
+        .iter()
+        .find(|m| m.id() == module_id)
+        .ok_or_else(|| {
+            format!(
+                "module '{module_id}' does not apply to '{}'",
+                session.dat_path
+            )
+        })
+}
 
-    let mut fields = Vec::with_capacity(module.fields.len());
-    for field in &module.fields {
-        let offset = record_offset + field.offset;
-        let value = read_field_value(pack_bytes, offset, field)
-            .map_err(|e| format!("field '{}': {e}", field.name))?;
-        fields.push(RecordField {
-            name: field.name.clone(),
-            value,
-            field_type: field.field_type.clone(),
-            size: field.size,
-            options: field.options.clone(),
+/// Builds a summary with the entry count resolved against the live payload
+/// (a block header count may sit in bytes the user has edited since open,
+/// via the battle unit header module).
+pub fn module_summary(loaded: &LoadedModule, payload: &[u8]) -> Result<ModuleSummary, String> {
+    let count =
+        module_runtime::resolve_count(payload, &loaded.module).map_err(|e| e.to_string())?;
+    let count_divergence =
+        module_runtime::count_divergence(&loaded.module, count).map(|d| CountDivergenceInfo {
+            expected: d.expected,
+            actual: d.actual,
         });
-    }
 
-    let name = if index < module.entry_names.len() {
-        module.entry_names[index].clone()
-    } else {
-        format!("Record {index}")
-    };
+    // Entry labels at or above the resolved count are never displayed.
+    let entry_labels = loaded
+        .entry_labels
+        .as_ref()
+        .map(|labels| {
+            labels
+                .iter()
+                .filter(|item| item.value < count)
+                .map(LabeledValue::from)
+                .collect()
+        })
+        .unwrap_or_default();
 
-    Ok(Record {
-        module_id: module.id.clone(),
-        index,
-        name,
-        fields,
+    Ok(ModuleSummary {
+        id: loaded.module.id.clone(),
+        label: loaded.module.label.clone(),
+        notes: loaded.module.notes.clone(),
+        entry_count: count,
+        count_divergence,
+        entry_labels,
     })
 }
 
-fn read_field_value(
-    data: &[u8],
-    offset: usize,
-    field: &FieldDefinition,
-) -> Result<FieldValue, String> {
-    let e = Endian::Little;
-    match field.field_type {
-        FieldType::Uint | FieldType::Dropdown => match field.size {
-            1 => reader::read_u8(data, offset)
-                .map(|v| FieldValue::Uint(v as u64))
-                .map_err(|e| e.to_string()),
-            2 => reader::read_u16(data, offset, e)
-                .map(|v| FieldValue::Uint(v as u64))
-                .map_err(|e| e.to_string()),
-            4 => reader::read_u32(data, offset, e)
-                .map(|v| FieldValue::Uint(v as u64))
-                .map_err(|e| e.to_string()),
-            s => Err(format!("unsupported uint size: {s}")),
-        },
-        FieldType::Int => match field.size {
-            1 => reader::read_i8(data, offset)
-                .map(|v| FieldValue::Int(v as i64))
-                .map_err(|e| e.to_string()),
-            2 => reader::read_i16(data, offset, e)
-                .map(|v| FieldValue::Int(v as i64))
-                .map_err(|e| e.to_string()),
-            4 => reader::read_i32(data, offset, e)
-                .map(|v| FieldValue::Int(v as i64))
-                .map_err(|e| e.to_string()),
-            s => Err(format!("unsupported int size: {s}")),
-        },
-        FieldType::Hex => reader::read_bytes(data, offset, field.size)
-            .map(|v| FieldValue::Hex(v.to_vec()))
-            .map_err(|e| e.to_string()),
+/// Summarizes every module against the live payload. Modules whose counts
+/// no longer resolve are reported in the second value instead of being
+/// silently dropped (the user can break a block header by editing the bytes
+/// it occupies).
+pub fn summarize_modules(
+    modules: &[Arc<LoadedModule>],
+    payload: &[u8],
+) -> (Vec<ModuleSummary>, Vec<String>) {
+    let mut summaries = Vec::new();
+    let mut errors = Vec::new();
+    for loaded in modules {
+        match module_summary(loaded, payload) {
+            Ok(summary) => summaries.push(summary),
+            Err(err) => errors.push(format!("module '{}': {err}", loaded.id())),
+        }
     }
+    (summaries, errors)
+}
+
+// --- Record reading ---
+
+fn display_name(field: &Field) -> Option<String> {
+    let display = match field {
+        Field::Uint(f) => f.display,
+        Field::Dropdown(f) => f.display,
+        _ => return None,
+    };
+    Some(
+        match display {
+            DisplayFormat::Decimal => "decimal",
+            DisplayFormat::Hex => "hex",
+        }
+        .to_string(),
+    )
+}
+
+pub fn read_record(payload: &[u8], loaded: &LoadedModule, index: u64) -> Result<Record, String> {
+    let values =
+        module_runtime::read_record(payload, &loaded.module, index).map_err(|e| e.to_string())?;
+
+    let fields = loaded
+        .module
+        .fields
+        .iter()
+        .zip(values)
+        .map(|(field, value)| {
+            let options = field.options_file().map(|path| {
+                loaded
+                    .options_for(path)
+                    .map(|items| items.iter().map(LabeledValue::from).collect())
+                    .unwrap_or_default()
+            });
+            RecordField {
+                id: field.id().to_string(),
+                label: field.label().to_string(),
+                notes: field.notes().map(str::to_string),
+                field_type: field.type_name().to_string(),
+                size: field.storage().map(|(_, size)| size),
+                display: display_name(field),
+                value: value.map(FieldValue::from),
+                options,
+            }
+        })
+        .collect();
+
+    let label = loaded.entry_labels.as_ref().and_then(|labels| {
+        labels
+            .iter()
+            .find(|item| item.value == index)
+            .map(|item| item.label.clone())
+    });
+
+    Ok(Record {
+        module_id: loaded.module.id.clone(),
+        index,
+        label,
+        fields,
+    })
 }
 
 // --- Field writing ---
 
 pub fn write_field(
-    pack_bytes: &mut [u8],
-    module: &ModuleDefinition,
-    index: usize,
-    field_name: &str,
+    payload: &mut [u8],
+    loaded: &LoadedModule,
+    index: u64,
+    field_id: &str,
     value: &FieldValue,
 ) -> Result<(), String> {
-    if index >= module.entry_count {
-        return Err(format!(
-            "record index {} out of range (module has {} entries)",
-            index, module.entry_count
-        ));
-    }
-
-    let field = module
-        .fields
-        .iter()
-        .find(|f| f.name == field_name)
-        .ok_or_else(|| format!("field '{}' not found in module '{}'", field_name, module.id))?;
-
-    let record_offset = module.base_offset + (index * module.entry_size);
-    let offset = record_offset + field.offset;
-    let e = Endian::Little;
-
-    match (&field.field_type, value) {
-        (FieldType::Uint | FieldType::Dropdown, FieldValue::Uint(v)) => match field.size {
-            1 => {
-                let v = u8::try_from(*v)
-                    .map_err(|_| format!("value {v} out of range for u8 (0..={})", u8::MAX))?;
-                writer::write_u8(pack_bytes, offset, v).map_err(|e| e.to_string())
-            }
-            2 => {
-                let v = u16::try_from(*v)
-                    .map_err(|_| format!("value {v} out of range for u16 (0..={})", u16::MAX))?;
-                writer::write_u16(pack_bytes, offset, v, e).map_err(|e| e.to_string())
-            }
-            4 => {
-                let v = u32::try_from(*v)
-                    .map_err(|_| format!("value {v} out of range for u32 (0..={})", u32::MAX))?;
-                writer::write_u32(pack_bytes, offset, v, e).map_err(|e| e.to_string())
-            }
-            s => Err(format!("unsupported uint size: {s}")),
-        },
-        (FieldType::Int, FieldValue::Int(v)) => match field.size {
-            1 => {
-                let v = i8::try_from(*v).map_err(|_| {
-                    format!("value {v} out of range for i8 ({}..={})", i8::MIN, i8::MAX)
-                })?;
-                writer::write_i8(pack_bytes, offset, v).map_err(|e| e.to_string())
-            }
-            2 => {
-                let v = i16::try_from(*v).map_err(|_| {
-                    format!(
-                        "value {v} out of range for i16 ({}..={})",
-                        i16::MIN,
-                        i16::MAX
-                    )
-                })?;
-                writer::write_i16(pack_bytes, offset, v, e).map_err(|e| e.to_string())
-            }
-            4 => {
-                let v = i32::try_from(*v).map_err(|_| {
-                    format!(
-                        "value {v} out of range for i32 ({}..={})",
-                        i32::MIN,
-                        i32::MAX
-                    )
-                })?;
-                writer::write_i32(pack_bytes, offset, v, e).map_err(|e| e.to_string())
-            }
-            s => Err(format!("unsupported int size: {s}")),
-        },
-        (FieldType::Hex, FieldValue::Hex(bytes)) => {
-            if bytes.len() != field.size {
-                return Err(format!(
-                    "hex field '{}' expects {} bytes, got {}",
-                    field_name,
-                    field.size,
-                    bytes.len()
-                ));
-            }
-            writer::write_bytes(pack_bytes, offset, bytes).map_err(|e| e.to_string())
-        }
-        _ => Err(format!(
-            "type mismatch: field '{}' is {:?} but got {:?}",
-            field_name, field.field_type, value
-        )),
-    }
+    module_runtime::write_field(payload, &loaded.module, index, field_id, &value.into())
+        .map_err(|e| e.to_string())
 }
 
 // --- Save pipeline ---
@@ -434,7 +540,9 @@ fn commit_prepared_save(
             let rollback = replace_existing_file(dat_rollback, dat_path);
             cleanup_file(ft_tmp);
             return match rollback {
-                Ok(()) => Err(format!("failed to commit FileTable.bin; dat rollback succeeded: {e}")),
+                Ok(()) => Err(format!(
+                    "failed to commit FileTable.bin; dat rollback succeeded: {e}"
+                )),
                 Err(rollback_err) => Err(format!(
                     "failed to commit FileTable.bin and failed to roll back dat: {e}; rollback error: {rollback_err}"
                 )),
@@ -553,359 +661,407 @@ pub fn save_dat_to_disk(game_dir: &mut GameDirectory) -> Result<SaveResult, Stri
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::modules;
-    use crate::modules::types::DatFile;
     use crate::pipeline::unpack_dat;
 
-    fn test_module() -> ModuleDefinition {
-        ModuleDefinition {
-            id: "test".to_string(),
-            name: "Test Module".to_string(),
-            description: "For testing".to_string(),
-            dat_file: DatFile::BattleData,
-            base_offset: 0,
-            entry_count: 3,
-            entry_size: 10,
-            entry_names: vec!["Alpha".to_string(), "Beta".to_string(), "Gamma".to_string()],
-            fields: vec![
-                FieldDefinition {
-                    name: "hp".to_string(),
-                    offset: 0,
-                    size: 2,
-                    field_type: FieldType::Uint,
-                    options: None,
-                },
-                FieldDefinition {
-                    name: "atk".to_string(),
-                    offset: 2,
-                    size: 1,
-                    field_type: FieldType::Uint,
-                    options: None,
-                },
-                FieldDefinition {
-                    name: "element".to_string(),
-                    offset: 3,
-                    size: 1,
-                    field_type: FieldType::Dropdown,
-                    options: Some(vec![
-                        FieldOption {
-                            value: 0,
-                            label: "Fire".to_string(),
-                        },
-                        FieldOption {
-                            value: 1,
-                            label: "Water".to_string(),
-                        },
-                    ]),
-                },
-                FieldDefinition {
-                    name: "bonus".to_string(),
-                    offset: 4,
-                    size: 2,
-                    field_type: FieldType::Int,
-                    options: None,
-                },
-                FieldDefinition {
-                    name: "flags".to_string(),
-                    offset: 6,
-                    size: 2,
-                    field_type: FieldType::Hex,
-                    options: None,
-                },
-            ],
+    // --- module fixtures ---
+
+    /// Writes a module set into a temp dir and loads it. Sidecars are fully
+    /// loaded into memory, so the temp dir may drop afterwards.
+    fn load_set(files: &[(&str, &str)]) -> ModuleSet {
+        let dir = tempfile::tempdir().unwrap();
+        for (path, content) in files {
+            let full = dir.path().join(path);
+            fs::create_dir_all(full.parent().unwrap()).unwrap();
+            fs::write(full, content).unwrap();
+        }
+        let (set, report) = load_module_set(dir.path()).unwrap();
+        assert!(report.is_valid(), "fixture set should be valid: {report:?}");
+        set
+    }
+
+    /// A set with one module for battle/test.dat (3 entries of 8 bytes at
+    /// offset 4) and one module for menu/other.dat.
+    fn test_set() -> ModuleSet {
+        load_set(&[
+            (
+                "battle_test.json5",
+                "{
+                    schema_version: 1,
+                    id: 'battle_test',
+                    label: 'Battle Test',
+                    notes: 'A test module.',
+                    files: ['battle/test.dat'],
+                    base_offset: 4,
+                    entry: { count: 3, size: 8, labels_file: 'entries/test.json5' },
+                    fields: [
+                        { id: 'hp', label: 'HP', offset: 0, size: 2, type: 'uint' },
+                        { id: 'element', label: 'Element', notes: 'Elemental type.', offset: 2, size: 1, type: 'dropdown', display: 'hex', options_file: 'options/element.json5' },
+                        { id: 'general', label: 'General', type: 'section' },
+                        { id: 'bonus', label: 'Bonus', offset: 3, size: 2, type: 'int' },
+                        { id: 'flags', label: 'Flags', offset: 5, size: 2, type: 'bytes' },
+                        { id: 'tag', label: 'Tag', offset: 7, size: 1, type: 'text' }
+                    ]
+                }",
+            ),
+            (
+                "menu_test.json5",
+                "{
+                    schema_version: 1,
+                    id: 'menu_test',
+                    label: 'Menu Test',
+                    files: ['menu/other.dat'],
+                    base_offset: 0,
+                    entry: { count: 1, size: 4 },
+                    fields: [ { id: 'a', label: 'A', offset: 0, size: 1, type: 'uint' } ]
+                }",
+            ),
+            (
+                "options/element.json5",
+                "[ { value: 0x00, label: 'Fire' }, { value: 0x01, label: 'Water', notes: 'Wet.' } ]",
+            ),
+            (
+                "entries/test.json5",
+                "[ { value: 0, label: 'Alpha' }, { value: 1, label: 'Beta' }, { value: 9, label: 'Out of range' } ]",
+            ),
+        ])
+    }
+
+    /// Payload for battle_test: 4 prefix bytes + 3 entries of 8 bytes.
+    fn test_payload() -> Vec<u8> {
+        let mut p = vec![0u8; 4];
+        // entry 0: hp=100, element=1, bonus=-5, flags=[0xAB,0xCD], tag='Z'
+        p.extend([100, 0, 1, 0xFB, 0xFF, 0xAB, 0xCD, b'Z']);
+        p.extend([0u8; 8]); // entry 1
+        p.extend([0u8; 8]); // entry 2
+        p
+    }
+
+    fn matched(set: &ModuleSet, dat_path: &str, payload: &[u8]) -> Vec<Arc<LoadedModule>> {
+        let (matched, errors) = match_modules(set, dat_path, payload);
+        assert!(errors.is_empty(), "unexpected module errors: {errors:?}");
+        matched
+    }
+
+    fn battle_session(set: &ModuleSet) -> DatSession {
+        let payload = test_payload();
+        let modules = matched(set, "battle/test.dat", &payload);
+        DatSession {
+            dat_path: "battle/test.dat".to_string(),
+            pack_data: PackData {
+                filename: "test_pack".to_string(),
+                bytes: payload,
+                compression: zip::CompressionMethod::Stored,
+            },
+            dirty: false,
+            modules,
         }
     }
 
-    fn test_pack_bytes() -> Vec<u8> {
-        // 3 records × 10 bytes = 30 bytes
-        let mut data = vec![0u8; 30];
-        // Record 0: hp=100, atk=50, element=1(Water), bonus=-5, flags=[0xAB,0xCD]
-        data[0] = 100;
-        data[1] = 0; // hp LE u16 = 100
-        data[2] = 50; // atk u8
-        data[3] = 1; // element u8
-        data[4] = 0xFB;
-        data[5] = 0xFF; // bonus LE i16 = -5
-        data[6] = 0xAB;
-        data[7] = 0xCD; // flags
-                        // Record 1: hp=999, atk=0, element=0(Fire), bonus=10, flags=[0x00,0x00]
-        data[10] = 0xE7;
-        data[11] = 0x03; // hp LE u16 = 999
-        data[12] = 0; // atk
-        data[13] = 0; // element
-        data[14] = 10;
-        data[15] = 0; // bonus LE i16 = 10
-                      // Record 2 is all zeros
-        data
-    }
-
-    // --- read_record tests ---
+    // --- match_modules ---
 
     #[test]
-    fn read_record_basic() {
-        let module = test_module();
-        let pack = test_pack_bytes();
-        let record = read_record(&pack, &module, 0).unwrap();
+    fn match_modules_filters_by_dat_path() {
+        let set = test_set();
+        let payload = test_payload();
 
-        assert_eq!(record.module_id, "test");
+        let battle = matched(&set, "battle/test.dat", &payload);
+        assert_eq!(battle.len(), 1);
+        assert_eq!(battle[0].id(), "battle_test");
+
+        let (none, errors) = match_modules(&set, "battle/unknown.dat", &payload);
+        assert!(none.is_empty());
+        assert!(errors.is_empty());
+    }
+
+    #[test]
+    fn match_modules_reports_runtime_failures_instead_of_dropping_them() {
+        let set = test_set();
+        // Payload too small for the battle_test table.
+        let (matched, errors) = match_modules(&set, "battle/test.dat", &[0u8; 4]);
+        assert!(matched.is_empty());
+        assert_eq!(errors.len(), 1);
+        assert!(errors[0].contains("battle_test"));
+    }
+
+    // --- find_matched ---
+
+    #[test]
+    fn find_matched_rejects_modules_not_matched_to_the_open_dat() {
+        let set = test_set();
+        let session = battle_session(&set);
+
+        assert!(find_matched(&session, "battle_test").is_ok());
+
+        // menu_test is loaded in the set but does not apply to this dat.
+        let err = find_matched(&session, "menu_test").unwrap_err();
+        assert!(err.contains("does not apply to 'battle/test.dat'"));
+
+        let err = find_matched(&session, "missing").unwrap_err();
+        assert!(err.contains("does not apply"));
+    }
+
+    // --- module_summary ---
+
+    #[test]
+    fn module_summary_exposes_labels_below_the_resolved_count() {
+        let set = test_set();
+        let session = battle_session(&set);
+        let summary = module_summary(&session.modules[0], &session.pack_data.bytes).unwrap();
+
+        assert_eq!(summary.id, "battle_test");
+        assert_eq!(summary.label, "Battle Test");
+        assert_eq!(summary.notes.as_deref(), Some("A test module."));
+        assert_eq!(summary.entry_count, 3);
+        // Value 9 is at or above the count and must not be exposed.
+        assert_eq!(summary.entry_labels.len(), 2);
+        assert_eq!(summary.entry_labels[0].label, "Alpha");
+        assert_eq!(summary.entry_labels[1].label, "Beta");
+    }
+
+    /// A set with one header-driven module: `xlce` block header at offset 0,
+    /// table at offset 0x10 with 2-byte entries, expected count 3.
+    fn header_set() -> ModuleSet {
+        load_set(&[
+            (
+                "dynamic.json5",
+                "{
+                    schema_version: 1,
+                    id: 'dynamic',
+                    label: 'Dynamic',
+                    files: ['battle/dyn.dat'],
+                    base_offset: 0x10,
+                    entry: {
+                        header: true,
+                        count: 3,
+                        size: 2,
+                        labels_file: 'entries/dyn.json5'
+                    },
+                    fields: [ { id: 'a', label: 'A', offset: 0, size: 1, type: 'uint' } ]
+                }",
+            ),
+            (
+                "entries/dyn.json5",
+                "[ { value: 0, label: 'First' }, { value: 1, label: 'Second' }, { value: 2, label: 'Third' } ]",
+            ),
+        ])
+    }
+
+    /// A payload holding an `xlce` block header (entry size 2) and room for
+    /// `entries` two-byte entries.
+    fn header_payload(count: u32, entries: usize) -> Vec<u8> {
+        let mut payload = Vec::new();
+        payload.extend_from_slice(b"xlce");
+        payload.extend_from_slice(&count.to_le_bytes());
+        payload.extend_from_slice(&0x10u32.to_le_bytes());
+        payload.extend_from_slice(&2u32.to_le_bytes());
+        payload.extend_from_slice(&vec![0u8; entries * 2]);
+        payload
+    }
+
+    #[test]
+    fn module_summary_resolves_count_from_the_live_block_header() {
+        let set = header_set();
+        // Header count says 3; room for exactly 3 entries.
+        let mut payload = header_payload(3, 3);
+        let modules = matched(&set, "battle/dyn.dat", &payload);
+
+        let summary = module_summary(&modules[0], &payload).unwrap();
+        assert_eq!(summary.entry_count, 3);
+        assert_eq!(summary.entry_labels.len(), 3);
+        assert!(summary.count_divergence.is_none());
+
+        // Editing the stored header count must be visible without
+        // re-matching, and labels at or above the new count disappear.
+        payload[4] = 2;
+        let summary = module_summary(&modules[0], &payload).unwrap();
+        assert_eq!(summary.entry_count, 2);
+        assert_eq!(summary.entry_labels.len(), 2);
+        assert_eq!(summary.entry_labels[1].label, "Second");
+    }
+
+    #[test]
+    fn module_summary_reports_expected_count_divergence_as_a_warning() {
+        let set = header_set();
+        // Header count 2 diverges from the module's expected count 3. The
+        // header count stays authoritative; the divergence is non-fatal.
+        let payload = header_payload(2, 2);
+        let modules = matched(&set, "battle/dyn.dat", &payload);
+
+        let summary = module_summary(&modules[0], &payload).unwrap();
+        assert_eq!(summary.entry_count, 2);
+        let divergence = summary.count_divergence.expect("divergence expected");
+        assert_eq!(divergence.expected, 3);
+        assert_eq!(divergence.actual, 2);
+    }
+
+    #[test]
+    fn summarize_modules_reports_counts_broken_by_edits() {
+        let set = header_set();
+        let mut payload = header_payload(3, 3);
+        let modules = matched(&set, "battle/dyn.dat", &payload);
+
+        let (summaries, errors) = summarize_modules(&modules, &payload);
+        assert_eq!(summaries.len(), 1);
+        assert!(errors.is_empty());
+
+        // A header count edit that pushes the table past the payload must
+        // surface as an error for that module, not silently drop or
+        // stale-cache it.
+        payload[4] = 200;
+        let (summaries, errors) = summarize_modules(&modules, &payload);
+        assert!(summaries.is_empty());
+        assert_eq!(errors.len(), 1);
+        assert!(errors[0].contains("dynamic"));
+        assert!(errors[0].contains("payload"));
+
+        // Breaking the magic itself is also an error, not a silent drop.
+        payload[4] = 3;
+        payload[0] = b'X';
+        let (summaries, errors) = summarize_modules(&modules, &payload);
+        assert!(summaries.is_empty());
+        assert_eq!(errors.len(), 1);
+        assert!(errors[0].contains("magic"));
+    }
+
+    // --- read_record ---
+
+    #[test]
+    fn read_record_builds_the_full_field_payload() {
+        let set = test_set();
+        let session = battle_session(&set);
+        let record = read_record(&session.pack_data.bytes, &session.modules[0], 0).unwrap();
+
+        assert_eq!(record.module_id, "battle_test");
         assert_eq!(record.index, 0);
-        assert_eq!(record.name, "Alpha");
-        assert_eq!(record.fields.len(), 5);
+        assert_eq!(record.label.as_deref(), Some("Alpha"));
+        assert_eq!(record.fields.len(), 6);
 
-        assert_eq!(record.fields[0].name, "hp");
-        assert_eq!(record.fields[0].value, FieldValue::Uint(100));
-        assert_eq!(record.fields[0].field_type, FieldType::Uint);
-        assert_eq!(record.fields[0].size, 2);
+        let hp = &record.fields[0];
+        assert_eq!(hp.id, "hp");
+        assert_eq!(hp.field_type, "uint");
+        assert_eq!(hp.size, Some(2));
+        assert_eq!(hp.display.as_deref(), Some("decimal"));
+        assert_eq!(hp.value, Some(FieldValue::Uint(100)));
+        assert!(hp.options.is_none());
 
-        assert_eq!(record.fields[1].name, "atk");
-        assert_eq!(record.fields[1].value, FieldValue::Uint(50));
+        let element = &record.fields[1];
+        assert_eq!(element.field_type, "dropdown");
+        assert_eq!(element.display.as_deref(), Some("hex"));
+        assert_eq!(element.notes.as_deref(), Some("Elemental type."));
+        assert_eq!(element.value, Some(FieldValue::Uint(1)));
+        let options = element.options.as_ref().unwrap();
+        assert_eq!(options.len(), 2);
+        assert_eq!(options[1].label, "Water");
+        assert_eq!(options[1].notes.as_deref(), Some("Wet."));
 
-        assert_eq!(record.fields[2].name, "element");
-        assert_eq!(record.fields[2].value, FieldValue::Uint(1));
-        assert_eq!(record.fields[2].field_type, FieldType::Dropdown);
-        assert!(record.fields[2].options.is_some());
+        let section = &record.fields[2];
+        assert_eq!(section.field_type, "section");
+        assert_eq!(section.size, None);
+        assert_eq!(section.display, None);
+        assert_eq!(section.value, None);
+        assert!(section.options.is_none());
 
-        assert_eq!(record.fields[3].name, "bonus");
-        assert_eq!(record.fields[3].value, FieldValue::Int(-5));
-
-        assert_eq!(record.fields[4].name, "flags");
-        assert_eq!(record.fields[4].value, FieldValue::Hex(vec![0xAB, 0xCD]));
+        assert_eq!(record.fields[3].value, Some(FieldValue::Int(-5)));
+        assert_eq!(
+            record.fields[4].value,
+            Some(FieldValue::Bytes(vec![0xAB, 0xCD]))
+        );
+        assert_eq!(record.fields[5].value, Some(FieldValue::Text("Z".into())));
     }
 
     #[test]
-    fn read_record_second_entry() {
-        let module = test_module();
-        let pack = test_pack_bytes();
-        let record = read_record(&pack, &module, 1).unwrap();
-
-        assert_eq!(record.name, "Beta");
-        assert_eq!(record.fields[0].value, FieldValue::Uint(999));
-        assert_eq!(record.fields[1].value, FieldValue::Uint(0));
-        assert_eq!(record.fields[2].value, FieldValue::Uint(0));
-        assert_eq!(record.fields[3].value, FieldValue::Int(10));
-        assert_eq!(record.fields[4].value, FieldValue::Hex(vec![0x00, 0x00]));
+    fn read_record_falls_back_to_no_label_for_unlabeled_indexes() {
+        let set = test_set();
+        let session = battle_session(&set);
+        let record = read_record(&session.pack_data.bytes, &session.modules[0], 2).unwrap();
+        assert_eq!(record.label, None);
     }
 
     #[test]
-    fn read_record_out_of_range() {
-        let module = test_module();
-        let pack = test_pack_bytes();
-        let err = read_record(&pack, &module, 3).unwrap_err();
+    fn read_record_rejects_out_of_range_indexes() {
+        let set = test_set();
+        let session = battle_session(&set);
+        let err = read_record(&session.pack_data.bytes, &session.modules[0], 3).unwrap_err();
         assert!(err.contains("out of range"));
     }
 
-    #[test]
-    fn read_record_pack_too_small() {
-        let module = test_module();
-        let pack = vec![0u8; 5]; // too small for even one record
-        let err = read_record(&pack, &module, 0).unwrap_err();
-        assert!(err.contains("out of bounds"));
-    }
-
-    // --- write_field tests ---
+    // --- write_field ---
 
     #[test]
-    fn write_uint_field() {
-        let module = test_module();
-        let mut pack = test_pack_bytes();
-        write_field(&mut pack, &module, 0, "hp", &FieldValue::Uint(500)).unwrap();
+    fn write_field_round_trips_through_the_dto_types() {
+        let set = test_set();
+        let mut session = battle_session(&set);
+        let module = session.modules[0].clone();
 
-        let record = read_record(&pack, &module, 0).unwrap();
-        assert_eq!(record.fields[0].value, FieldValue::Uint(500));
-    }
+        let writes = [
+            ("hp", FieldValue::Uint(500)),
+            ("element", FieldValue::Uint(0)),
+            ("bonus", FieldValue::Int(-100)),
+            ("flags", FieldValue::Bytes(vec![0xFF, 0x00])),
+            ("tag", FieldValue::Text("Q".into())),
+        ];
+        for (field_id, value) in &writes {
+            write_field(&mut session.pack_data.bytes, &module, 0, field_id, value).unwrap();
+        }
 
-    #[test]
-    fn write_u8_field() {
-        let module = test_module();
-        let mut pack = test_pack_bytes();
-        write_field(&mut pack, &module, 0, "atk", &FieldValue::Uint(200)).unwrap();
-
-        let record = read_record(&pack, &module, 0).unwrap();
-        assert_eq!(record.fields[1].value, FieldValue::Uint(200));
-    }
-
-    #[test]
-    fn write_dropdown_field() {
-        let module = test_module();
-        let mut pack = test_pack_bytes();
-        write_field(&mut pack, &module, 0, "element", &FieldValue::Uint(0)).unwrap();
-
-        let record = read_record(&pack, &module, 0).unwrap();
-        assert_eq!(record.fields[2].value, FieldValue::Uint(0));
+        let record = read_record(&session.pack_data.bytes, &module, 0).unwrap();
+        assert_eq!(record.fields[0].value, Some(FieldValue::Uint(500)));
+        assert_eq!(record.fields[1].value, Some(FieldValue::Uint(0)));
+        assert_eq!(record.fields[3].value, Some(FieldValue::Int(-100)));
+        assert_eq!(
+            record.fields[4].value,
+            Some(FieldValue::Bytes(vec![0xFF, 0x00]))
+        );
+        assert_eq!(record.fields[5].value, Some(FieldValue::Text("Q".into())));
     }
 
     #[test]
-    fn write_int_field() {
-        let module = test_module();
-        let mut pack = test_pack_bytes();
-        write_field(&mut pack, &module, 0, "bonus", &FieldValue::Int(-100)).unwrap();
+    fn write_field_surfaces_runtime_errors_as_strings() {
+        let set = test_set();
+        let mut session = battle_session(&set);
+        let module = session.modules[0].clone();
 
-        let record = read_record(&pack, &module, 0).unwrap();
-        assert_eq!(record.fields[3].value, FieldValue::Int(-100));
-    }
-
-    #[test]
-    fn write_hex_field() {
-        let module = test_module();
-        let mut pack = test_pack_bytes();
-        write_field(
-            &mut pack,
+        let err = write_field(
+            &mut session.pack_data.bytes,
             &module,
             0,
-            "flags",
-            &FieldValue::Hex(vec![0xFF, 0x00]),
+            "hp",
+            &FieldValue::Uint(70000),
         )
-        .unwrap();
+        .unwrap_err();
+        assert!(err.contains("outside the stored range"));
 
-        let record = read_record(&pack, &module, 0).unwrap();
-        assert_eq!(record.fields[4].value, FieldValue::Hex(vec![0xFF, 0x00]));
+        let err = write_field(
+            &mut session.pack_data.bytes,
+            &module,
+            0,
+            "general",
+            &FieldValue::Uint(1),
+        )
+        .unwrap_err();
+        assert!(err.contains("no stored value"));
+    }
+
+    // --- ModulesState ---
+
+    #[test]
+    fn modules_state_load_reports_a_missing_directory_without_panicking() {
+        let state = ModulesState::load(PathBuf::from("/nonexistent/modules/dir"));
+        assert!(state.set.modules.is_empty());
+        assert_eq!(state.report.errors.len(), 1);
+        assert!(state.report.errors[0].message.contains("module directory"));
+
+        let diag = state.diagnostics();
+        assert_eq!(diag.module_count, 0);
+        assert_eq!(diag.errors.len(), 1);
     }
 
     #[test]
-    fn write_field_only_affects_target() {
-        let module = test_module();
-        let mut pack = test_pack_bytes();
-        let original = pack.clone();
-
-        write_field(&mut pack, &module, 0, "hp", &FieldValue::Uint(500)).unwrap();
-
-        // Bytes 0-1 changed (hp field), rest unchanged
-        assert_ne!(&pack[0..2], &original[0..2]);
-        assert_eq!(&pack[2..], &original[2..]);
-    }
-
-    #[test]
-    fn write_field_second_record() {
-        let module = test_module();
-        let mut pack = test_pack_bytes();
-
-        write_field(&mut pack, &module, 1, "hp", &FieldValue::Uint(1234)).unwrap();
-
-        // Record 0 unchanged
-        let r0 = read_record(&pack, &module, 0).unwrap();
-        assert_eq!(r0.fields[0].value, FieldValue::Uint(100));
-
-        // Record 1 updated
-        let r1 = read_record(&pack, &module, 1).unwrap();
-        assert_eq!(r1.fields[0].value, FieldValue::Uint(1234));
-    }
-
-    #[test]
-    fn write_field_out_of_range() {
-        let module = test_module();
-        let mut pack = test_pack_bytes();
-        let err = write_field(&mut pack, &module, 5, "hp", &FieldValue::Uint(1)).unwrap_err();
-        assert!(err.contains("out of range"));
-    }
-
-    #[test]
-    fn write_field_unknown_name() {
-        let module = test_module();
-        let mut pack = test_pack_bytes();
-        let err =
-            write_field(&mut pack, &module, 0, "nonexistent", &FieldValue::Uint(1)).unwrap_err();
-        assert!(err.contains("not found"));
-    }
-
-    #[test]
-    fn write_field_type_mismatch_int_to_uint() {
-        let module = test_module();
-        let mut pack = test_pack_bytes();
-        let err = write_field(&mut pack, &module, 0, "hp", &FieldValue::Int(5)).unwrap_err();
-        assert!(err.contains("type mismatch"));
-    }
-
-    #[test]
-    fn write_field_type_mismatch_uint_to_int() {
-        let module = test_module();
-        let mut pack = test_pack_bytes();
-        let err = write_field(&mut pack, &module, 0, "bonus", &FieldValue::Uint(5)).unwrap_err();
-        assert!(err.contains("type mismatch"));
-    }
-
-    #[test]
-    fn write_hex_wrong_length() {
-        let module = test_module();
-        let mut pack = test_pack_bytes();
-        let err =
-            write_field(&mut pack, &module, 0, "flags", &FieldValue::Hex(vec![0xFF])).unwrap_err();
-        assert!(err.contains("expects 2 bytes, got 1"));
-    }
-
-    // --- Range validation tests ---
-
-    #[test]
-    fn write_u8_overflow_rejected() {
-        let module = test_module();
-        let mut pack = test_pack_bytes();
-        let original = pack.clone();
-        let err = write_field(&mut pack, &module, 0, "atk", &FieldValue::Uint(256)).unwrap_err();
-        assert!(err.contains("out of range"));
-        assert_eq!(pack, original, "pack bytes must not be modified on error");
-    }
-
-    #[test]
-    fn write_u16_overflow_rejected() {
-        let module = test_module();
-        let mut pack = test_pack_bytes();
-        let err = write_field(&mut pack, &module, 0, "hp", &FieldValue::Uint(65536)).unwrap_err();
-        assert!(err.contains("out of range"));
-    }
-
-    #[test]
-    fn write_i8_overflow_rejected() {
-        let mut m = test_module();
-        m.fields[3] = FieldDefinition {
-            name: "bonus".to_string(),
-            offset: 4,
-            size: 1,
-            field_type: FieldType::Int,
-            options: None,
-        };
-        let mut pack = test_pack_bytes();
-        let err = write_field(&mut pack, &m, 0, "bonus", &FieldValue::Int(200)).unwrap_err();
-        assert!(err.contains("out of range"));
-    }
-
-    #[test]
-    fn write_i8_underflow_rejected() {
-        let mut pack = test_pack_bytes();
-        let mut m = test_module();
-        m.fields[3] = FieldDefinition {
-            name: "bonus".to_string(),
-            offset: 4,
-            size: 1,
-            field_type: FieldType::Int,
-            options: None,
-        };
-        let err = write_field(&mut pack, &m, 0, "bonus", &FieldValue::Int(-129)).unwrap_err();
-        assert!(err.contains("out of range"));
-    }
-
-    #[test]
-    fn write_i16_overflow_rejected() {
-        let module = test_module();
-        let mut pack = test_pack_bytes();
-        let err = write_field(&mut pack, &module, 0, "bonus", &FieldValue::Int(32768)).unwrap_err();
-        assert!(err.contains("out of range"));
-    }
-
-    #[test]
-    fn write_u8_max_accepted() {
-        let module = test_module();
-        let mut pack = test_pack_bytes();
-        write_field(&mut pack, &module, 0, "atk", &FieldValue::Uint(255)).unwrap();
-        let record = read_record(&pack, &module, 0).unwrap();
-        assert_eq!(record.fields[1].value, FieldValue::Uint(255));
-    }
-
-    #[test]
-    fn write_u16_max_accepted() {
-        let module = test_module();
-        let mut pack = test_pack_bytes();
-        write_field(&mut pack, &module, 0, "hp", &FieldValue::Uint(65535)).unwrap();
-        let record = read_record(&pack, &module, 0).unwrap();
-        assert_eq!(record.fields[0].value, FieldValue::Uint(65535));
+    fn modules_state_load_reads_the_committed_set() {
+        let dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../modules");
+        let state = ModulesState::load(dir);
+        assert_eq!(state.set.modules.len(), 24);
+        assert!(state.report.is_valid());
     }
 
     // --- Path validation tests ---
@@ -947,40 +1103,12 @@ mod tests {
         assert!(err.contains("failed to resolve"));
     }
 
-    // --- Round-trip tests ---
-
-    #[test]
-    fn write_then_read_all_types() {
-        let module = test_module();
-        let mut pack = vec![0u8; 30];
-
-        write_field(&mut pack, &module, 0, "hp", &FieldValue::Uint(12345)).unwrap();
-        write_field(&mut pack, &module, 0, "atk", &FieldValue::Uint(255)).unwrap();
-        write_field(&mut pack, &module, 0, "element", &FieldValue::Uint(1)).unwrap();
-        write_field(&mut pack, &module, 0, "bonus", &FieldValue::Int(-32000)).unwrap();
-        write_field(
-            &mut pack,
-            &module,
-            0,
-            "flags",
-            &FieldValue::Hex(vec![0xDE, 0xAD]),
-        )
-        .unwrap();
-
-        let record = read_record(&pack, &module, 0).unwrap();
-        assert_eq!(record.fields[0].value, FieldValue::Uint(12345));
-        assert_eq!(record.fields[1].value, FieldValue::Uint(255));
-        assert_eq!(record.fields[2].value, FieldValue::Uint(1));
-        assert_eq!(record.fields[3].value, FieldValue::Int(-32000));
-        assert_eq!(record.fields[4].value, FieldValue::Hex(vec![0xDE, 0xAD]));
-    }
-
     // --- scan_directory tests ---
 
     #[test]
     fn scan_empty_dir() {
         let dir = tempfile::tempdir().unwrap();
-        let nodes = scan_directory(dir.path());
+        let nodes = scan_directory(dir.path(), &ModuleSet::default());
         assert!(nodes.is_empty());
     }
 
@@ -990,10 +1118,10 @@ mod tests {
         fs::write(dir.path().join("test.dat"), b"data").unwrap();
         fs::write(dir.path().join("readme.txt"), b"hi").unwrap();
 
-        let nodes = scan_directory(dir.path());
+        let nodes = scan_directory(dir.path(), &ModuleSet::default());
         assert_eq!(nodes.len(), 2);
 
-        // Sorted alphabetically
+        // Sorted alphabetically; no module matches an empty set.
         match &nodes[0] {
             FileTreeNode::File {
                 name,
@@ -1014,7 +1142,7 @@ mod tests {
         fs::create_dir(dir.path().join("sub")).unwrap();
         fs::write(dir.path().join("sub/file.dat"), b"data").unwrap();
 
-        let nodes = scan_directory(dir.path());
+        let nodes = scan_directory(dir.path(), &ModuleSet::default());
         assert_eq!(nodes.len(), 1);
 
         match &nodes[0] {
@@ -1033,36 +1161,33 @@ mod tests {
     }
 
     #[test]
-    fn scan_detects_modules() {
+    fn scan_marks_files_with_matching_modules() {
+        let set = test_set();
         let dir = tempfile::tempdir().unwrap();
         fs::create_dir(dir.path().join("battle")).unwrap();
-        fs::write(dir.path().join("battle/battle_data_release.dat"), b"data").unwrap();
+        fs::write(dir.path().join("battle/test.dat"), b"data").unwrap();
         fs::write(dir.path().join("battle/other.dat"), b"data").unwrap();
 
-        let nodes = scan_directory(dir.path());
+        let nodes = scan_directory(dir.path(), &set);
         let battle_dir = match &nodes[0] {
             FileTreeNode::Directory { children, .. } => children,
             _ => panic!("expected Directory"),
         };
 
-        let battle_dat = battle_dir
-            .iter()
-            .find(|n| matches!(n, FileTreeNode::File { name, .. } if name == "battle_data_release.dat"))
-            .unwrap();
-        match battle_dat {
-            FileTreeNode::File { has_modules, .. } => assert!(has_modules),
-            _ => unreachable!(),
-        }
+        let find = |target: &str| {
+            battle_dir
+                .iter()
+                .find_map(|n| match n {
+                    FileTreeNode::File {
+                        name, has_modules, ..
+                    } if name == target => Some(*has_modules),
+                    _ => None,
+                })
+                .unwrap()
+        };
 
-        // All .dat files are now treated as having modules.
-        let other_dat = battle_dir
-            .iter()
-            .find(|n| matches!(n, FileTreeNode::File { name, .. } if name == "other.dat"))
-            .unwrap();
-        match other_dat {
-            FileTreeNode::File { has_modules, .. } => assert!(has_modules),
-            _ => unreachable!(),
-        }
+        assert!(find("test.dat"), "matched dat should have modules");
+        assert!(!find("other.dat"), "unmatched dat should not");
     }
 
     // --- save_dat_to_disk tests ---
@@ -1131,6 +1256,7 @@ mod tests {
                 dat_path: dat_rel.to_string(),
                 pack_data,
                 dirty: true,
+                modules: Vec::new(),
             }),
         };
 
@@ -1241,6 +1367,7 @@ mod tests {
                     compression: zip::CompressionMethod::Stored,
                 },
                 dirty: true,
+                modules: Vec::new(),
             }),
         };
 
@@ -1356,6 +1483,13 @@ mod tests {
             .join("original_game_files")
     }
 
+    fn real_module_set() -> ModuleSet {
+        let dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../modules");
+        let (set, report) = load_module_set(&dir).unwrap();
+        assert!(report.is_valid());
+        set
+    }
+
     #[test]
     fn read_real_dat_record() {
         let dat_path = test_data_dir().join("battle/battle_data_release.dat");
@@ -1367,12 +1501,25 @@ mod tests {
         let encrypted = fs::read(&dat_path).unwrap();
         let pack = unpack_dat(&encrypted).unwrap();
 
-        let module = modules::find_module("equipment").unwrap();
-        let record = read_record(&pack.bytes, &module, 0).unwrap();
+        let set = real_module_set();
+        let (matched, errors) = match_modules(&set, "battle/battle_data_release.dat", &pack.bytes);
+        assert!(errors.is_empty(), "module errors: {errors:?}");
+        assert_eq!(matched.len(), 20);
 
-        assert_eq!(record.module_id, "equipment");
-        assert_eq!(record.index, 0);
+        let armament = matched
+            .iter()
+            .find(|m| m.id() == "battle_armament")
+            .unwrap();
+        let summary = module_summary(armament, &pack.bytes).unwrap();
+        assert_eq!(summary.entry_count, 761);
+
+        let record = read_record(&pack.bytes, armament, 0).unwrap();
+        assert_eq!(record.module_id, "battle_armament");
         assert!(!record.fields.is_empty());
+        assert!(
+            record.label.is_some(),
+            "armament entry 0 should have a label"
+        );
     }
 
     #[test]
@@ -1387,23 +1534,36 @@ mod tests {
         let pack = unpack_dat(&encrypted).unwrap();
         let mut bytes = pack.bytes.clone();
 
-        let module = modules::find_module("equipment").unwrap();
-        let original = read_record(&bytes, &module, 0).unwrap();
+        let set = real_module_set();
+        let (matched, _) = match_modules(&set, "battle/battle_data_release.dat", &pack.bytes);
+        let armament = matched
+            .iter()
+            .find(|m| m.id() == "battle_armament")
+            .unwrap();
 
-        let first_field = &module.fields[0];
-        let new_value = match &original.fields[0].value {
-            FieldValue::Uint(v) => FieldValue::Uint(v.wrapping_add(1)),
-            FieldValue::Int(v) => FieldValue::Int(v.wrapping_add(1)),
-            _ => panic!("expected numeric first field"),
+        let original = read_record(&bytes, armament, 0).unwrap();
+        let first_stored = original
+            .fields
+            .iter()
+            .find(|f| matches!(f.value, Some(FieldValue::Uint(_))))
+            .unwrap();
+        let Some(FieldValue::Uint(v)) = &first_stored.value else {
+            unreachable!();
         };
+        let new_value = FieldValue::Uint((*v + 1) & 0xff);
 
-        write_field(&mut bytes, &module, 0, &first_field.name, &new_value).unwrap();
-        let modified = read_record(&bytes, &module, 0).unwrap();
-        assert_eq!(modified.fields[0].value, new_value);
+        write_field(&mut bytes, armament, 0, &first_stored.id, &new_value).unwrap();
+        let modified = read_record(&bytes, armament, 0).unwrap();
+        let modified_field = modified
+            .fields
+            .iter()
+            .find(|f| f.id == first_stored.id)
+            .unwrap();
+        assert_eq!(modified_field.value, Some(new_value));
 
         // Other records unaffected
-        let r1 = read_record(&bytes, &module, 1).unwrap();
-        let r1_orig = read_record(&pack.bytes, &module, 1).unwrap();
+        let r1 = read_record(&bytes, armament, 1).unwrap();
+        let r1_orig = read_record(&pack.bytes, armament, 1).unwrap();
         assert_eq!(r1.fields[0].value, r1_orig.fields[0].value);
     }
 
@@ -1425,7 +1585,7 @@ mod tests {
     }
 
     #[test]
-    fn read_all_modules_all_records() {
+    fn read_all_matched_modules_all_records() {
         let dat_path = test_data_dir().join("battle/battle_data_release.dat");
         if !dat_path.exists() {
             eprintln!("skipping: test data not found at {}", dat_path.display());
@@ -1434,19 +1594,101 @@ mod tests {
 
         let encrypted = fs::read(&dat_path).unwrap();
         let pack = unpack_dat(&encrypted).unwrap();
-        let battle_modules = modules::modules_for_dat("battle/battle_data_release.dat");
 
-        for module in &battle_modules {
-            for i in 0..module.entry_count {
-                let record = read_record(&pack.bytes, module, i);
+        let set = real_module_set();
+        let (matched, errors) = match_modules(&set, "battle/battle_data_release.dat", &pack.bytes);
+        assert!(errors.is_empty(), "module errors: {errors:?}");
+
+        for module in &matched {
+            let count = module_runtime::resolve_count(&pack.bytes, &module.module).unwrap();
+            for index in 0..count {
+                let record = read_record(&pack.bytes, module, index);
                 assert!(
                     record.is_ok(),
                     "failed to read module '{}' record {}: {}",
-                    module.id,
-                    i,
+                    module.id(),
+                    index,
                     record.unwrap_err()
                 );
             }
+        }
+    }
+
+    #[test]
+    fn battle_unit_count_resolves_from_a_real_entry_unit_header() {
+        let dat_path = test_data_dir().join("battle/entry/ENTRY_UNIT_1553.dat");
+        if !dat_path.exists() {
+            eprintln!("skipping: test data not found at {}", dat_path.display());
+            return;
+        }
+
+        let encrypted = fs::read(&dat_path).unwrap();
+        let pack = unpack_dat(&encrypted).unwrap();
+
+        let set = real_module_set();
+        let (matched, errors) =
+            match_modules(&set, "battle/entry/ENTRY_UNIT_1553.dat", &pack.bytes);
+        assert!(errors.is_empty(), "module errors: {errors:?}");
+
+        // BattleUnit (header-driven, glob) and BattleUnitHeader (fixed).
+        assert_eq!(matched.len(), 2);
+
+        let unit = matched
+            .iter()
+            .find(|m| m.id() == "battle_entry_battle_unit")
+            .unwrap();
+        let summary = module_summary(unit, &pack.bytes).unwrap();
+        // This file's block header holds 11 units; the .nmm source declared
+        // 23 — exactly the per-file variance header-driven counts exist for.
+        assert_eq!(summary.entry_count, 11);
+        // No expected count on the glob module, so no divergence warning.
+        assert!(summary.count_divergence.is_none());
+
+        for index in 0..summary.entry_count {
+            read_record(&pack.bytes, unit, index).unwrap();
+        }
+
+        // The companion header module exposes the same block header as an
+        // editable record; its count field must read the resolved count.
+        let header = matched
+            .iter()
+            .find(|m| m.id() == "battle_entry_battle_unit_header")
+            .unwrap();
+        let record = read_record(&pack.bytes, header, 0).unwrap();
+        let count_field = record
+            .fields
+            .iter()
+            .find(|f| matches!(f.value, Some(FieldValue::Uint(11))))
+            .expect("a header field should expose the unit count 11");
+        assert!(count_field.label.to_lowercase().contains("count"));
+    }
+
+    #[test]
+    fn menu_modules_resolve_against_the_real_menu_dat() {
+        let dat_path = test_data_dir().join("menu/menu_data.dat");
+        if !dat_path.exists() {
+            eprintln!("skipping: test data not found at {}", dat_path.display());
+            return;
+        }
+
+        let encrypted = fs::read(&dat_path).unwrap();
+        let pack = unpack_dat(&encrypted).unwrap();
+
+        let set = real_module_set();
+        let (matched, errors) = match_modules(&set, "menu/menu_data.dat", &pack.bytes);
+        assert!(errors.is_empty(), "module errors: {errors:?}");
+        assert_eq!(matched.len(), 2);
+
+        let (summaries, summary_errors) = summarize_modules(&matched, &pack.bytes);
+        assert!(summary_errors.is_empty(), "{summary_errors:?}");
+        for summary in &summaries {
+            // Vanilla files must match the converted expected counts exactly.
+            assert!(
+                summary.count_divergence.is_none(),
+                "unexpected divergence in '{}': {:?}",
+                summary.id,
+                summary.count_divergence
+            );
         }
     }
 }

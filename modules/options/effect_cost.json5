@@ -1,0 +1,7 @@
+[
+    { value: 0x00, label: 'None' },
+    { value: 0x01, label: 'HP : Health Points' },
+    { value: 0x02, label: 'MP : Magic Points' },
+    { value: 0x03, label: 'TP : Tactical Points' },
+    { value: 0x04, label: 'TP All (Amount = Minimum)' }
+]

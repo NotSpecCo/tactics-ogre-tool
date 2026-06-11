@@ -1,0 +1,11 @@
+[
+    { value: 0x0000, label: 'None' },
+    { value: 0x0179, label: 'Punch' },
+    { value: 0x017a, label: 'Slap' },
+    { value: 0x017b, label: 'Rabbit Punch' },
+    { value: 0x017c, label: 'Bite' },
+    { value: 0x017d, label: 'Haymaker' },
+    { value: 0x017e, label: 'Rake' },
+    { value: 0x017f, label: 'Flog' },
+    { value: 0x0189, label: 'Punch [Dark Lord 2]' }
+]

@@ -1,0 +1,15 @@
+[
+    { value: 0x00, label: 'None' },
+    { value: 0x01, label: 'Human' },
+    { value: 0x02, label: 'Winged' },
+    { value: 0x03, label: 'Lizardman' },
+    { value: 0x04, label: 'Lamia' },
+    { value: 0x05, label: 'Orc' },
+    { value: 0x06, label: 'Skeleton' },
+    { value: 0x07, label: 'Ghost' },
+    { value: 0x08, label: 'Faerie' },
+    { value: 0x09, label: 'Gremlin' },
+    { value: 0x0a, label: 'Pumpkinhead' },
+    { value: 0x0b, label: 'Dragon' },
+    { value: 0x0c, label: 'Golem' }
+]

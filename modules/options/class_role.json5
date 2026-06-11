@@ -1,0 +1,7 @@
+[
+    { value: 0x00, label: 'Fighter' },
+    { value: 0x01, label: 'Defender' },
+    { value: 0x02, label: 'Ranger' },
+    { value: 0x03, label: 'Mage' },
+    { value: 0x04, label: 'Healer' }
+]

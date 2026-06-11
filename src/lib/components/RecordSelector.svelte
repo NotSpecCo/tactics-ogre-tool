@@ -1,13 +1,14 @@
 <script lang="ts">
+    import type { EntryOption } from '$lib/entry-options';
     import Select from '$lib/ui-components/form/Select.svelte';
 
     interface Props {
-        entryNames: string[];
+        entries: EntryOption[];
         selectedIndex: number | null;
         onSelect: (index: number) => void;
     }
 
-    let { entryNames, selectedIndex, onSelect }: Props = $props();
+    let { entries, selectedIndex, onSelect }: Props = $props();
 
     function handleChange(e: Event) {
         const target = e.target as HTMLSelectElement;
@@ -16,7 +17,9 @@
 </script>
 
 <Select class="" value={String(selectedIndex ?? 0)} onchange={handleChange}>
-    {#each entryNames as name, i (i)}
-        <option value={String(i)}>{i}: {name}</option>
+    {#each entries as entry (entry.index)}
+        <option value={String(entry.index)} title={entry.notes ?? undefined}>
+            {entry.label !== null ? `${entry.index}: ${entry.label}` : entry.index}
+        </option>
     {/each}
 </Select>

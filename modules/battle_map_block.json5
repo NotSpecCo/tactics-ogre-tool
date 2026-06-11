@@ -1,0 +1,281 @@
+{
+    schema_version: 1,
+    id: 'battle_map_block',
+    label: 'Map Block',
+    notes: 'Tactics Ogre: Reborn - Map Block module for Nightmare Table Editor',
+
+    source: {
+        format: 'nightmare',
+        path: 'battle/MapBlock.nmm',
+        title: 'Tactics Ogre: Reborn ==> battle_data_release / pack ==> Map Block'
+    },
+
+    files: ['battle/battle_data_release.dat'],
+
+    base_offset: 0x0042b240,
+    endian: 'little',
+
+    entry: {
+        header: true,
+        count: 54,
+        size: 34,
+        labels_file: null
+    },
+
+    fields: [
+        {
+            id: 'movement_cost',
+            label: '____Movement Cost__________',
+            type: 'section'
+        },
+        {
+            id: 'move_type_none',
+            label: 'Move Type: None',
+            offset: 0x00,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'move_type_agile_2_3',
+            label: 'Move Type: Agile 2/3',
+            offset: 0x01,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'move_type_agile_3_4',
+            label: 'Move Type: Agile 3/4',
+            offset: 0x02,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'move_type_slow_1_2',
+            label: 'Move Type: Slow 1/2',
+            offset: 0x03,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'move_type_teleport_16_16',
+            label: 'Move Type: Teleport 16/16',
+            offset: 0x04,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'move_type_fly_32_32',
+            label: 'Move Type: Fly 32/32',
+            offset: 0x05,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'move_type_float_3_3',
+            label: 'Move Type: Float 3/3',
+            offset: 0x06,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'move_type_wade_1',
+            label: 'Move Type: Wade 1',
+            offset: 0x07,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'move_type_wade_2',
+            label: 'Move Type: Wade 2',
+            offset: 0x08,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'move_type_waterwalk',
+            label: 'Move Type: Waterwalk',
+            offset: 0x09,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'move_type_lavawalk',
+            label: 'Move Type: Lavawalk',
+            offset: 0x0a,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'move_type_0b',
+            label: 'Move Type: 0B',
+            offset: 0x0b,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'section_2',
+            label: '___________________________',
+            type: 'section'
+        },
+        {
+            id: 'animation_1',
+            label: 'Animation 1 ?',
+            offset: 0x0c,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'animation_2',
+            label: 'Animation 2 ?',
+            offset: 0x0d,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'flag',
+            label: '? Flag ?',
+            offset: 0x0e,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'flag_2',
+            label: '? Flag ?',
+            offset: 0x0f,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'fly_away_from_knockback',
+            label: 'Fly Away from Knockback ?',
+            offset: 0x10,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'flag_3',
+            label: '? Flag ?',
+            offset: 0x11,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'flag_4',
+            label: '? Flag ?',
+            offset: 0x12,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'flag_5',
+            label: '? Flag ?',
+            offset: 0x13,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'terrain_type',
+            label: 'Terrain Type',
+            offset: 0x14,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/terrain_type.json5'
+        },
+        {
+            id: 'base_melee_hit',
+            label: 'Base Melee Hit %',
+            offset: 0x15,
+            size: 1,
+            type: 'int'
+        },
+        {
+            id: 'base_ranged_hit',
+            label: 'Base Ranged Hit %',
+            offset: 0x16,
+            size: 1,
+            type: 'int'
+        },
+        {
+            id: 'aquatic_bonus_melee_hit',
+            label: 'Aquatic Bonus Melee Hit %',
+            offset: 0x17,
+            size: 1,
+            type: 'int'
+        },
+        {
+            id: 'aquatic_bonus_ranged_hit',
+            label: 'Aquatic Bonus Ranged Hit %',
+            offset: 0x18,
+            size: 1,
+            type: 'int'
+        },
+        {
+            id: 'lavatic_bonus_melee_hit',
+            label: 'Lavatic Bonus Melee Hit %',
+            offset: 0x19,
+            size: 1,
+            type: 'int'
+        },
+        {
+            id: 'lavatic_bonus_ranged_hit',
+            label: 'Lavatic Bonus Ranged Hit %',
+            offset: 0x1a,
+            size: 1,
+            type: 'int'
+        },
+        {
+            id: 'unused_1b',
+            label: '<unused> 1B',
+            offset: 0x1b,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'traversable',
+            label: 'Traversable ?',
+            offset: 0x1c,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'apply_status',
+            label: 'Apply Status',
+            offset: 0x1d,
+            size: 1,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/status.json5'
+        },
+        {
+            id: 'panel_name',
+            label: 'Panel Name',
+            offset: 0x1e,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/name_panel.json5'
+        },
+        {
+            id: 'death',
+            label: 'Death ?',
+            offset: 0x20,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'unused_21',
+            label: '<unused> 21',
+            offset: 0x21,
+            size: 1,
+            type: 'uint'
+        }
+    ]
+}

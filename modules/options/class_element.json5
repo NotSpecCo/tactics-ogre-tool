@@ -1,0 +1,7 @@
+[
+    { value: 0x00, label: 'Forbidden' },
+    { value: 0x01, label: 'Allowed' },
+    { value: 0x02, label: 'Required' },
+    { value: 0x03, label: 'Tolerated' },
+    { value: 0xff, label: '??' }
+]

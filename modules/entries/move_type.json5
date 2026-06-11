@@ -1,0 +1,13 @@
+[
+    { value: 0x00, label: '<None>' },
+    { value: 0x01, label: 'Agile 2/3' },
+    { value: 0x02, label: 'Agile 3/4' },
+    { value: 0x03, label: 'Slow 1/2' },
+    { value: 0x04, label: 'Teleport 16/16' },
+    { value: 0x05, label: 'Fly 32/32' },
+    { value: 0x06, label: 'Float 3/3' },
+    { value: 0x07, label: 'Wade 1' },
+    { value: 0x08, label: 'Wade 2' },
+    { value: 0x09, label: 'Waterwalk' },
+    { value: 0x0a, label: 'Lavawalk' }
+]

@@ -1,0 +1,10 @@
+[
+    { value: 0x00, label: 'None' },
+    { value: 0x01, label: 'Grass, Scrub' },
+    { value: 0x02, label: 'Natural Ground' },
+    { value: 0x03, label: 'Water, Swamp, Mold' },
+    { value: 0x04, label: 'Lava, Basalt, Ash' },
+    { value: 0x05, label: 'Snow, Frost' },
+    { value: 0x06, label: 'Impassible/Obstruction' },
+    { value: 0x07, label: 'Manmade Ground' }
+]

@@ -1,0 +1,112 @@
+{
+    schema_version: 1,
+    id: 'battle_effect_type',
+    label: 'Effect Type',
+    notes: 'Tactics Ogre: Reborn - Effect Type module for Nightmare Table Editor',
+
+    source: {
+        format: 'nightmare',
+        path: 'battle/EffectType.nmm',
+        title: 'Tactics Ogre: Reborn ==> battle_data_release / pack ==> Effect Type'
+    },
+
+    files: ['battle/battle_data_release.dat'],
+
+    base_offset: 0x004b39c0,
+    endian: 'little',
+
+    entry: {
+        header: true,
+        count: 44,
+        size: 12,
+        labels_file: 'entries/effect_type.json5'
+    },
+
+    fields: [
+        {
+            id: 'item_type',
+            label: 'Item Type',
+            offset: 0x00,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/item_type.json5'
+        },
+        {
+            id: 'elevation_up',
+            label: 'Elevation Up?',
+            offset: 0x01,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'elevation_down',
+            label: 'Elevation Down?',
+            offset: 0x02,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'require_item_type',
+            label: '? Require Item Type ?',
+            offset: 0x03,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'flag',
+            label: '? Flag ?',
+            offset: 0x04,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'field_0x05',
+            label: '? 05 (unused?)',
+            offset: 0x05,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'flag_2',
+            label: '? Flag ?',
+            offset: 0x06,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'flag_3',
+            label: '? Flag ?',
+            offset: 0x07,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'flag_4',
+            label: '?? Flag ?',
+            offset: 0x08,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'flag_5',
+            label: '? Flag ?',
+            offset: 0x09,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'value',
+            label: '? Value ?',
+            offset: 0x0a,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'field_0x0b',
+            label: '? 0B (unused?)',
+            offset: 0x0b,
+            size: 1,
+            type: 'uint'
+        }
+    ]
+}

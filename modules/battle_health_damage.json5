@@ -1,0 +1,907 @@
+{
+    schema_version: 1,
+    id: 'battle_health_damage',
+    label: 'Health Damage',
+    notes: 'Tactics Ogre: Reborn - Health Damage module for Nightmare Table Editor\nDo not edit the top row with this module; though it is valid for editing, its fields have different value types and is only present here to preserve the correct ID for other rows.\nField names and visibility were changed to reflect the default configuration values in the top row.\nRows seem to be in pairs: first is an attacker configuration, and next is the defender configuration for that attacker type.',
+
+    source: {
+        format: 'nightmare',
+        path: 'battle/HealthDamage.nmm',
+        title: 'Tactics Ogre: Reborn ==> battle_data_release / pack ==> Health Damage'
+    },
+
+    files: ['battle/battle_data_release.dat'],
+
+    base_offset: 0x00418c30,
+    endian: 'little',
+
+    entry: {
+        header: true,
+        count: 81,
+        size: 260,
+        labels_file: 'entries/health_damage.json5'
+    },
+
+    fields: [
+        {
+            id: 'base',
+            label: '====Base===================',
+            type: 'section'
+        },
+        {
+            id: 'total_atk',
+            label: 'Total ATK',
+            offset: 0x00,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'total_def',
+            label: 'Total DEF',
+            offset: 0x02,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'factor',
+            label: 'Factor',
+            offset: 0x0a,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'total_str',
+            label: 'Total STR',
+            offset: 0x0c,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'total_vit',
+            label: 'Total VIT',
+            offset: 0x0e,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'total_dex',
+            label: 'Total DEX',
+            offset: 0x10,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'total_int',
+            label: 'Total INT',
+            offset: 0x12,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'total_mnd',
+            label: 'Total MND',
+            offset: 0x14,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'total_res',
+            label: 'Total RES',
+            offset: 0x16,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'weapon_element_relationship',
+            label: '___Weapon-Element Relationship',
+            type: 'section'
+        },
+        {
+            id: 'strong',
+            label: 'Strong',
+            offset: 0x04,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'neutral',
+            label: 'Neutral',
+            offset: 0x06,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'weak',
+            label: 'Weak',
+            offset: 0x08,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'weapon_skills',
+            label: '____Weapon Skills',
+            type: 'section'
+        },
+        {
+            id: 'fists',
+            label: 'Fists',
+            notes: 'Skill 2',
+            offset: 0x1a,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'daggers',
+            label: 'Daggers',
+            notes: 'Skill 3',
+            offset: 0x1c,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'swords_1h',
+            label: 'Swords (1H)',
+            notes: 'Skill 4',
+            offset: 0x1e,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'swords_2h',
+            label: 'Swords (2H)',
+            notes: 'Skill 5',
+            offset: 0x20,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'axes',
+            label: 'Axes',
+            notes: 'Skill 6',
+            offset: 0x22,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'spears',
+            label: 'Spears',
+            notes: 'Skill 8',
+            offset: 0x26,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'hammers',
+            label: 'Hammers',
+            notes: 'Skill 9',
+            offset: 0x28,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'katana_1h',
+            label: 'Katana (1H)',
+            notes: 'Skill 11',
+            offset: 0x2c,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'katana_2h',
+            label: 'Katana (2H)',
+            notes: 'Skill 12',
+            offset: 0x2e,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'cudgels',
+            label: 'Cudgels',
+            notes: 'Skill 13',
+            offset: 0x30,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'whips',
+            label: 'Whips',
+            notes: 'Skill 15',
+            offset: 0x34,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'spellbooks',
+            label: 'Spellbooks',
+            notes: 'Skill 16',
+            offset: 0x36,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'instruments',
+            label: 'Instruments',
+            notes: 'Skill 17',
+            offset: 0x38,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'blowguns',
+            label: 'Blowguns',
+            notes: 'Skill 18',
+            offset: 0x3a,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'bows',
+            label: 'Bows',
+            notes: 'Skill 19',
+            offset: 0x3c,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'crossbows',
+            label: 'Crossbows',
+            notes: 'Skill 20',
+            offset: 0x3e,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'fusils',
+            label: 'Fusils',
+            notes: 'Skill 21',
+            offset: 0x40,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'bonus',
+            label: '====Bonus==================',
+            type: 'section'
+        },
+        {
+            id: 'petrified',
+            label: 'Petrified',
+            offset: 0x44,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'petrified_up',
+            label: 'Petrified Up',
+            offset: 0x46,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'petrified_down',
+            label: 'Petrified Down',
+            offset: 0x48,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'status',
+            label: '____Status',
+            type: 'section'
+        },
+        {
+            id: 'strengthened',
+            label: 'Strengthened',
+            notes: 'Status 1',
+            offset: 0x4a,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'weakened',
+            label: 'Weakened',
+            notes: 'Status 2',
+            offset: 0x4c,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'spellcraft',
+            label: 'Spellcraft',
+            notes: 'Status 3',
+            offset: 0x4e,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'spoilspell',
+            label: 'Spoilspell',
+            notes: 'Status 4',
+            offset: 0x50,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'fortified',
+            label: 'Fortified',
+            notes: 'Status 5',
+            offset: 0x52,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'breached',
+            label: 'Breached',
+            notes: 'Status 6',
+            offset: 0x54,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'resilient',
+            label: 'Resilient',
+            notes: 'Status 7',
+            offset: 0x56,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'enfeebled',
+            label: 'Enfeebled',
+            notes: 'Status 8',
+            offset: 0x58,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'pain_aura',
+            label: 'Pain Aura',
+            notes: 'Status 9',
+            offset: 0x5a,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'status_attuned',
+            label: '____Status: Attuned',
+            type: 'section'
+        },
+        {
+            id: 'air_attuned',
+            label: 'Air Attuned',
+            notes: 'Status Up 1',
+            offset: 0x5c,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'earth_attuned',
+            label: 'Earth Attuned',
+            notes: 'Status Up 2',
+            offset: 0x5e,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'lightning_attuned',
+            label: 'Lightning Attuned',
+            notes: 'Status Up 3',
+            offset: 0x60,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'water_attuned',
+            label: 'Water Attuned',
+            notes: 'Status Up 4',
+            offset: 0x62,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'fire_attuned',
+            label: 'Fire Attuned',
+            notes: 'Status Up 5',
+            offset: 0x64,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'ice_attuned',
+            label: 'Ice Attuned',
+            notes: 'Status Up 6',
+            offset: 0x66,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'light_attuned',
+            label: 'Light Attuned',
+            notes: 'Status Up 7',
+            offset: 0x68,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'dark_attuned',
+            label: 'Dark Attuned',
+            notes: 'Status Up 8',
+            offset: 0x6a,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'status_averse',
+            label: '____Status: Averse',
+            type: 'section'
+        },
+        {
+            id: 'air_averse',
+            label: 'Air Averse',
+            notes: 'Status Down 1',
+            offset: 0x6c,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'earth_averse',
+            label: 'Earth Averse',
+            notes: 'Status Down 2',
+            offset: 0x6e,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'lightning_averse',
+            label: 'Lightning Averse',
+            notes: 'Status Down 3',
+            offset: 0x70,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'water_averse',
+            label: 'Water Averse',
+            notes: 'Status Down 4',
+            offset: 0x72,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'fire_averse',
+            label: 'Fire Averse',
+            notes: 'Status Down 5',
+            offset: 0x74,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'ice_averse',
+            label: 'Ice Averse',
+            notes: 'Status Down 6',
+            offset: 0x76,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'light_averse',
+            label: 'Light Averse',
+            notes: 'Status Down 7',
+            offset: 0x78,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'dark_averse',
+            label: 'Dark Averse',
+            notes: 'Status Down 8',
+            offset: 0x7a,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'physical_atk',
+            label: '____Physical ATK',
+            type: 'section'
+        },
+        {
+            id: 'crushing',
+            label: 'crushing',
+            offset: 0x9c,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'slashing',
+            label: 'slashing',
+            offset: 0x9e,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'piercing',
+            label: 'piercing',
+            offset: 0xa0,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'physical_def',
+            label: '____Physical DEF',
+            type: 'section'
+        },
+        {
+            id: 'crushing_2',
+            label: 'crushing',
+            offset: 0xa2,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'slashing_2',
+            label: 'slashing',
+            offset: 0xa4,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'piercing_2',
+            label: 'piercing',
+            offset: 0xa6,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'tribe_atk',
+            label: '____Tribe ATK',
+            type: 'section'
+        },
+        {
+            id: 'human',
+            label: 'human',
+            offset: 0xa8,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'beast',
+            label: 'beast',
+            offset: 0xaa,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'reptile',
+            label: 'reptile',
+            offset: 0xac,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'dragon',
+            label: 'dragon',
+            offset: 0xae,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'divine',
+            label: 'divine',
+            offset: 0xb0,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'umbra',
+            label: 'umbra',
+            offset: 0xb2,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'faerie',
+            label: 'faerie',
+            offset: 0xb4,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'phantom',
+            label: 'phantom',
+            offset: 0xb6,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'golem',
+            label: 'golem',
+            offset: 0xb8,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'tribe_def',
+            label: '____Tribe DEF',
+            type: 'section'
+        },
+        {
+            id: 'human_2',
+            label: 'human',
+            offset: 0xba,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'beast_2',
+            label: 'beast',
+            offset: 0xbc,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'reptile_2',
+            label: 'reptile',
+            offset: 0xbe,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'dragon_2',
+            label: 'dragon',
+            offset: 0xc0,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'divine_2',
+            label: 'divine',
+            offset: 0xc2,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'umbra_2',
+            label: 'umbra',
+            offset: 0xc4,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'faerie_2',
+            label: 'faerie',
+            offset: 0xc6,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'phantom_2',
+            label: 'phantom',
+            offset: 0xc8,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'golem_2',
+            label: 'golem',
+            offset: 0xca,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'element_atk',
+            label: '____Element ATK',
+            type: 'section'
+        },
+        {
+            id: 'air',
+            label: 'air',
+            offset: 0xcc,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'earth',
+            label: 'earth',
+            offset: 0xce,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'lightning',
+            label: 'lightning',
+            offset: 0xd0,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'water',
+            label: 'water',
+            offset: 0xd2,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'fire',
+            label: 'fire',
+            offset: 0xd4,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'ice',
+            label: 'ice',
+            offset: 0xd6,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'light',
+            label: 'light',
+            offset: 0xd8,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'dark',
+            label: 'dark',
+            offset: 0xda,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'element_def',
+            label: '____Element DEF',
+            type: 'section'
+        },
+        {
+            id: 'air_2',
+            label: 'air',
+            offset: 0xdc,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'earth_2',
+            label: 'earth',
+            offset: 0xde,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'lightning_2',
+            label: 'lightning',
+            offset: 0xe0,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'water_2',
+            label: 'water',
+            offset: 0xe2,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'fire_2',
+            label: 'fire',
+            offset: 0xe4,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'ice_2',
+            label: 'ice',
+            offset: 0xe6,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'light_2',
+            label: 'light',
+            offset: 0xe8,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'dark_2',
+            label: 'dark',
+            offset: 0xea,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'unit_element_relationship',
+            label: '____Unit-Element Relationship',
+            type: 'section'
+        },
+        {
+            id: 'strong_2',
+            label: 'strong',
+            offset: 0xec,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'neutral_2',
+            label: 'neutral',
+            offset: 0xee,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'weak_2',
+            label: 'weak',
+            offset: 0xf0,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'map_element',
+            label: '____Map Element',
+            type: 'section'
+        },
+        {
+            id: 'air_3',
+            label: 'air',
+            offset: 0xf2,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'earth_3',
+            label: 'earth',
+            offset: 0xf4,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'lightning_3',
+            label: 'lightning',
+            offset: 0xf6,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'water_3',
+            label: 'water',
+            offset: 0xf8,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'fire_3',
+            label: 'fire',
+            offset: 0xfa,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'ice_3',
+            label: 'ice',
+            offset: 0xfc,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'light_3',
+            label: 'light',
+            offset: 0xfe,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'dark_3',
+            label: 'dark',
+            offset: 0x100,
+            size: 2,
+            type: 'int'
+        },
+        {
+            id: 'hp_lost_percent',
+            label: 'HP Lost Percent',
+            offset: 0x102,
+            size: 2,
+            type: 'int'
+        }
+    ]
+}

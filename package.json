@@ -1,6 +1,6 @@
 {
     "name": "tactics-ogre-tool",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "description": "",
     "type": "module",
     "scripts": {
@@ -12,9 +12,11 @@
         "ui:build": "vite build",
         "clean:dist": "rimraf dist",
         "preview": "vite preview",
+        "convert:nmm": "node scripts/convert_nmm_modules.mjs",
+        "convert:nmm:check": "node scripts/convert_nmm_modules.mjs --check",
         "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
         "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-        "lint": "prettier --check . && eslint .",
+        "lint": "prettier --check .",
         "format": "prettier --write .",
         "test:unit": "vitest --run",
         "test:unit:watch": "vitest --watch",
@@ -35,6 +37,7 @@
         "@tailwindcss/typography": "^0.5.19",
         "@tailwindcss/vite": "^4.3.0",
         "@tauri-apps/cli": "^2",
+        "@types/node": "^25.9.2",
         "prettier": "^3.8.3",
         "prettier-plugin-svelte": "^3.5.2",
         "prettier-plugin-tailwindcss": "^0.8.0",

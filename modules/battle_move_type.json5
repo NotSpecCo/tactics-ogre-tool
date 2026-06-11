@@ -1,0 +1,67 @@
+{
+    schema_version: 1,
+    id: 'battle_move_type',
+    label: 'Move Type',
+    notes: 'Tactics Ogre: Reborn - Move Type module for Nightmare Table Editor',
+
+    source: {
+        format: 'nightmare',
+        path: 'battle/MoveType.nmm',
+        title: 'Tactics Ogre: Reborn ==> battle_data_release / pack ==> Move Type'
+    },
+
+    files: ['battle/battle_data_release.dat'],
+
+    base_offset: 0x00459170,
+    endian: 'little',
+
+    entry: {
+        header: true,
+        count: 16,
+        size: 6,
+        labels_file: 'entries/move_type.json5'
+    },
+
+    fields: [
+        {
+            id: 'jump_up',
+            label: 'Jump Up',
+            offset: 0x00,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'jump_down',
+            label: 'Jump Down',
+            offset: 0x01,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'movement_effect',
+            label: 'Movement Effect',
+            offset: 0x02,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/effect.json5'
+        },
+        {
+            id: 'icon',
+            label: 'Icon',
+            offset: 0x04,
+            size: 1,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/skill_icon.json5'
+        },
+        {
+            id: 'amphibious',
+            label: 'Amphibious?',
+            offset: 0x05,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/amphibious.json5'
+        }
+    ]
+}

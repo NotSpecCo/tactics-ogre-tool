@@ -1,0 +1,14 @@
+[
+    { value: 0x00, label: 'HP (Health Points)' },
+    { value: 0x01, label: 'MP (Magic Points)' },
+    { value: 0x02, label: 'STR (Strength)' },
+    { value: 0x03, label: 'VIT (Vitality)' },
+    { value: 0x04, label: 'DEX (Dexterity)' },
+    { value: 0x05, label: 'AGI (Agility)' },
+    { value: 0x06, label: 'AVD (Avoidance)' },
+    { value: 0x07, label: 'INT (Intelligence)' },
+    { value: 0x08, label: 'MND (Mind)' },
+    { value: 0x09, label: 'RES (Resistance)' },
+    { value: 0x0a, label: 'LUK (Luck)' },
+    { value: 0x0b, label: 'Loyalty' }
+]

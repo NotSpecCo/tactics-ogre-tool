@@ -11,6 +11,5 @@ vite.config.ts.timestamp-*
 
 reference_files
 test_files
-docs
 .claude
 dist

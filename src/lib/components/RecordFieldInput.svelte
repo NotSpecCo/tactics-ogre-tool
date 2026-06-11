@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { formatFieldValue, isPrintableAscii, parseFieldInput, storedRange } from '$lib/field-format';
     import type { FieldValue, RecordField } from '$lib/tauri';
     import Input from '$lib/ui-components/form/Input.svelte';
 
@@ -26,80 +27,95 @@
         return bytes;
     }
 
-    const isHex = $derived(field.field_type === 'Hex');
-    const isUnsigned = $derived(field.value.type === 'Uint');
-    const numericValue = $derived(field.value.type === 'Uint' || field.value.type === 'Int' ? field.value.value : 0);
-    const hexValue = $derived(field.value.type === 'Hex' ? bytesToHex(field.value.value) : '');
+    const size = $derived(field.size ?? 0);
+    const isBytes = $derived(field.type === 'bytes');
+    const isText = $derived(field.type === 'text');
+    const isInt = $derived(field.type === 'int');
 
-    const bounds = $derived.by(() => {
-        switch (field.size) {
-            case 1:
-                return isUnsigned ? { min: 0, max: 255 } : { min: -128, max: 127 };
-            case 2:
-                return isUnsigned ? { min: 0, max: 65535 } : { min: -32768, max: 32767 };
-            case 4:
-                return isUnsigned ? { min: 0, max: 4294967295 } : { min: -2147483648, max: 2147483647 };
+    /** True when the stored text decoded lossily and must not be written back. */
+    const lossyText = $derived(field.value?.type === 'text' && field.value.value.includes('�'));
+
+    // The user's in-progress input. While null, the input renders the stored
+    // value; a failed commit keeps the draft on screen with error styling.
+    let draft = $state<string | null>(null);
+    let invalid = $state(false);
+
+    const rendered = $derived.by(() => {
+        if (draft !== null) return draft;
+        switch (field.value?.type) {
+            case 'uint':
+                return formatFieldValue(field.value.value, field.display);
+            case 'int':
+                return String(field.value.value);
+            case 'bytes':
+                return bytesToHex(field.value.value);
+            case 'text':
+                return field.value.value;
             default:
-                return { min: 0, max: 255 };
+                return '';
         }
     });
 
-    let displayValue = $state('');
-    let hasDraftHexValue = $state(false);
-    let invalid = $state(false);
+    const title = $derived.by(() => {
+        if (isText) {
+            const hint = `Printable ASCII only, up to ${size} character${size === 1 ? '' : 's'}.`;
+            return lossyText ? `${hint} The current value contains non-text bytes and is display-only.` : hint;
+        }
+        if (isBytes) return `${size} byte${size === 1 ? '' : 's'} of hex.`;
+        const range = storedRange(field.type, field.size);
+        if (!range) return undefined;
+        const hex = isInt ? '' : '; decimal or 0x hex';
+        return `${range.min} to ${range.max}${hex}.`;
+    });
 
-    const renderedHexValue = $derived(hasDraftHexValue ? displayValue : hexValue);
-
-    function handleHexInput(e: Event) {
-        displayValue = (e.target as HTMLInputElement).value;
-        hasDraftHexValue = true;
+    function handleInput(e: Event) {
+        draft = (e.target as HTMLInputElement).value;
         invalid = false;
     }
 
-    function handleHexBlur() {
-        const bytes = hexToBytes(displayValue);
-        if (bytes && bytes.length === field.size) {
-            invalid = false;
-            hasDraftHexValue = false;
-            onUpdate({ type: 'Hex', value: bytes });
+    function commit() {
+        if (draft === null) return;
+        const raw = draft;
+
+        if (isBytes) {
+            const bytes = hexToBytes(raw);
+            if (!bytes || bytes.length !== size) {
+                invalid = true;
+                return;
+            }
+            draft = null;
+            onUpdate({ type: 'bytes', value: bytes });
+        } else if (isText) {
+            // Sends only what the user typed, never the lossy read-back of
+            // the stored bytes.
+            if (!isPrintableAscii(raw) || raw.length > size) {
+                invalid = true;
+                return;
+            }
+            draft = null;
+            onUpdate({ type: 'text', value: raw });
         } else {
-            invalid = true;
+            const parsed = parseFieldInput(raw, { hex: !isInt, negative: isInt });
+            const range = storedRange(field.type, field.size);
+            if (parsed === null || !range || parsed < range.min || parsed > range.max) {
+                invalid = true;
+                return;
+            }
+            draft = null;
+            onUpdate(isInt ? { type: 'int', value: parsed } : { type: 'uint', value: parsed });
         }
-    }
-
-    function handleNumberChange(e: Event) {
-        const target = e.target as HTMLInputElement;
-        const raw = parseInt(target.value, 10);
-
-        if (isNaN(raw)) {
-            target.value = String(numericValue);
-            return;
-        }
-
-        const clamped = Math.max(bounds.min, Math.min(bounds.max, raw));
-        target.value = String(clamped);
-
-        const value: FieldValue = isUnsigned ? { type: 'Uint', value: clamped } : { type: 'Int', value: clamped };
-        onUpdate(value);
     }
 </script>
 
-{#if isHex}
-    <Input
-        type="text"
-        value={renderedHexValue}
-        inputClass="font-mono {invalid ? 'border-red-500' : isDirty ? 'border-indigo-400/60' : ''}"
-        oninput={handleHexInput}
-        onblur={handleHexBlur}
-        placeholder={Array.from({ length: field.size }, () => '00').join(' ')}
-    />
-{:else}
-    <Input
-        type="number"
-        value={numericValue}
-        min={bounds.min}
-        max={bounds.max}
-        inputClass={isDirty ? 'border-indigo-400/60' : ''}
-        onchange={handleNumberChange}
-    />
-{/if}
+<Input
+    type="text"
+    value={rendered}
+    {title}
+    maxlength={isText ? size : undefined}
+    placeholder={isBytes ? Array.from({ length: size }, () => '00').join(' ') : undefined}
+    inputClass="{isBytes || isText ? 'font-mono' : ''}
+        {invalid ? 'border-red-500' : isDirty ? 'border-indigo-400/60' : ''}
+        {lossyText && !invalid ? 'border-amber-500' : ''}"
+    oninput={handleInput}
+    onchange={commit}
+/>

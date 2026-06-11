@@ -3,11 +3,7 @@ pub mod writer;
 
 use std::fmt;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Endian {
-    Little,
-    Big,
-}
+pub use crate::module_spec::Endian;
 
 #[derive(Debug)]
 pub enum BinaryError {

@@ -1,0 +1,766 @@
+{
+    schema_version: 1,
+    id: 'battle_skill',
+    label: 'Skill',
+    notes: 'Tactics Ogre: Reborn - Skill module for Nightmare Table Editor',
+
+    source: {
+        format: 'nightmare',
+        path: 'battle/Skill.nmm',
+        title: 'Tactics Ogre: Reborn ==> battle_data_release / pack ==> Skill'
+    },
+
+    files: ['battle/battle_data_release.dat'],
+
+    base_offset: 0x0042b980,
+    endian: 'little',
+
+    entry: {
+        header: true,
+        count: 800,
+        size: 102,
+        labels_file: 'entries/skill.json5'
+    },
+
+    fields: [
+        {
+            id: 'unused_00_01_padding',
+            label: '<unused> 00 - 01 Padding?',
+            offset: 0x00,
+            size: 2,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'skill_type',
+            label: 'Skill Type',
+            offset: 0x02,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_type.json5'
+        },
+        {
+            id: 'unused_03',
+            label: '<unused> 03',
+            offset: 0x03,
+            size: 1,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'effect',
+            label: 'Effect',
+            offset: 0x04,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/effect.json5'
+        },
+        {
+            id: 'effect_type_associated_allowed',
+            label: 'Effect Type, Associated? Allowed?',
+            offset: 0x06,
+            size: 1,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/effect_type.json5'
+        },
+        {
+            id: 'rank_index',
+            label: 'Rank Index?',
+            offset: 0x07,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'unused_sp_cost',
+            label: '<unused> SP Cost',
+            notes: 'Skills are no longer purchased, so Cost and Prerequisite is not used.',
+            offset: 0x08,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'unused_prerequisite',
+            label: '<unused> Prerequisite',
+            offset: 0x0a,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/skill.json5'
+        },
+        {
+            id: 'unused_rank_exp_rate',
+            label: '<unused> Rank EXP Rate',
+            notes: 'Only weapon skills have ranks now, so xp rate is not used.',
+            offset: 0x0c,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'exclusion_group_1_broken',
+            label: 'Exclusion Group 1 (broken?)',
+            notes: 'These don\'t appear to actually work as intended anymore.',
+            offset: 0x0d,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'exclusion_group_2_broken',
+            label: 'Exclusion Group 2 (broken?)',
+            offset: 0x0e,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'auto_activation_chance',
+            label: '[Auto] Activation Chance %',
+            offset: 0x0f,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'usability',
+            label: '====Usability================',
+            type: 'section'
+        },
+        {
+            id: 'boss_all',
+            label: 'Boss/All',
+            offset: 0x10,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'warrior',
+            label: 'Warrior',
+            offset: 0x11,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'archer',
+            label: 'Archer',
+            offset: 0x12,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'wizard',
+            label: 'Wizard',
+            offset: 0x13,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'cleric',
+            label: 'Cleric',
+            offset: 0x14,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'rune_fencer',
+            label: 'Rune Fencer',
+            offset: 0x15,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'knight',
+            label: 'Knight',
+            offset: 0x16,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'terror_knight',
+            label: 'Terror Knight',
+            offset: 0x17,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'berserker',
+            label: 'Berserker',
+            offset: 0x18,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'swordmaster',
+            label: 'Swordmaster',
+            offset: 0x19,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'dragoon',
+            label: 'Dragoon',
+            offset: 0x1a,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'ninja',
+            label: 'Ninja',
+            offset: 0x1b,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'rogue',
+            label: 'Rogue',
+            offset: 0x1c,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'fusilier',
+            label: 'Fusilier',
+            offset: 0x1d,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'beast_tamer',
+            label: 'Beast Tamer',
+            offset: 0x1e,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'warlock',
+            label: 'Warlock',
+            offset: 0x1f,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'necromancer',
+            label: 'Necromancer',
+            offset: 0x20,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'lich',
+            label: 'Lich',
+            offset: 0x21,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'divine_knight',
+            label: 'Divine Knight',
+            offset: 0x22,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'hoplite',
+            label: 'Hoplite',
+            offset: 0x23,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'juggernaut',
+            label: 'Juggernaut',
+            offset: 0x24,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'patriarch',
+            label: 'Patriarch',
+            offset: 0x25,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'familiar',
+            label: 'Familiar',
+            offset: 0x26,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'incubus',
+            label: 'Incubus',
+            offset: 0x27,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'not_used',
+            label: '<not used>',
+            offset: 0x28,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'not_used_2',
+            label: '<not used>',
+            offset: 0x29,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'boogeyman',
+            label: 'Boogeyman',
+            offset: 0x2a,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'cloud_dragon',
+            label: 'Cloud Dragon',
+            offset: 0x2b,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'earth_dragon',
+            label: 'Earth Dragon',
+            offset: 0x2c,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'thunder_dragon',
+            label: 'Thunder Dragon',
+            offset: 0x2d,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'flood_dragon',
+            label: 'Flood Dragon',
+            offset: 0x2e,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'flame_dragon',
+            label: 'Flame Dragon',
+            offset: 0x2f,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'frost_dragon',
+            label: 'Frost Dragon',
+            offset: 0x30,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'arc_dragon',
+            label: 'Arc Dragon',
+            offset: 0x31,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'dark_dragon',
+            label: 'Dark Dragon',
+            offset: 0x32,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'hydra',
+            label: 'Hydra',
+            offset: 0x33,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'clay_golem',
+            label: 'Clay Golem',
+            offset: 0x34,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'stone_golem',
+            label: 'Stone Golem',
+            offset: 0x35,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'iron_golem',
+            label: 'Iron Golem',
+            offset: 0x36,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'baldur_golem',
+            label: 'Baldur Golem',
+            offset: 0x37,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'gryphon',
+            label: 'Gryphon',
+            offset: 0x38,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'cockatrice',
+            label: 'Cockatrice',
+            offset: 0x39,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'octopus',
+            label: 'Octopus',
+            offset: 0x3a,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'cyclops',
+            label: 'Cyclops',
+            offset: 0x3b,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'lord',
+            label: 'Lord',
+            offset: 0x3c,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'ranger',
+            label: 'Ranger',
+            offset: 0x3d,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'priest',
+            label: 'Priest',
+            offset: 0x3e,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'dark_priest',
+            label: 'Dark Priest',
+            offset: 0x3f,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'princess',
+            label: 'Princess',
+            offset: 0x40,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'paladin',
+            label: 'Paladin',
+            offset: 0x41,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'astromancer',
+            label: 'Astromancer',
+            offset: 0x42,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'vartan',
+            label: 'Vartan',
+            offset: 0x43,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'white_knight',
+            label: 'White Knight',
+            offset: 0x44,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'shaman',
+            label: 'Shaman',
+            offset: 0x45,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'wicce',
+            label: 'Wicce',
+            offset: 0x46,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'songstress',
+            label: 'Songstress',
+            offset: 0x47,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'buccaneer',
+            label: 'Buccaneer',
+            offset: 0x48,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'knight_commander',
+            label: 'Knight Commander',
+            offset: 0x49,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'scylla_naga',
+            label: 'Scylla/Naga',
+            offset: 0x4a,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'phoenix',
+            label: 'Phoenix',
+            offset: 0x4b,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'rukh',
+            label: 'Rukh',
+            offset: 0x4c,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'not_used_3',
+            label: '<not used>',
+            offset: 0x4d,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'not_used_4',
+            label: '<not used>',
+            offset: 0x4e,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'not_used_5',
+            label: '<not used>',
+            offset: 0x4f,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_usability.json5'
+        },
+        {
+            id: 'section_2',
+            label: '=============================',
+            type: 'section'
+        },
+        {
+            id: 'action_id',
+            label: '[Action] ? ID ?',
+            offset: 0x50,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'sort_order',
+            label: 'Sort Order',
+            offset: 0x52,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_category',
+            label: 'Skill Category',
+            offset: 0x55,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_category.json5'
+        },
+        {
+            id: 'unlearnable',
+            label: 'Unlearnable',
+            offset: 0x55,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'weapon_3000',
+            label: '[Weapon] ? 3000 ?',
+            offset: 0x56,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'exclusion_group_3',
+            label: 'Exclusion Group 3',
+            offset: 0x58,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'name',
+            label: 'Name',
+            offset: 0x5a,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/name_skill.json5'
+        },
+        {
+            id: 'description',
+            label: 'Description',
+            offset: 0x5c,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/name_skill.json5'
+        },
+        {
+            id: 'unlearnable_slightly_different',
+            label: 'Unlearnable? (slightly different)',
+            offset: 0x5e,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'field_0x5f',
+            label: '?? 5F Group/Type/ID ?',
+            offset: 0x5f,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'passive_icon_also_display_at_top',
+            label: '[Passive] Icon, also Display at Top',
+            offset: 0x60,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_icon.json5'
+        },
+        {
+            id: 'unused_61',
+            label: '<unused> 61',
+            offset: 0x61,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'field_0x62',
+            label: '?? 62 Group/Type/ID ?',
+            offset: 0x62,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'unused_63',
+            label: '<unused> 63',
+            offset: 0x63,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'passive_icon_only_in_item_inspect',
+            label: '[Passive] Icon, only in Item Inspect',
+            offset: 0x64,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_icon.json5'
+        },
+        {
+            id: 'template_limited_type',
+            label: 'Template-Limited Type',
+            offset: 0x65,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_limit.json5'
+        }
+    ]
+}

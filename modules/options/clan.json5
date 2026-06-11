@@ -1,0 +1,10 @@
+[
+    { value: 0x00, label: 'Unknown' },
+    { value: 0x01, label: 'Walister' },
+    { value: 0x02, label: 'Galgastan' },
+    { value: 0x03, label: 'Bakram' },
+    { value: 0x04, label: 'Xenobia' },
+    { value: 0x05, label: 'Lodis' },
+    { value: 0x06, label: 'Bolmocca' },
+    { value: 0x07, label: 'Balboede' }
+]

@@ -1,0 +1,5 @@
+[
+    { value: 0x01, label: 'Blue: Guest / Friendly' },
+    { value: 0x02, label: 'Red: Enemy' },
+    { value: 0x03, label: 'Green: Neutral / Ally' }
+]

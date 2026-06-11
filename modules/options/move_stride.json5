@@ -1,0 +1,10 @@
+[
+    { value: 0x00, label: 'None' },
+    { value: 0x04, label: 'Blinkwalk' },
+    { value: 0x05, label: 'Windwalk' },
+    { value: 0x06, label: 'Cloudwalk' },
+    { value: 0x07, label: 'Wade 1' },
+    { value: 0x08, label: 'Wade 2' },
+    { value: 0x09, label: 'Waterwalk' },
+    { value: 0x0a, label: 'Lavawalk' }
+]

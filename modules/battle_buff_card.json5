@@ -1,0 +1,60 @@
+{
+    schema_version: 1,
+    id: 'battle_buff_card',
+    label: 'Buff Card',
+    notes: 'Tactics Ogre: Reborn - Buff Card module for Nightmare Table Editor',
+
+    source: {
+        format: 'nightmare',
+        path: 'battle/BuffCard.nmm',
+        title: 'Tactics Ogre: Reborn ==> battle_data_release / pack ==> Buff Card'
+    },
+
+    files: ['battle/battle_data_release.dat'],
+
+    base_offset: 0x00682930,
+    endian: 'little',
+
+    entry: {
+        header: true,
+        count: 16,
+        size: 6,
+        labels_file: 'entries/buff_card.json5'
+    },
+
+    fields: [
+        {
+            id: 'effect',
+            label: 'Effect',
+            offset: 0x00,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/effect.json5'
+        },
+        {
+            id: 'name',
+            label: 'Name',
+            offset: 0x02,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/name_buff_card.json5'
+        },
+        {
+            id: 'ai_cost',
+            label: 'AI Cost?',
+            offset: 0x04,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'unused_05',
+            label: '<unused> 05',
+            offset: 0x05,
+            size: 1,
+            type: 'uint',
+            display: 'hex'
+        }
+    ]
+}

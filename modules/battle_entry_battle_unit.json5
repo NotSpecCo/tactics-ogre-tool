@@ -1,0 +1,1129 @@
+{
+    schema_version: 1,
+    id: 'battle_entry_battle_unit',
+    label: 'Battle Unit',
+    notes: 'Tactics Ogre: Reborn - Battle Unit module for Nightmare Table Editor\nTo find the correct record count, use Battle Unit Header module.\nChange the count--the non-hex number below the title--and reload this module show all the records.',
+
+    source: {
+        format: 'nightmare',
+        path: 'battle/entry/BattleUnit.nmm',
+        title: 'Tactics Ogre: Reborn ==> battle / entry / entry_unit_#### / pack ==> Battle Unit'
+    },
+
+    files: ['battle/entry/entry_unit_*.dat'],
+
+    base_offset: 0x00000030,
+    endian: 'little',
+
+    entry: {
+        header: true,
+        size: 196,
+        labels_file: null
+    },
+
+    fields: [
+        {
+            id: 'unit_name_specific',
+            label: 'Unit Name, Specific',
+            offset: 0x00,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/name_unit_name.json5'
+        },
+        {
+            id: 'unit_template',
+            label: 'Unit Template',
+            offset: 0x02,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/unit_template.json5'
+        },
+        {
+            id: 'event_id',
+            label: 'Event ID',
+            offset: 0x04,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'unit_name_random_type',
+            label: 'Unit Name, Random Type',
+            offset: 0x05,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/unit_name.json5'
+        },
+        {
+            id: 'class',
+            label: 'Class',
+            offset: 0x06,
+            size: 1,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/class.json5'
+        },
+        {
+            id: 'field_0x07',
+            label: '?? 07',
+            offset: 0x07,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'unit_level_base',
+            label: 'Unit Level Base',
+            offset: 0x08,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'unit_level_modifier',
+            label: 'Unit Level Modifier',
+            offset: 0x09,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'position_x',
+            label: 'Position X',
+            offset: 0x0a,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'position_y',
+            label: 'Position Y',
+            offset: 0x0b,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'facing',
+            label: 'Facing',
+            offset: 0x0c,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/facing.json5'
+        },
+        {
+            id: 'field_0x0d',
+            label: '?? 0D',
+            notes: 'possibly related to randomly picking this unit to appear',
+            offset: 0x0d,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'field_0x0e',
+            label: '?? 0E',
+            notes: 'possibly related to randomly picking this unit to appear',
+            offset: 0x0e,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'hp_scalar',
+            label: '?? HP Scalar?',
+            offset: 0x0f,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'team',
+            label: 'Team',
+            offset: 0x10,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/team.json5'
+        },
+        {
+            id: 'guest',
+            label: 'Guest',
+            offset: 0x11,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'leader',
+            label: 'Leader',
+            offset: 0x12,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'target',
+            label: 'Target',
+            offset: 0x13,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'alignment',
+            label: 'Alignment',
+            offset: 0x14,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/alignment.json5'
+        },
+        {
+            id: 'loyalty',
+            label: 'Loyalty',
+            offset: 0x15,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'clan',
+            label: 'Clan',
+            offset: 0x16,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/clan.json5'
+        },
+        {
+            id: 'union',
+            label: 'Union',
+            offset: 0x17,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/union.json5'
+        },
+        {
+            id: 'unused_18',
+            label: '<unused> 18',
+            offset: 0x18,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'flag_19',
+            label: '? Flag? 19',
+            offset: 0x19,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'summoned',
+            label: 'Summoned?',
+            offset: 0x1a,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'magic',
+            label: '?? Magic?',
+            offset: 0x1b,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'equipment',
+            label: '?? Equipment?',
+            offset: 0x1c,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'flag_1d',
+            label: '? Flag? 1D',
+            offset: 0x1d,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'zombie',
+            label: 'Zombie',
+            offset: 0x1e,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'subtarget',
+            label: 'Subtarget?',
+            offset: 0x1f,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'flag_20',
+            label: '? Flag? 20',
+            offset: 0x20,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'unused_21',
+            label: '<unused> 21',
+            offset: 0x21,
+            size: 1,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'skill_1',
+            label: 'Skill 1',
+            offset: 0x22,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/skill.json5'
+        },
+        {
+            id: 'skill_1_rank',
+            label: 'Skill 1 Rank',
+            offset: 0x24,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_2',
+            label: 'Skill 2',
+            offset: 0x26,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/skill.json5'
+        },
+        {
+            id: 'skill_2_rank',
+            label: 'Skill 2 Rank',
+            offset: 0x28,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_3',
+            label: 'Skill 3',
+            offset: 0x2a,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/skill.json5'
+        },
+        {
+            id: 'skill_3_rank',
+            label: 'Skill 3 Rank',
+            offset: 0x2c,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_4',
+            label: 'Skill 4',
+            offset: 0x2e,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/skill.json5'
+        },
+        {
+            id: 'skill_4_rank',
+            label: 'Skill 4 Rank',
+            offset: 0x30,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_5',
+            label: 'Skill 5',
+            offset: 0x32,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/skill.json5'
+        },
+        {
+            id: 'skill_5_rank',
+            label: 'Skill 5 Rank',
+            offset: 0x34,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_6',
+            label: 'Skill 6',
+            offset: 0x36,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/skill.json5'
+        },
+        {
+            id: 'skill_6_rank',
+            label: 'Skill 6 Rank',
+            offset: 0x38,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_7',
+            label: 'Skill 7',
+            offset: 0x3a,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/skill.json5'
+        },
+        {
+            id: 'skill_7_rank',
+            label: 'Skill 7 Rank',
+            offset: 0x3c,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_8',
+            label: 'Skill 8',
+            offset: 0x3e,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/skill.json5'
+        },
+        {
+            id: 'skill_8_rank',
+            label: 'Skill 8 Rank',
+            offset: 0x40,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_9',
+            label: 'Skill 9',
+            offset: 0x42,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/skill.json5'
+        },
+        {
+            id: 'skill_9_rank',
+            label: 'Skill 9 Rank',
+            offset: 0x44,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'skill_10',
+            label: 'Skill 10',
+            offset: 0x46,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/skill.json5'
+        },
+        {
+            id: 'skill_10_rank',
+            label: 'Skill 10 Rank',
+            offset: 0x48,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'armament_1',
+            label: 'Armament 1',
+            offset: 0x4a,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/armament.json5'
+        },
+        {
+            id: 'armament_1_drop_chance',
+            label: 'Armament 1 Drop Chance',
+            offset: 0x4c,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'armament_1_unused',
+            label: 'Armament 1 ? <unused>',
+            offset: 0x4d,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'armament_2',
+            label: 'Armament 2',
+            offset: 0x4e,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/armament.json5'
+        },
+        {
+            id: 'armament_2_drop_chance',
+            label: 'Armament 2 Drop Chance',
+            offset: 0x50,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'armament_2_unused',
+            label: 'Armament 2 ? <unused>',
+            offset: 0x51,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'armament_3',
+            label: 'Armament 3',
+            offset: 0x52,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/armament.json5'
+        },
+        {
+            id: 'armament_3_drop_chance',
+            label: 'Armament 3 Drop Chance',
+            offset: 0x54,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'armament_3_unused',
+            label: 'Armament 3 ? <unused>',
+            offset: 0x55,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'armament_4',
+            label: 'Armament 4',
+            offset: 0x56,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/armament.json5'
+        },
+        {
+            id: 'armament_4_drop_chance',
+            label: 'Armament 4 Drop Chance',
+            offset: 0x58,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'armament_4_unused',
+            label: 'Armament 4 ? <unused>',
+            offset: 0x59,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'armament_5',
+            label: 'Armament 5',
+            offset: 0x5a,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/armament.json5'
+        },
+        {
+            id: 'armament_5_drop_chance',
+            label: 'Armament 5 Drop Chance',
+            offset: 0x5c,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'armament_5_unused',
+            label: 'Armament 5 ? <unused>',
+            offset: 0x5d,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'armament_6',
+            label: 'Armament 6',
+            offset: 0x5e,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/armament.json5'
+        },
+        {
+            id: 'armament_6_drop_chance',
+            label: 'Armament 6 Drop Chance',
+            offset: 0x60,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'armament_6_unused',
+            label: 'Armament 6 ? <unused>',
+            offset: 0x61,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'armament_7',
+            label: 'Armament 7',
+            offset: 0x62,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/armament.json5'
+        },
+        {
+            id: 'armament_7_drop_chance',
+            label: 'Armament 7 Drop Chance',
+            offset: 0x64,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'armament_7_unused',
+            label: 'Armament 7 ? <unused>',
+            offset: 0x65,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'commodity_1',
+            label: 'Commodity 1',
+            offset: 0x66,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/commodity_consumable.json5'
+        },
+        {
+            id: 'commodity_1_drop_chance',
+            label: 'Commodity 1 Drop Chance',
+            offset: 0x68,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'commodity_1_unused',
+            label: 'Commodity 1 ? <unused>',
+            offset: 0x69,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'commodity_2',
+            label: 'Commodity 2',
+            offset: 0x6a,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/commodity_consumable.json5'
+        },
+        {
+            id: 'commodity_2_drop_chance',
+            label: 'Commodity 2 Drop Chance',
+            offset: 0x6c,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'commodity_2_unused',
+            label: 'Commodity 2 ? <unused>',
+            offset: 0x6d,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'commodity_3',
+            label: 'Commodity 3',
+            offset: 0x6e,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/commodity_consumable.json5'
+        },
+        {
+            id: 'commodity_3_drop_chance',
+            label: 'Commodity 3 Drop Chance',
+            offset: 0x70,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'commodity_3_unused',
+            label: 'Commodity 3 ? <unused>',
+            offset: 0x71,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'commodity_4',
+            label: 'Commodity 4',
+            offset: 0x72,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/commodity_consumable.json5'
+        },
+        {
+            id: 'commodity_4_drop_chance',
+            label: 'Commodity 4 Drop Chance',
+            offset: 0x74,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'commodity_4_unused',
+            label: 'Commodity 4 ? <unused>',
+            offset: 0x75,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'loot_1',
+            label: 'Loot 1',
+            offset: 0x76,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/ingredient.json5'
+        },
+        {
+            id: 'loot_1_quantity',
+            label: 'Loot 1 Quantity',
+            offset: 0x78,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'loot_1_drop_chance',
+            label: 'Loot 1 Drop Chance',
+            offset: 0x79,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'loot_2',
+            label: 'Loot 2',
+            offset: 0x7a,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/ingredient.json5'
+        },
+        {
+            id: 'loot_2_quantity',
+            label: 'Loot 2 Quantity',
+            offset: 0x7c,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'loot_2_drop_chance',
+            label: 'Loot 2 Drop Chance',
+            offset: 0x7d,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'loot_3',
+            label: 'Loot 3',
+            offset: 0x7e,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/ingredient.json5'
+        },
+        {
+            id: 'loot_3_quantity',
+            label: 'Loot 3 Quantity',
+            offset: 0x80,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'loot_3_drop_chance',
+            label: 'Loot 3 Drop Chance',
+            offset: 0x81,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'loot_4',
+            label: 'Loot 4',
+            offset: 0x82,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/ingredient.json5'
+        },
+        {
+            id: 'loot_4_quantity',
+            label: 'Loot 4 Quantity',
+            offset: 0x84,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'loot_4_drop_chance',
+            label: 'Loot 4 Drop Chance',
+            offset: 0x85,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'spell_1',
+            label: 'Spell 1',
+            offset: 0x86,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/effect.json5'
+        },
+        {
+            id: 'spell_2',
+            label: 'Spell 2',
+            offset: 0x88,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/effect.json5'
+        },
+        {
+            id: 'spell_3',
+            label: 'Spell 3',
+            offset: 0x8a,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/effect.json5'
+        },
+        {
+            id: 'spell_4',
+            label: 'Spell 4',
+            offset: 0x8c,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/effect.json5'
+        },
+        {
+            id: 'unused_8e',
+            label: '<unused> 8E',
+            offset: 0x8e,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'flag_8f',
+            label: '? Flag? 8F',
+            offset: 0x8f,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'unused_90',
+            label: '<unused> 90',
+            offset: 0x90,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'unused_91',
+            label: '<unused> 91',
+            offset: 0x91,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'unused_92',
+            label: '<unused> 92',
+            offset: 0x92,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'unused_93',
+            label: '<unused> 93',
+            offset: 0x93,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'ai_script',
+            label: 'AI Script',
+            offset: 0x94,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'unused_95',
+            label: '<unused> 95',
+            offset: 0x95,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'field_0x96',
+            label: '?? 96',
+            offset: 0x96,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'element',
+            label: 'Element',
+            offset: 0x98,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/element_battle_unit.json5'
+        },
+        {
+            id: 'scream_voice',
+            label: 'Scream Voice',
+            offset: 0x99,
+            size: 1,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/voice_scream.json5'
+        },
+        {
+            id: 'disable_persuade',
+            label: 'Disable Persuade',
+            offset: 0x9a,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'flag_9b',
+            label: '? Flag? 9B',
+            offset: 0x9b,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'weapon_finisher_1',
+            label: 'Weapon Finisher 1',
+            offset: 0x9c,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/effect.json5'
+        },
+        {
+            id: 'weapon_finisher_2',
+            label: 'Weapon Finisher 2',
+            offset: 0x9e,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/effect.json5'
+        },
+        {
+            id: 'weapon_finisher_3',
+            label: 'Weapon Finisher 3',
+            offset: 0xa0,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/effect.json5'
+        },
+        {
+            id: 'weapon_finisher_4',
+            label: 'Weapon Finisher 4',
+            offset: 0xa2,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/effect.json5'
+        },
+        {
+            id: 'weapon_finisher_5',
+            label: 'Weapon Finisher 5',
+            offset: 0xa4,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/effect.json5'
+        },
+        {
+            id: 'weapon_finisher_6',
+            label: 'Weapon Finisher 6',
+            offset: 0xa6,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/effect.json5'
+        },
+        {
+            id: 'weapon_finisher_7',
+            label: 'Weapon Finisher 7',
+            offset: 0xa8,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/effect.json5'
+        },
+        {
+            id: 'weapon_finisher_8',
+            label: 'Weapon Finisher 8',
+            offset: 0xaa,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/effect.json5'
+        },
+        {
+            id: 'automatic_finishers',
+            label: 'Automatic Finishers',
+            offset: 0xac,
+            size: 1,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/battle_unit_finishers.json5'
+        },
+        {
+            id: 'buff_card_1',
+            label: 'Buff Card 1',
+            offset: 0xad,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'buff_card_2',
+            label: 'Buff Card 2',
+            offset: 0xae,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'buff_card_3',
+            label: 'Buff Card 3',
+            offset: 0xaf,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'buff_card_4',
+            label: 'Buff Card 4',
+            offset: 0xb0,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'unused_b1',
+            label: '<unused> B1',
+            offset: 0xb1,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'extra_loot_1',
+            label: 'Extra Loot 1',
+            offset: 0xb2,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/ingredient.json5'
+        },
+        {
+            id: 'extra_loot_1_quantity',
+            label: 'Extra Loot 1 Quantity',
+            offset: 0xb4,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'extra_loot_1_drop_chance',
+            label: 'Extra Loot 1 Drop Chance',
+            offset: 0xb5,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'extra_loot_2',
+            label: 'Extra Loot 2',
+            offset: 0xb6,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/ingredient.json5'
+        },
+        {
+            id: 'extra_loot_2_quantity',
+            label: 'Extra Loot 2 Quantity',
+            offset: 0xb8,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'extra_loot_2_drop_chance',
+            label: 'Extra Loot 2 Drop Chance',
+            offset: 0xb9,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'extra_loot_3',
+            label: 'Extra Loot 3',
+            offset: 0xba,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/ingredient.json5'
+        },
+        {
+            id: 'extra_loot_3_quantity',
+            label: 'Extra Loot 3 Quantity',
+            offset: 0xbc,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'extra_loot_3_drop_chance',
+            label: 'Extra Loot 3 Drop Chance',
+            offset: 0xbd,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'extra_loot_4',
+            label: 'Extra Loot 4',
+            offset: 0xbe,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/ingredient.json5'
+        },
+        {
+            id: 'extra_loot_4_quantity',
+            label: 'Extra Loot 4 Quantity',
+            offset: 0xc0,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'extra_loot_4_drop_chance',
+            label: 'Extra Loot 4 Drop Chance',
+            offset: 0xc1,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'flag_c2',
+            label: '? Flag? C2',
+            offset: 0xc2,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'flag_c3',
+            label: '? Flag? C3',
+            offset: 0xc3,
+            size: 1,
+            type: 'uint'
+        }
+    ]
+}

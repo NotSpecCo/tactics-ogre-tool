@@ -1,0 +1,19 @@
+[
+    { value: 0x0000, label: 'Nothing' },
+    { value: 0x206c, label: 'Physical Card' },
+    { value: 0x206d, label: 'Magic Card' },
+    { value: 0x206e, label: 'Critical Card' },
+    { value: 0x206f, label: 'Air Card' },
+    { value: 0x2070, label: 'Earth Card' },
+    { value: 0x2071, label: 'Lightning Card' },
+    { value: 0x2072, label: 'Water Card' },
+    { value: 0x2073, label: 'Fire Card' },
+    { value: 0x2074, label: 'Ice Card' },
+    { value: 0x2075, label: 'Light Card' },
+    { value: 0x2076, label: 'Dark Card' },
+    { value: 0x2077, label: 'HP Regen Card' },
+    { value: 0x2078, label: 'MP Recharge Card' },
+    { value: 0x2079, label: 'Reset Card' },
+    { value: 0x207a, label: 'Auto Skill Card' },
+    { value: 0x207b, label: 'Random Card' }
+]

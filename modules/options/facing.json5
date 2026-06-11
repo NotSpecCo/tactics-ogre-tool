@@ -1,0 +1,6 @@
+[
+    { value: 0x00, label: 'East' },
+    { value: 0x01, label: 'South' },
+    { value: 0x02, label: 'West' },
+    { value: 0x03, label: 'North' }
+]

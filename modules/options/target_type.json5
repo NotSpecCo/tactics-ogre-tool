@@ -1,0 +1,19 @@
+[
+    { value: 0x00, label: 'None' },
+    { value: 0x01, label: 'Radius, First Target' },
+    { value: 0x02, label: 'Line, All Targets' },
+    { value: 0x03, label: 'Ignore Range, One Target' },
+    { value: 0x04, label: 'Radius, Empty Tile' },
+    { value: 0x05, label: 'Radius, One Target' },
+    { value: 0x06, label: 'Self' },
+    { value: 0x07, label: 'All Enemies' },
+    { value: 0x08, label: 'All Allies' },
+    { value: 0x09, label: '<not used> ?' },
+    { value: 0x0a, label: 'All Targets in Range' },
+    { value: 0x0b, label: 'Cone, All Targets' },
+    { value: 0x0c, label: '<not used> Radius by Rank' },
+    { value: 0x0d, label: '<not used> ? {Lobber}' },
+    { value: 0x0e, label: 'Ignore Range, All Targets' },
+    { value: 0x0f, label: 'Line, First Target' },
+    { value: 0x10, label: '? Radius, Empty Tile, ?' }
+]

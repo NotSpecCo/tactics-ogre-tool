@@ -1,0 +1,596 @@
+{
+    schema_version: 1,
+    id: 'battle_unit_template',
+    label: 'Unit Template',
+    notes: 'Tactics Ogre: Reborn - Unit Template module for Nightmare Table Editor',
+
+    source: {
+        format: 'nightmare',
+        path: 'battle/UnitTemplate.nmm',
+        title: 'Tactics Ogre: Reborn ==> battle_data_release / pack ==> Unit Template'
+    },
+
+    files: ['battle/battle_data_release.dat'],
+
+    base_offset: 0x00420a20,
+    endian: 'little',
+
+    entry: {
+        header: true,
+        count: 512,
+        size: 84,
+        labels_file: 'entries/unit_template.json5'
+    },
+
+    fields: [
+        {
+            id: 'unused_00_01_padding',
+            label: '<unused> 00 - 01 Padding?',
+            offset: 0x00,
+            size: 2,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'tribe',
+            label: 'Tribe',
+            offset: 0x02,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/tribe.json5'
+        },
+        {
+            id: 'gender',
+            label: 'Gender',
+            offset: 0x03,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/gender.json5'
+        },
+        {
+            id: 'scream_voice',
+            label: 'Scream Voice',
+            offset: 0x04,
+            size: 1,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/voice_scream.json5'
+        },
+        {
+            id: 'aura_color',
+            label: 'Aura Color',
+            offset: 0x05,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'flags',
+            label: '____Flags____________',
+            type: 'section'
+        },
+        {
+            id: 'undead',
+            label: 'Undead',
+            notes: 'When killed, Unit is Stilled instead of Incapacitated.',
+            offset: 0x06,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'unused_07',
+            label: '<unused> 07',
+            offset: 0x07,
+            size: 1,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'unused_08_flag',
+            label: '<unused> 08 Flag?',
+            offset: 0x08,
+            size: 1,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'bodysnatch_target',
+            label: 'Bodysnatch Target',
+            offset: 0x09,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'bodysnatch_caster',
+            label: 'Bodysnatch Caster',
+            offset: 0x0a,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'snapdragon',
+            label: 'Snapdragon',
+            offset: 0x0b,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'field_0x0c',
+            label: '? 0C Flag ?',
+            offset: 0x0c,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'field_0x0d',
+            label: '? 0D Flag ?',
+            offset: 0x0d,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'field_0x0e',
+            label: '? 0E Flag ?',
+            offset: 0x0e,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'field_0x0f',
+            label: '? 0F Flag ?',
+            offset: 0x0f,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'field_0x10',
+            label: '? 10 Flag ?',
+            offset: 0x10,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'aura',
+            label: 'Aura',
+            offset: 0x11,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'weapon_offset',
+            label: 'Weapon Offset?',
+            offset: 0x12,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'field_0x13',
+            label: '? 13 Flag ?',
+            offset: 0x13,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'recruitable',
+            label: 'Recruitable',
+            offset: 0x14,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'rename_on_recruit',
+            label: 'Rename on Recruit',
+            offset: 0x15,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'cannot_use_items',
+            label: 'Cannot Use Items',
+            offset: 0x16,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'unused_17_flag',
+            label: '<unused> 17 Flag?',
+            offset: 0x17,
+            size: 1,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'stats',
+            label: '____Stats____________',
+            type: 'section'
+        },
+        {
+            id: 'base_hp_health_points',
+            label: 'Base HP : Health Points',
+            offset: 0x18,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'base_mp_magic_points',
+            label: 'Base MP : Magic Points',
+            offset: 0x1a,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'hp_growth_10',
+            label: 'HP Growth * 10',
+            offset: 0x1c,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'mp_growth_10',
+            label: 'MP Growth * 10',
+            offset: 0x1d,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'base_str_strength',
+            label: 'Base STR : Strength',
+            offset: 0x1e,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'str_growth_10',
+            label: 'STR Growth * 10',
+            offset: 0x1f,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'base_vit_vitality',
+            label: 'Base VIT : Vitality',
+            offset: 0x20,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'vit_growth_10',
+            label: 'VIT Growth * 10',
+            offset: 0x21,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'base_dex_dexterity',
+            label: 'Base DEX : Dexterity',
+            offset: 0x22,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'dex_growth_10',
+            label: 'DEX Growth * 10',
+            offset: 0x23,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'base_agi_agility',
+            label: 'Base AGI : Agility',
+            offset: 0x24,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'agi_growth_10',
+            label: 'AGI Growth * 10',
+            offset: 0x25,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'base_avd_avoidance',
+            label: 'Base AVD : Avoidance',
+            offset: 0x26,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'avd_growth_10',
+            label: 'AVD Growth * 10',
+            offset: 0x27,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'base_int_intelligence',
+            label: 'Base INT : Intelligence',
+            offset: 0x28,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'int_growth_10',
+            label: 'INT Growth * 10',
+            offset: 0x29,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'base_mnd_mind',
+            label: 'Base MND : Mind',
+            offset: 0x2a,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'mnd_growth_10',
+            label: 'MND Growth * 10',
+            offset: 0x2b,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'base_res_resistance',
+            label: 'Base RES : Resistance',
+            offset: 0x2c,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'res_growth_10',
+            label: 'RES Growth * 10',
+            offset: 0x2d,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'base_rt_recovery_time',
+            label: 'Base RT : Recovery Time',
+            offset: 0x2e,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'section_3',
+            label: '________________',
+            type: 'section'
+        },
+        {
+            id: 'dismiss_quote',
+            label: 'Dismiss Quote?',
+            offset: 0x2f,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'move_type_override',
+            label: 'Move Type Override',
+            offset: 0x30,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/move_type_template.json5'
+        },
+        {
+            id: 'unused_31',
+            label: '<unused> 31',
+            offset: 0x31,
+            size: 1,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'innate_melee_weapon',
+            label: 'Innate Melee Weapon',
+            offset: 0x32,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/armament_innate_melee_template.json5'
+        },
+        {
+            id: 'innate_ranged_weapon',
+            label: 'Innate Ranged Weapon',
+            offset: 0x34,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/armament_innate_ranged_template.json5'
+        },
+        {
+            id: 'death_agony',
+            label: 'Death Agony',
+            offset: 0x36,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'unused_37',
+            label: '<unused> 37',
+            offset: 0x37,
+            size: 1,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'class_set',
+            label: 'Class Set',
+            offset: 0x38,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/class_set.json5'
+        },
+        {
+            id: 'race',
+            label: 'Race',
+            offset: 0x39,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/race.json5'
+        },
+        {
+            id: 'sprite',
+            label: 'Sprite',
+            offset: 0x3a,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/sprite.json5'
+        },
+        {
+            id: 'animation_override',
+            label: 'Animation Override',
+            offset: 0x3c,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'palette',
+            label: 'Palette',
+            offset: 0x3d,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/palette.json5'
+        },
+        {
+            id: 'field_0x3e',
+            label: '?? 3E ID/Type ?',
+            offset: 0x3e,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'species',
+            label: 'Species?',
+            offset: 0x3f,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/species.json5'
+        },
+        {
+            id: 'portrait',
+            label: '____Portrait____________',
+            type: 'section'
+        },
+        {
+            id: 'single_portrait_or_palette_0_player',
+            label: 'Single Portrait or Palette 0 (Player)',
+            offset: 0x40,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/portrait.json5'
+        },
+        {
+            id: 'palette_1_portrait_bakram',
+            label: 'Palette 1 Portrait (Bakram)',
+            offset: 0x42,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/portrait.json5'
+        },
+        {
+            id: 'palette_2_portrait_galgastan',
+            label: 'Palette 2 Portrait (Galgastan)',
+            offset: 0x44,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/portrait.json5'
+        },
+        {
+            id: 'palette_3_portrait_undead',
+            label: 'Palette 3 Portrait (Undead)',
+            offset: 0x46,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/portrait.json5'
+        },
+        {
+            id: 'palette_4_portrait_liberation_army',
+            label: 'Palette 4 Portrait (Liberation Army)',
+            offset: 0x48,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/portrait.json5'
+        },
+        {
+            id: 'palette_5_portrait_outlaws',
+            label: 'Palette 5 Portrait (Outlaws)',
+            offset: 0x4a,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/portrait.json5'
+        },
+        {
+            id: 'palette_6_portrait_other',
+            label: 'Palette 6 Portrait (Other)',
+            offset: 0x4c,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/portrait.json5'
+        },
+        {
+            id: 'section_5',
+            label: '________________',
+            type: 'section'
+        },
+        {
+            id: 'field_0x4e',
+            label: '?? 4E ID/Type ?',
+            offset: 0x4e,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'unused_4f',
+            label: '<unused> 4F',
+            offset: 0x4f,
+            size: 1,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'field_0x50',
+            label: '?? 50 ID/Type ?',
+            offset: 0x50,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'damage_voice',
+            label: 'Damage Voice',
+            offset: 0x51,
+            size: 1,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/voice_damage.json5'
+        },
+        {
+            id: 'field_0x52',
+            label: '? 52 Flag ?',
+            offset: 0x52,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'limited_skills_type',
+            label: 'Limited Skills Type',
+            offset: 0x53,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_limit.json5'
+        }
+    ]
+}

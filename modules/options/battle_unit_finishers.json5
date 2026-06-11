@@ -1,0 +1,5 @@
+[
+    { value: 0x00, label: 'No' },
+    { value: 0x04, label: 'Yes, 1 Skill' },
+    { value: 0x08, label: 'Yes, 2 Skills' }
+]

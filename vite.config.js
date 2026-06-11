@@ -2,7 +2,6 @@ import { sveltekit } from '@sveltejs/kit/vite';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'vitest/config';
 
-// @ts-expect-error process is a nodejs global
 const host = process.env.TAURI_DEV_HOST;
 
 // https://vite.dev/config/
@@ -40,6 +39,14 @@ export default defineConfig(async () => ({
                     environment: 'node',
                     include: ['src/**/*.{test,spec}.{js,ts}'],
                     exclude: ['src/**/*.svelte.{test,spec}.{js,ts}']
+                }
+            },
+            {
+                extends: './vite.config.js',
+                test: {
+                    name: 'scripts',
+                    environment: 'node',
+                    include: ['scripts/**/*.{test,spec}.{js,mjs,ts}']
                 }
             }
         ]

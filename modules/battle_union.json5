@@ -1,0 +1,54 @@
+{
+    schema_version: 1,
+    id: 'battle_union',
+    label: 'Union',
+    notes: 'Tactics Ogre: Reborn - Union module for Nightmare Table Editor',
+
+    source: {
+        format: 'nightmare',
+        path: 'battle/Union.nmm',
+        title: 'Tactics Ogre: Reborn ==> battle_data_release / pack ==> Union'
+    },
+
+    files: ['battle/battle_data_release.dat'],
+
+    base_offset: 0x004a6340,
+    endian: 'little',
+
+    entry: {
+        header: true,
+        count: 21,
+        size: 4,
+        labels_file: 'entries/union.json5'
+    },
+
+    fields: [
+        {
+            id: 'name',
+            label: 'Name',
+            offset: 0x00,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/name_union.json5'
+        },
+        {
+            id: 'primary_palette',
+            label: 'Primary Palette',
+            offset: 0x02,
+            size: 1,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/palette.json5'
+        },
+        {
+            id: 'alternate_palette',
+            label: 'Alternate Palette',
+            offset: 0x03,
+            size: 1,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/palette.json5'
+        }
+    ]
+}

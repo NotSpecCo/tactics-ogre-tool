@@ -1,0 +1,7 @@
+[
+    { value: 0x00, label: 'Accuracy' },
+    { value: 0x01, label: 'If First, Accuracy' },
+    { value: 0x02, label: 'Chance %' },
+    { value: 0x03, label: 'If First, Chance %' },
+    { value: 0x04, label: 'If First, Succeed' }
+]

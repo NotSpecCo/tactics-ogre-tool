@@ -1,3 +1,4 @@
+import { buildEntryOptions, type EntryOption } from '$lib/entry-options';
 import type { FieldValue, Record as GameRecord, ModuleSummary } from '$lib/tauri';
 import * as tauri from '$lib/tauri';
 import { SvelteMap, SvelteSet } from 'svelte/reactivity';
@@ -23,6 +24,13 @@ class EditorStore {
         return session.modules.find((m) => m.id === this.selectedModuleId) ?? null;
     }
 
+    /** Selectable entries for the current module, labeled by value lookup. */
+    get entryOptions(): EntryOption[] {
+        const mod = this.selectedModule;
+        if (!mod) return [];
+        return buildEntryOptions(mod.entry_count, mod.entry_labels);
+    }
+
     async selectModule(moduleId: string): Promise<void> {
         this.selectedModuleId = moduleId;
         this.selectedRecordIndex = null;
@@ -40,7 +48,6 @@ class EditorStore {
         this.loadingRecord = true;
         try {
             const record = await tauri.getRecord(session.sessionId, this.selectedModuleId, index);
-            console.log('Loaded record:', record);
             this.selectedRecordIndex = index;
             this.currentRecord = record;
         } catch (e) {
@@ -50,25 +57,31 @@ class EditorStore {
         }
     }
 
-    async updateField(fieldName: string, value: FieldValue): Promise<void> {
+    async updateField(fieldId: string, value: FieldValue): Promise<void> {
         if (!session.sessionId || !this.selectedModuleId || this.selectedRecordIndex === null) return;
 
         try {
-            await tauri.setField(session.sessionId, this.selectedModuleId, this.selectedRecordIndex, fieldName, value);
-            if (this.currentRecord) {
-                const field = this.currentRecord.fields.find((f) => f.name === fieldName);
-                if (field) {
-                    field.value = value;
-                }
-            }
+            const record = await tauri.setField(
+                session.sessionId,
+                this.selectedModuleId,
+                this.selectedRecordIndex,
+                fieldId,
+                value
+            );
+            // Other fields may view the same bytes, so replace the whole
+            // record with the backend's re-read instead of patching locally.
+            this.currentRecord = record;
             const key = `${this.selectedModuleId}:${this.selectedRecordIndex}`;
             let set = this.allDirtyFields.get(key);
             if (!set) {
                 set = new SvelteSet<string>();
                 this.allDirtyFields.set(key, set);
             }
-            set.add(fieldName);
+            set.add(fieldId);
             session.markDirty();
+            // The write may have changed bytes a block header entry count
+            // reads, so refresh module summaries from the live payload.
+            await session.refreshModules();
         } catch (e) {
             session.showToast(String((e as any)?.message ?? e), 'error');
         }

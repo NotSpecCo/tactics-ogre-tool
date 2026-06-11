@@ -1,0 +1,995 @@
+{
+    schema_version: 1,
+    id: 'battle_class',
+    label: 'Class',
+    notes: 'Tactics Ogre: Reborn - Class module for Nightmare Table Editor',
+
+    source: {
+        format: 'nightmare',
+        path: 'battle/Class.nmm',
+        title: 'Tactics Ogre: Reborn ==> battle_data_release / pack ==> Class'
+    },
+
+    files: ['battle/battle_data_release.dat'],
+
+    base_offset: 0x003ba4a0,
+    endian: 'little',
+
+    entry: {
+        header: true,
+        count: 256,
+        size: 208,
+        labels_file: 'entries/class.json5'
+    },
+
+    fields: [
+        {
+            id: 'unused_00_01_padding',
+            label: '<unused> 00 - 01 Padding?',
+            offset: 0x00,
+            size: 2,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'bonus_hp_health_points',
+            label: 'Bonus HP : Health Points',
+            offset: 0x02,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'hp_growth_10',
+            label: 'HP Growth * 10',
+            notes: 'To allow for fractional numbers without using floating-point variables, these values are considered as * 10: 1 = 0.1, 10 = 1, 100 = 10, etc.',
+            offset: 0x04,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'hp',
+            label: '? HP...?',
+            notes: 'Not sure what these are.',
+            offset: 0x06,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'bonus_mp_magic_points',
+            label: 'Bonus MP : Magic Points',
+            offset: 0x08,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'mp_growth_10',
+            label: 'MP Growth * 10',
+            offset: 0x0a,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'mp',
+            label: '? MP...?',
+            offset: 0x0c,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'bonus_str_strength',
+            label: 'Bonus STR : Strength',
+            offset: 0x0e,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'str_growth_10',
+            label: 'STR Growth * 10',
+            offset: 0x10,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'str',
+            label: '? STR...?',
+            offset: 0x12,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'bonus_vit_vitality',
+            label: 'Bonus VIT : Vitality',
+            offset: 0x14,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'vit_growth_10',
+            label: 'VIT Growth * 10',
+            offset: 0x16,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'vit',
+            label: '? VIT...?',
+            offset: 0x18,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'bonus_dex_dexterity',
+            label: 'Bonus DEX : Dexterity',
+            offset: 0x1a,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'dex_growth_10',
+            label: 'DEX Growth * 10',
+            offset: 0x1c,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'dex',
+            label: '? DEX...?',
+            offset: 0x1e,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'bonus_agi_agility',
+            label: 'Bonus AGI : Agility',
+            offset: 0x20,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'agi_growth_10',
+            label: 'AGI Growth * 10',
+            offset: 0x22,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'agi',
+            label: '? AGI...?',
+            offset: 0x24,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'bonus_avd_avoidance',
+            label: 'Bonus AVD : Avoidance',
+            offset: 0x26,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'avd_growth_10',
+            label: 'AVD Growth * 10',
+            offset: 0x28,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'avd',
+            label: '? AVD...?',
+            offset: 0x2a,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'bonus_int_intelligence',
+            label: 'Bonus INT : Intelligence',
+            offset: 0x2c,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'int_growth_10',
+            label: 'INT Growth * 10',
+            offset: 0x2e,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'int',
+            label: '? INT...?',
+            offset: 0x30,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'bonus_mnd_mind',
+            label: 'Bonus MND : Mind',
+            offset: 0x32,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'mnd_growth_10',
+            label: 'MND Growth * 10',
+            offset: 0x34,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'mnd',
+            label: '? MND...?',
+            offset: 0x36,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'bonus_res_resistance',
+            label: 'Bonus RES : Resistance',
+            offset: 0x38,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'res_growth_10',
+            label: 'RES Growth * 10',
+            offset: 0x3a,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'res',
+            label: '? RES...?',
+            offset: 0x3c,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'base_luk_luck',
+            label: 'Base LUK : Luck',
+            offset: 0x3e,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'bonus_rt_recovery_time',
+            label: 'Bonus RT : Recovery Time',
+            offset: 0x40,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'unused_41',
+            label: '<unused> 41',
+            offset: 0x41,
+            size: 1,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'base_atk_attack',
+            label: 'Base ATK : Attack',
+            offset: 0x42,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'atk_growth_10',
+            label: 'ATK Growth ? * 10?',
+            offset: 0x44,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'base_def_defense',
+            label: 'Base DEF : Defense',
+            offset: 0x46,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'def_growth_10',
+            label: 'DEF Growth ? * 10?',
+            offset: 0x48,
+            size: 2,
+            type: 'uint'
+        },
+        {
+            id: 'innate_melee_weapon',
+            label: 'Innate Melee Weapon',
+            offset: 0x4a,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/armament_innate_melee.json5'
+        },
+        {
+            id: 'innate_ranged_weapon',
+            label: 'Innate Ranged Weapon',
+            offset: 0x4c,
+            size: 2,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/armament_innate_ranged.json5'
+        },
+        {
+            id: 'move_type',
+            label: 'Move Type',
+            offset: 0x4e,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/move_type.json5'
+        },
+        {
+            id: 'move_stride',
+            label: 'Move Stride',
+            offset: 0x4f,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/move_stride.json5'
+        },
+        {
+            id: 'class_role',
+            label: 'Class Role?',
+            offset: 0x50,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/class_role.json5'
+        },
+        {
+            id: 'effect_spell_set',
+            label: 'Effect (Spell) Set',
+            offset: 0x51,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/effect_set.json5'
+        },
+        {
+            id: 'unused_52',
+            label: '<unused> 52',
+            offset: 0x52,
+            size: 1,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'skill_set',
+            label: 'Skill Set',
+            offset: 0x53,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/skill_set.json5'
+        },
+        {
+            id: 'amphibious',
+            label: 'Amphibious',
+            offset: 0x54,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/amphibious.json5'
+        },
+        {
+            id: 'height_size',
+            label: 'Height/Size',
+            offset: 0x55,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'move_distance_1',
+            label: 'Move Distance + 1',
+            offset: 0x56,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'move_rt_per_step',
+            label: 'Move RT per Step',
+            offset: 0x57,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'flag',
+            label: '? Flag ?',
+            offset: 0x58,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'overwrite_female_sprite',
+            label: 'Overwrite (Female?) Sprite?',
+            offset: 0x59,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'flag_2',
+            label: '? Flag ?',
+            offset: 0x5a,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'flag_3',
+            label: '? Flag ?',
+            offset: 0x5b,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'flag_4',
+            label: '? Flag ?',
+            offset: 0x5c,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'recruitable',
+            label: 'Recruitable?',
+            offset: 0x5d,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'flag_5',
+            label: '? Flag ?',
+            offset: 0x5e,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/no_yes.json5'
+        },
+        {
+            id: 'unused_5f_flag',
+            label: '<unused> 5F Flag',
+            offset: 0x5f,
+            size: 1,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'armament_equipment_set',
+            label: 'Armament (Equipment) Set',
+            offset: 0x60,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/armament_set.json5'
+        },
+        {
+            id: 'unused_61_67',
+            label: '<unused> 61 - 67',
+            offset: 0x61,
+            size: 7,
+            type: 'bytes'
+        },
+        {
+            id: 'clan_portrait',
+            label: '____Clan Portrait____________',
+            type: 'section'
+        },
+        {
+            id: 'male_wallister',
+            label: 'Male Wallister',
+            offset: 0x68,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/portrait.json5'
+        },
+        {
+            id: 'male_galgastan',
+            label: 'Male Galgastan',
+            offset: 0x6a,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/portrait.json5'
+        },
+        {
+            id: 'male_bakram',
+            label: 'Male Bakram',
+            offset: 0x6c,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/portrait.json5'
+        },
+        {
+            id: 'male_xenobia',
+            label: 'Male Xenobia',
+            offset: 0x6e,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/portrait.json5'
+        },
+        {
+            id: 'male_lodis',
+            label: 'Male Lodis',
+            offset: 0x70,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/portrait.json5'
+        },
+        {
+            id: 'male_bolmocca',
+            label: 'Male Bolmocca',
+            offset: 0x72,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/portrait.json5'
+        },
+        {
+            id: 'male_balboede',
+            label: 'Male Balboede',
+            offset: 0x74,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/portrait.json5'
+        },
+        {
+            id: 'female_wallister',
+            label: 'Female Wallister',
+            offset: 0x76,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/portrait.json5'
+        },
+        {
+            id: 'female_galgastan',
+            label: 'Female Galgastan',
+            offset: 0x78,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/portrait.json5'
+        },
+        {
+            id: 'female_bakram',
+            label: 'Female Bakram',
+            offset: 0x7a,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/portrait.json5'
+        },
+        {
+            id: 'female_xenobia',
+            label: 'Female Xenobia',
+            offset: 0x7c,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/portrait.json5'
+        },
+        {
+            id: 'female_lodis',
+            label: 'Female Lodis',
+            offset: 0x7e,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/portrait.json5'
+        },
+        {
+            id: 'female_bolmocca',
+            label: 'Female Bolmocca',
+            offset: 0x80,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/portrait.json5'
+        },
+        {
+            id: 'female_balboede',
+            label: 'Female Balboede',
+            offset: 0x82,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/portrait.json5'
+        },
+        {
+            id: 'unused_84_87',
+            label: '<unused> 84 - 87',
+            offset: 0x84,
+            size: 4,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'include_in_class_set',
+            label: 'Include in Class Set',
+            offset: 0x88,
+            size: 8,
+            type: 'bytes'
+        },
+        {
+            id: 'class_set_reference',
+            label: 'Class Set Reference',
+            offset: 0x00,
+            size: 1,
+            type: 'dropdown',
+            display: 'hex',
+            options_file: 'options/class_set_ref.json5'
+        },
+        {
+            id: 'sprite_male',
+            label: 'Sprite, Male',
+            offset: 0x90,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/sprite.json5'
+        },
+        {
+            id: 'sprite_female',
+            label: 'Sprite, Female',
+            offset: 0x92,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/sprite.json5'
+        },
+        {
+            id: 'palette',
+            label: 'Palette',
+            offset: 0x94,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/palette.json5'
+        },
+        {
+            id: 'field_0x95',
+            label: '??',
+            offset: 0x95,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'field_0x96',
+            label: '??',
+            offset: 0x96,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'field_0x97',
+            label: '??',
+            offset: 0x97,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'class_list_icon',
+            label: '____Class List Icon__________',
+            type: 'section'
+        },
+        {
+            id: 'human_male',
+            label: 'Human Male',
+            notes: 'The Class List was all but removed in Reborn, so these probably don\'t matter anymore as you never get to see them.',
+            offset: 0x98,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/class_icon.json5'
+        },
+        {
+            id: 'human_female',
+            label: 'Human Female',
+            offset: 0x99,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/class_icon.json5'
+        },
+        {
+            id: 'winged',
+            label: 'Winged',
+            offset: 0x9a,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/class_icon.json5'
+        },
+        {
+            id: 'lizardman',
+            label: 'Lizardman',
+            offset: 0x9b,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/class_icon.json5'
+        },
+        {
+            id: 'lamia',
+            label: 'Lamia',
+            offset: 0x9c,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/class_icon.json5'
+        },
+        {
+            id: 'orc',
+            label: 'Orc',
+            offset: 0x9d,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/class_icon.json5'
+        },
+        {
+            id: 'skeleton',
+            label: 'Skeleton',
+            offset: 0x9e,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/class_icon.json5'
+        },
+        {
+            id: 'ghost',
+            label: 'Ghost',
+            offset: 0x9f,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/class_icon.json5'
+        },
+        {
+            id: 'faerie',
+            label: 'Faerie',
+            offset: 0xa0,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/class_icon.json5'
+        },
+        {
+            id: 'gremlin',
+            label: 'Gremlin',
+            offset: 0xa1,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/class_icon.json5'
+        },
+        {
+            id: 'pumpkinhead',
+            label: 'Pumpkinhead',
+            offset: 0xa2,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/class_icon.json5'
+        },
+        {
+            id: 'dragon',
+            label: 'Dragon',
+            offset: 0xa3,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/class_icon.json5'
+        },
+        {
+            id: 'golem',
+            label: 'Golem',
+            offset: 0xa4,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/class_icon.json5'
+        },
+        {
+            id: 'unused_invalid_race',
+            label: '<unused> (invalid race)',
+            offset: 0xa4,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'unused_invalid_race_2',
+            label: '<unused> (invalid race)',
+            offset: 0xa6,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'unused_invalid_race_3',
+            label: '<unused> (invalid race)',
+            offset: 0xa7,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'class_list_sort_order',
+            label: 'Class List Sort Order',
+            offset: 0xa8,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'unused_a9',
+            label: '<unused> A9',
+            offset: 0xa9,
+            size: 1,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'element_affinity',
+            label: '____Element Affinity_________',
+            type: 'section'
+        },
+        {
+            id: 'air',
+            label: 'Air',
+            offset: 0xaa,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/class_element.json5'
+        },
+        {
+            id: 'earth',
+            label: 'Earth',
+            offset: 0xab,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/class_element.json5'
+        },
+        {
+            id: 'lightning',
+            label: 'Lightning',
+            offset: 0xac,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/class_element.json5'
+        },
+        {
+            id: 'water',
+            label: 'Water',
+            offset: 0xad,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/class_element.json5'
+        },
+        {
+            id: 'fire',
+            label: 'Fire',
+            offset: 0xae,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/class_element.json5'
+        },
+        {
+            id: 'ice',
+            label: 'Ice',
+            offset: 0xaf,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/class_element.json5'
+        },
+        {
+            id: 'light',
+            label: 'Light',
+            offset: 0xb0,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/class_element.json5'
+        },
+        {
+            id: 'dark',
+            label: 'Dark',
+            offset: 0xb1,
+            size: 1,
+            type: 'dropdown',
+            options_file: 'options/class_element.json5'
+        },
+        {
+            id: 'name',
+            label: 'Name?',
+            offset: 0xb2,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/name_class.json5'
+        },
+        {
+            id: 'description',
+            label: 'Description?',
+            offset: 0xb4,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/name_class.json5'
+        },
+        {
+            id: 'flag_6',
+            label: '? Flag ?',
+            offset: 0xb6,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'unused_b7',
+            label: '<unused> B7',
+            offset: 0xb7,
+            size: 1,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'field_0xb8',
+            label: '??',
+            offset: 0xb8,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'unused_b9_bf',
+            label: '<unused> B9 - BF',
+            offset: 0xb9,
+            size: 7,
+            type: 'bytes'
+        },
+        {
+            id: 'flag_7',
+            label: '? Flag ?',
+            offset: 0xc0,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'flag_8',
+            label: '? Flag ?',
+            offset: 0xc1,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'flag_9',
+            label: '? Flag ?',
+            offset: 0xc2,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'flag_10',
+            label: '? Flag ?',
+            offset: 0xc3,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'flag_11',
+            label: '?? Flag ?',
+            offset: 0xc4,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'flag_12',
+            label: '? Flag ?',
+            offset: 0xc5,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'flag_13',
+            label: '?? Flag ?',
+            offset: 0xc6,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'unused_c7_flag',
+            label: '<unused> C7 Flag?',
+            offset: 0xc7,
+            size: 1,
+            type: 'uint',
+            display: 'hex'
+        },
+        {
+            id: 'flag_14',
+            label: '? Flag ?',
+            offset: 0xc8,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'flag_15',
+            label: '? Flag ?',
+            offset: 0xc9,
+            size: 1,
+            type: 'uint'
+        },
+        {
+            id: 'unused_ca_cf',
+            label: '<unused> CA - CF',
+            offset: 0xca,
+            size: 6,
+            type: 'bytes'
+        }
+    ]
+}

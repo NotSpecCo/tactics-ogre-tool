@@ -1,0 +1,563 @@
+{
+    schema_version: 1,
+    id: 'battle_health_damage_configuration',
+    label: 'Health Damage Configuration',
+    notes: 'Tactics Ogre: Reborn - Health Damage Configuration module for Nightmare Table Editor\nThis edits the top row in the Health Damage table which contains configuration for the other rows.\nWhile it is the same size/width as other rows, only fields that have configuration are present.\nIf you make any changes here, you should edit HealthDamage.nmm to adjust field names and visibility.',
+
+    source: {
+        format: 'nightmare',
+        path: 'battle/HealthDamageConfiguration.nmm',
+        title: 'Tactics Ogre: Reborn ==> battle_data_release / pack ==> Health Damage Configuration'
+    },
+
+    files: ['battle/battle_data_release.dat'],
+
+    base_offset: 0x00418c30,
+    endian: 'little',
+
+    entry: {
+        count: 1,
+        size: 260,
+        labels_file: 'entries/configuration.json5'
+    },
+
+    fields: [
+        {
+            id: 'base_skills_support_weapon',
+            label: '====Base Skills: Support, Weapon',
+            type: 'section'
+        },
+        {
+            id: 'field_0x18',
+            label: '1',
+            offset: 0x18,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'field_0x1a',
+            label: '2',
+            offset: 0x1a,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'field_0x1c',
+            label: '3',
+            offset: 0x1c,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'field_0x1e',
+            label: '4',
+            offset: 0x1e,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'field_0x20',
+            label: '5',
+            offset: 0x20,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'field_0x22',
+            label: '6',
+            offset: 0x22,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'field_0x24',
+            label: '7',
+            offset: 0x24,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'field_0x26',
+            label: '8',
+            offset: 0x26,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'field_0x28',
+            label: '9',
+            offset: 0x28,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'field_0x2a',
+            label: '10',
+            offset: 0x2a,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'field_0x2c',
+            label: '11',
+            offset: 0x2c,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'field_0x2e',
+            label: '12',
+            offset: 0x2e,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'field_0x30',
+            label: '13',
+            offset: 0x30,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'field_0x32',
+            label: '14',
+            offset: 0x32,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'field_0x34',
+            label: '15',
+            offset: 0x34,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'field_0x36',
+            label: '16',
+            offset: 0x36,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'field_0x38',
+            label: '17',
+            offset: 0x38,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'field_0x3a',
+            label: '18',
+            offset: 0x3a,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'field_0x3c',
+            label: '19',
+            offset: 0x3c,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'field_0x3e',
+            label: '20',
+            offset: 0x3e,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'field_0x40',
+            label: '21',
+            offset: 0x40,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'field_0x42',
+            label: '22',
+            offset: 0x42,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'bonus_skills_support_stats',
+            label: '====Bonus Skills: Support, Stats',
+            type: 'section'
+        },
+        {
+            id: 'field_0x7c',
+            label: '1',
+            offset: 0x7c,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'field_0x7e',
+            label: '2',
+            offset: 0x7e,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'field_0x80',
+            label: '3',
+            offset: 0x80,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'field_0x82',
+            label: '4',
+            offset: 0x82,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'field_0x84',
+            label: '5',
+            offset: 0x84,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'field_0x86',
+            label: '6',
+            offset: 0x86,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'field_0x88',
+            label: '7',
+            offset: 0x88,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'field_0x8a',
+            label: '8',
+            offset: 0x8a,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'field_0x8c',
+            label: '9',
+            offset: 0x8c,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'field_0x8e',
+            label: '10',
+            offset: 0x8e,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'field_0x90',
+            label: '11',
+            offset: 0x90,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'field_0x92',
+            label: '12',
+            offset: 0x92,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'field_0x94',
+            label: '13',
+            offset: 0x94,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'field_0x96',
+            label: '14',
+            offset: 0x96,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'field_0x98',
+            label: '15',
+            offset: 0x98,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'field_0x9a',
+            label: '16',
+            offset: 0x9a,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_skill.json5'
+        },
+        {
+            id: 'bonus_status',
+            label: '====Bonus Status',
+            type: 'section'
+        },
+        {
+            id: 'defense',
+            label: 'Defense',
+            offset: 0x44,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_status.json5'
+        },
+        {
+            id: 'field_0x4a',
+            label: '1',
+            offset: 0x4a,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_status.json5'
+        },
+        {
+            id: 'field_0x4c',
+            label: '2',
+            offset: 0x4c,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_status.json5'
+        },
+        {
+            id: 'field_0x4e',
+            label: '3',
+            offset: 0x4e,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_status.json5'
+        },
+        {
+            id: 'field_0x50',
+            label: '4',
+            offset: 0x50,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_status.json5'
+        },
+        {
+            id: 'field_0x52',
+            label: '5',
+            offset: 0x52,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_status.json5'
+        },
+        {
+            id: 'field_0x54',
+            label: '6',
+            offset: 0x54,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_status.json5'
+        },
+        {
+            id: 'field_0x56',
+            label: '7',
+            offset: 0x56,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_status.json5'
+        },
+        {
+            id: 'field_0x58',
+            label: '8',
+            offset: 0x58,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_status.json5'
+        },
+        {
+            id: 'field_0x5a',
+            label: '9',
+            offset: 0x5a,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_status.json5'
+        },
+        {
+            id: 'bonus_status_attuned',
+            label: '====Bonus Status: Attuned',
+            type: 'section'
+        },
+        {
+            id: 'field_0x5c',
+            label: '1',
+            offset: 0x5c,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_status.json5'
+        },
+        {
+            id: 'field_0x5e',
+            label: '2',
+            offset: 0x5e,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_status.json5'
+        },
+        {
+            id: 'field_0x60',
+            label: '3',
+            offset: 0x60,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_status.json5'
+        },
+        {
+            id: 'field_0x62',
+            label: '4',
+            offset: 0x62,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_status.json5'
+        },
+        {
+            id: 'field_0x64',
+            label: '5',
+            offset: 0x64,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_status.json5'
+        },
+        {
+            id: 'field_0x66',
+            label: '6',
+            offset: 0x66,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_status.json5'
+        },
+        {
+            id: 'field_0x68',
+            label: '7',
+            offset: 0x68,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_status.json5'
+        },
+        {
+            id: 'field_0x6a',
+            label: '8',
+            offset: 0x6a,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_status.json5'
+        },
+        {
+            id: 'bonus_status_averse',
+            label: '====Bonus Status: Averse',
+            type: 'section'
+        },
+        {
+            id: 'field_0x6c',
+            label: '1',
+            offset: 0x6c,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_status.json5'
+        },
+        {
+            id: 'field_0x6e',
+            label: '2',
+            offset: 0x6e,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_status.json5'
+        },
+        {
+            id: 'field_0x70',
+            label: '3',
+            offset: 0x70,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_status.json5'
+        },
+        {
+            id: 'field_0x72',
+            label: '4',
+            offset: 0x72,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_status.json5'
+        },
+        {
+            id: 'field_0x74',
+            label: '5',
+            offset: 0x74,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_status.json5'
+        },
+        {
+            id: 'field_0x76',
+            label: '6',
+            offset: 0x76,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_status.json5'
+        },
+        {
+            id: 'field_0x78',
+            label: '7',
+            offset: 0x78,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_status.json5'
+        },
+        {
+            id: 'field_0x7a',
+            label: '8',
+            offset: 0x7a,
+            size: 2,
+            type: 'dropdown',
+            options_file: 'options/configuration_status.json5'
+        }
+    ]
+}
