@@ -47,12 +47,6 @@ const SPEC_EXAMPLE: &str = r#"
     label: 'Armament',
     notes: 'Weapon and armor stats.',
 
-    source: {
-        format: 'nightmare',
-        path: 'battle/Armament.nmm',
-        title: 'Tactics Ogre: Reborn ==> battle_data_release / pack ==> Armament (Equipment)'
-    },
-
     files: ['battle/battle_data_release.dat'],
 
     base_offset: 0x00393f20,
@@ -124,10 +118,7 @@ fn spec_example_module_parses() {
     assert_eq!(module.base_offset, 0x0039_3f20);
     assert_eq!(module.endian, Endian::Little);
 
-    let source = module.source.expect("source should be present");
-    assert_eq!(source.format.as_deref(), Some("nightmare"));
-    assert_eq!(source.path.as_deref(), Some("battle/Armament.nmm"));
-    assert!(source.title.unwrap().contains("Armament (Equipment)"));
+    assert!(module.source.is_none());
 
     assert_eq!(
         module.entry.count,
@@ -174,7 +165,7 @@ fn spec_example_module_parses() {
 
 #[test]
 fn spec_header_driven_glob_example_parses() {
-    // The BattleUnit example from the spec's "Battle Unit Tables" section:
+    // The BattleUnit example from the spec's "Example: Battle Unit Tables" section:
     // header-driven with no expected count.
     let module = parse_ok(
         "{
@@ -249,6 +240,24 @@ fn notes_parse_on_fields_and_sections() {
 #[test]
 fn source_is_optional() {
     assert_eq!(parse_ok(ENTRY, FIELD_UINT).source, None);
+}
+
+#[test]
+fn source_parses_when_present() {
+    let text = module_text(ENTRY, FIELD_UINT).replace(
+        "entry:",
+        "source: {
+            format: 'nightmare',
+            path: 'battle/Armament.nmm',
+            title: 'Tactics Ogre: Reborn ==> battle_data_release / pack ==> Armament (Equipment)'
+        }, entry:",
+    );
+    let module = parse_module(&text).expect("module with source should parse");
+
+    let source = module.source.expect("source should be present");
+    assert_eq!(source.format.as_deref(), Some("nightmare"));
+    assert_eq!(source.path.as_deref(), Some("battle/Armament.nmm"));
+    assert!(source.title.unwrap().contains("Armament (Equipment)"));
 }
 
 #[test]
